@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+   web4umap:
+      build:
+        context: ./umap-web
+        args: 
+          IMAGE_VERSION: ${IMAGE_VERSION}
+        target: PRODUCTION
+      image: ${DOCKER_REGISTRY:-docker}/umap/web4umap:${IMAGE_VERSION:-latest}
+      container_name: web4umap
+      # env_file:
+      #   - .env
+      ports:
+        - 3001:3000
+      restart: on-failure
