@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="Overpass API 0.7.60.6 e2dc3e5b">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2023-06-14T13:21:35Z"/>
+
+  <bounds minlat="10.7314800" minlon="106.6765500" maxlat="10.7326400" maxlon="106.6782300"/>
+
+  <node id="366423043" lat="10.7315598" lon="106.6750496" version="5" timestamp="2018-07-12T01:22:30Z" changeset="60631060" uid="7446620" user="kawle"/>
+  <node id="2156215280" lat="10.7307521" lon="106.6756618" version="5" timestamp="2018-07-12T01:22:30Z" changeset="60631060" uid="7446620" user="kawle"/>
+  <node id="2156215287" lat="10.7310384" lon="106.6762531" version="1" timestamp="2013-02-15T16:14:31Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215291" lat="10.7312208" lon="106.6766978" version="1" timestamp="2013-02-15T16:14:31Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215345" lat="10.7314177" lon="106.6772427" version="1" timestamp="2013-02-15T16:14:32Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215372" lat="10.7322435" lon="106.6767833" version="1" timestamp="2013-02-15T16:14:32Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215373" lat="10.7323437" lon="106.6797075" version="1" timestamp="2013-02-15T16:14:32Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215400" lat="10.7329589" lon="106.6786940" version="1" timestamp="2013-02-15T16:14:32Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="2156215703" lat="10.7333991" lon="106.6798251" version="1" timestamp="2013-02-15T16:14:36Z" changeset="15041860" uid="509465" user="Dymo12"/>
+  <node id="3232854937" lat="10.7319905" lon="106.6787674" version="1" timestamp="2014-12-13T10:24:35Z" changeset="27439451" uid="1377843" user="528491"/>
+  <node id="5750448280" lat="10.7309957" lon="106.6779536" version="1" timestamp="2018-07-10T01:20:05Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448298" lat="10.7320946" lon="106.6790444" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448300" lat="10.7328606" lon="106.6784315" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448308" lat="10.7322013" lon="106.6793286" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448311" lat="10.7314085" lon="106.6772172" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448313" lat="10.7310551" lon="106.6779381" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750448314" lat="10.7315787" lon="106.6776712" version="1" timestamp="2018-07-10T01:20:06Z" changeset="60556382" uid="7795534" user="marupally"/>
+  <node id="5750601685" lat="10.7312083" lon="106.6766674" version="1" timestamp="2018-07-10T03:22:42Z" changeset="60557821" uid="7795534" user="marupally"/>
+  <node id="5753333624" lat="10.7321751" lon="106.6792598" version="2" timestamp="2021-01-27T05:10:49Z" changeset="98197941" uid="11555426" user="pri_ya123"/>
+  <node id="5753333625" lat="10.7330362" lon="106.6788927" version="1" timestamp="2018-07-11T07:37:24Z" changeset="60600751" uid="7795534" user="marupally"/>
+  <node id="10548331823" lat="10.7310005" lon="106.6761749" version="1" timestamp="2023-01-13T07:57:17Z" changeset="131217770" uid="17344224" user="GrabVN_QuanTan"/>
+  <node id="10768119935" lat="10.7309411" lon="106.6779700" version="1" timestamp="2023-03-28T08:34:38Z" changeset="134209238" uid="15740602" user="GrabVN_QThoai">
+    <tag k="access" v="private"/>
+    <tag k="barrier" v="gate"/>
+  </node>
+  <way id="205650763" version="9" timestamp="2023-01-31T04:22:25Z" changeset="131904236" uid="3323343" user="saigongiadinh1698">
+    <nd ref="2156215373"/>
+    <nd ref="5750448308"/>
+    <nd ref="5753333624"/>
+    <nd ref="5750448298"/>
+    <nd ref="3232854937"/>
+    <nd ref="5750448314"/>
+    <nd ref="2156215345"/>
+    <nd ref="5750448311"/>
+    <nd ref="2156215291"/>
+    <nd ref="5750601685"/>
+    <nd ref="2156215287"/>
+    <nd ref="10548331823"/>
+    <nd ref="2156215280"/>
+    <tag k="highway" v="residential"/>
+    <tag k="name" v="Hẻm C7D Phạm Hùng"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="606518858" version="4" timestamp="2023-03-28T08:34:38Z" changeset="134209238" uid="15740602" user="GrabVN_QThoai">
+    <nd ref="5750448314"/>
+    <nd ref="5750448313"/>
+    <nd ref="5750448280"/>
+    <nd ref="10768119935"/>
+    <tag k="highway" v="residential"/>
+  </way>
+  <way id="606518861" version="7" timestamp="2023-03-28T08:46:36Z" changeset="134209763" uid="15740602" user="GrabVN_QThoai">
+    <nd ref="366423043"/>
+    <nd ref="2156215372"/>
+    <nd ref="5750448300"/>
+    <nd ref="2156215400"/>
+    <nd ref="5753333625"/>
+    <nd ref="2156215703"/>
+    <tag k="highway" v="residential"/>
+    <tag k="name" v="Hẻm C7C Phạm Hùng"/>
+  </way>
+
+</osm>
