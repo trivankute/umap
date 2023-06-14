@@ -41,7 +41,11 @@ jobs:
           node-version: 16
           cache: 'npm'
           cache-dependency-path: 'umap-web/package-lock.json'
-      
+    
+      - name: npm ci
+        working-directory: umap-web
+        run: ci
+        
       - name: npm run build
         working-directory: umap-web
         run: npm run build --if-present
