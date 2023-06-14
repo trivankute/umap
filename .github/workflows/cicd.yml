@@ -34,4 +34,12 @@ jobs:
       - name: List files after using working-directory
         run: |
             ls .
+
+      - name: Npm run build ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - run: npm run build --if-present
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
