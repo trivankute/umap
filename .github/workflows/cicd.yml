@@ -7,9 +7,9 @@ on:
 jobs:
   Explore-GitHub-Actions:
     runs-on: [self-hosted, some-label] #ubuntu-18.04
-    defaults:
-      run:
-        working-directory: umap-web
+    # defaults:
+    #   run:
+    #     working-directory: umap-web
 
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -26,4 +26,8 @@ jobs:
         run: |
           ls ${{ github.workspace }}
 
+      - name: List files in umap-web
+        working-directory: umap-web
+        run: |
+            ls .
       - run: echo "🍏 This job's status is ${{ job.status }}."
