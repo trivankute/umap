@@ -30,4 +30,8 @@ jobs:
         working-directory: umap-web
         run: |
             ls .
+
+      - name: List files after using working-directory
+        run: |
+            ls .
       - run: echo "🍏 This job's status is ${{ job.status }}."
