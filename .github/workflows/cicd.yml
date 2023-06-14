@@ -2,15 +2,15 @@ name: Test GitHub Actions
 # on: [push]
 on:
   push:
-    branches: [cicd/test-actions]
+    branches: [cicd/*]
 
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-18.04
+    runs-on: [self-hosted, some-label] #ubuntu-18.04
     defaults:
       run:
         working-directory: umap-web
-        
+
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
