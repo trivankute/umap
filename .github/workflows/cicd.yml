@@ -3,7 +3,8 @@ name: Test GitHub Actions
 on:
   push:
     branches: [cicd/*]
-
+    tags:        
+      - '*'
 env:
   DAY_OF_WEEK: Monday
   env_var1: ${{ vars.UMAP_DOMAIN }}
