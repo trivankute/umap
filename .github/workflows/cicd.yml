@@ -43,20 +43,20 @@ jobs:
         run: |
             ls .
 
-      - name: Setup node  ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-          cache-dependency-path: 'umap-web/package-lock.json'
+      # - name: Setup node  ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 16
+      #     cache: 'npm'
+      #     cache-dependency-path: 'umap-web/package-lock.json'
     
-      - name: npm ci
-        working-directory: umap-web
-        run: npm ci
+      # - name: npm ci
+      #   working-directory: umap-web
+      #   run: npm ci
 
-      - name: npm run build
-        working-directory: umap-web
-        run: npm run build 
+      # - name: npm run build
+      #   working-directory: umap-web
+      #   run: npm run build 
 
       - name: Login Docker Hub
         uses: docker/login-action@v2
