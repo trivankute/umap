@@ -101,7 +101,9 @@ jobs:
           username: ${{ secrets.UMAP_SSH_USER }}
           key: ${{ secrets.UMAP_SSH_PRIVATE_KEY }}
           script: |
-             ls -la
+            cd ${{ secrets.UMAP_DEPLOY_FOLDER }}
+            ls -la
+            docker-compose up -d --pull --no-deps web4umap
       #      ./deploy.sh
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
