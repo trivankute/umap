@@ -9,7 +9,6 @@ services:
       #- /var/run/docker.sock:/var/run/docker.sock
       #windows
       - //var/run/docker.sock:/var/run/docker.sock
-      #- /usr/local/bin/docker:/usr/bin/docker
 
     env_file:
       - .env
@@ -21,13 +20,9 @@ services:
       EPHEMERAL: 1
       #ACCESS_TOKEN: __GITHUB_ACCESS_TOKEN__ # setting in .env file
 
-
     deploy:
       replicas: 2
       resources:
         limits:
           cpus: '1'
           memory: 1G
-        # reservations:
-        #   cpus: '0.2'
-        #   memory: 256M
