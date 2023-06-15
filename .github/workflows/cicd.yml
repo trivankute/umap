@@ -74,7 +74,6 @@ jobs:
         id: docker_build
         with:
           context: ./umap-web
-          file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:test
