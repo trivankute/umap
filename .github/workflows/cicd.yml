@@ -16,7 +16,7 @@ jobs:
     #     working-directory: umap-web
     environment: UMAP_DEV
     steps:
-      - run: echo "day of week $DAY_OF_WEEK" # thay the khi su dung
+      - run: echo "day of week $DAY_OF_WEEK ${{github.run_number}}" # thay the khi su dung
       - run: echo "day of week ${{ env.DAY_OF_WEEK }}" # duoc thay the truoc khi chay
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -78,7 +78,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: | 
-            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:test
+            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}
             ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:latest
           provenance: false
 
