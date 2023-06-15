@@ -4,17 +4,25 @@ on:
   push:
     branches: [cicd/*]
 
+env:
+  DAY_OF_WEEK: Monday
+  env_var1: ${{ vars.UMAP_DOMAIN }}
+  env_var2: ${{ secrets.DOCKER_REGISTRY }}
 jobs:
   Explore-GitHub-Actions:
     runs-on: [self-hosted, some-label] #ubuntu-18.04
     # defaults:
     #   run:
     #     working-directory: umap-web
-
+    environment: UMAP_DEV
     steps:
+      - run: echo "day of week $DAY_OF_WEEK"
+      - run: echo "day of week ${{ env.DAY_OF_WEEK }}"
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo " Environment UMAP_DOMAIN ${{ env.env_var1 }} - ${{ vars.UMAP_DOMAIN }}"
+      - run: echo " Environment DOCKER_REGISTRY ${{ env.env_var2 }} - ${{ secrets.DOCKER_REGISTRY }}"
 
       - name: Check out repository code
         uses: actions/checkout@v3
