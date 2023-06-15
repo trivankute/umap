@@ -1,15 +1,46 @@
-name: GitHub Actions Demo
-on: [push]
+name: Test GitHub Actions
+# on: [push]
+on:
+  push:
+    branches: [cicd/*]
+    tags:        
+      - '*'
+env:
+  DAY_OF_WEEK: Monday
+  env_var1: ${{ vars.UMAP_DOMAIN }}
+  env_var2: ${{ secrets.DOCKER_REGISTRY }}
 jobs:
   Explore-GitHub-Actions:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, some-label] #ubuntu-18.04
+    # defaults:
+    #   run:
+    #     working-directory: umap-web
+    environment: UMAP_DEV
     steps:
+      - run: echo "day of week $DAY_OF_WEEK ${{github.run_number}}" # thay the khi su dung
+      - run: echo "day of week ${{ env.DAY_OF_WEEK }}" # duoc thay the truoc khi chay
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo " Environment UMAP_DOMAIN ${{ env.env_var1 }} - ${{ vars.UMAP_DOMAIN }}"
+      - run: echo " Environment DOCKER_REGISTRY ${{ env.env_var2 }} - ${{ secrets.DOCKER_REGISTRY }}"
+      
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v2
+        with:
+          prefix: "sha-"
+
+      - run: |
+          echo "commit-short ${{ steps.commit.outputs.short }}"
+          echo "commit-hash ${{ steps.commit.outputs.hash }}"
+
+      - name: Show Branch name
+        run: |
+          echo ${{github.ref_name}} ${{github.ref_type}}
+
 
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
@@ -17,5 +48,72 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-          
+
+      - name: List files in umap-web
+        working-directory: umap-web
+        run: |
+            ls .
+
+      - name: List files after using working-directory
+        run: |
+            ls .
+
+      # - name: Setup node  ${{ matrix.node-version }}
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 16
+      #     cache: 'npm'
+      #     cache-dependency-path: 'umap-web/package-lock.json'
+    
+      # - name: npm ci
+      #   working-directory: umap-web
+      #   run: npm ci
+
+      # - name: npm run build
+      #   working-directory: umap-web
+      #   run: npm run build 
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASS }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        id: buildx
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        id: docker_build
+        with:
+          context: ./umap-web
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/amd64
+          push: true
+          tags: | 
+            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}-${{steps.commit.outputs.short}}
+            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:latest
+          provenance: false
+
+      - name: Verify
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.UMAP_SSH_HOST }}
+          port: ${{ secrets.UMAP_SSH_PORT }}
+          username: ${{ secrets.UMAP_SSH_USER }}
+          key: ${{ secrets.UMAP_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            whoami
+            cd ${{ secrets.UMAP_DEPLOY_FOLDER }}
+            ls -la
+            docker-compose pull web4umap
+            docker-compose up -d  --no-deps web4umap
+      #      ./deploy.sh #chu ý file deploy.sh nay o tren remote server
+
       - run: echo "🍏 This job's status is ${{ job.status }}."
