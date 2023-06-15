@@ -74,33 +74,34 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASS }}
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        id: buildx
+      # - name: Setup Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
+      #   id: buildx
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        id: docker_build
-        with:
-          context: ./umap-web
-          builder: ${{ steps.buildx.outputs.name }}
-          platforms: linux/amd64
-          push: true
-          tags: | 
-            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}-${{steps.commit.outputs.short}}
-            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:latest
-          provenance: false
-
-      - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }}
-
-      # - name: SSH deploy
-      #   uses: appleboy/ssh-action@master
+      # - name: Build and Push Docker Image
+      #   uses: docker/build-push-action@v4
+      #   id: docker_build
       #   with:
-      #     host: ${{ secrets.UMAP_SSH_HOST }}
-      #     username: ${{ secrets.UMAP_SSH_USER }}
-      #     key: ${{ secrets.UMAP_SSH_PRIVATE_KEY }}
-      #     script: |
+      #     context: ./umap-web
+      #     builder: ${{ steps.buildx.outputs.name }}
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: | 
+      #       ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}-${{steps.commit.outputs.short}}
+      #       ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:latest
+      #     provenance: false
+
+      # - name: Verify
+      #   run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.UMAP_SSH_HOST }}
+          username: ${{ secrets.UMAP_SSH_USER }}
+          key: ${{ secrets.UMAP_SSH_PRIVATE_KEY }}
+          script: |
+             ls -la
       #      ./deploy.sh
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
