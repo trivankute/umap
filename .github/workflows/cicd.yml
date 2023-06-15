@@ -103,7 +103,8 @@ jobs:
           script: |
             cd ${{ secrets.UMAP_DEPLOY_FOLDER }}
             ls -la
-            docker-compose up -d --pull --no-deps web4umap
-      #      ./deploy.sh
+            docker-compose pull web4umap
+            docker-compose up -d  --no-deps web4umap
+      #      ./deploy.sh #chu ý file deploy.sh nay o tren remote server
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
