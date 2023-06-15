@@ -23,6 +23,15 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
       - run: echo " Environment UMAP_DOMAIN ${{ env.env_var1 }} - ${{ vars.UMAP_DOMAIN }}"
       - run: echo " Environment DOCKER_REGISTRY ${{ env.env_var2 }} - ${{ secrets.DOCKER_REGISTRY }}"
+      
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v2
+        with:
+          prefix: "sha-"
+
+      - run: |
+          echo "commit-short ${{ steps.commit.outputs.short }}"
+          echo "commit-hash ${{ steps.commit.outputs.hash }}"
 
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -78,7 +87,7 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: | 
-            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}
+            ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:${{github.run_number}}-${{steps.commit.outputs.short}}
             ${{ secrets.DOCKER_REGISTRY }}/umap/web4umap:latest
           provenance: false
 
