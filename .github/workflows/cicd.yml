@@ -101,7 +101,9 @@ jobs:
           port: ${{ secrets.UMAP_SSH_PORT }}
           username: ${{ secrets.UMAP_SSH_USER }}
           key: ${{ secrets.UMAP_SSH_PRIVATE_KEY }}
+          script_stop: true
           script: |
+            whoami
             cd ${{ secrets.UMAP_DEPLOY_FOLDER }}
             ls -la
             docker-compose pull web4umap
