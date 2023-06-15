@@ -17,7 +17,7 @@ async function fetchDataFromTPHCMOsm(parentDirectory: string) {
 }
 
 async function updateToPostgis(parentDirectory: string) {
-    const childProcess = spawn('osm2pgsql',
+    const childProcess = spawn(parentDirectory + "\\src\\pages\\api\\osm2pgsql\\osm2pgsql-bin\\osm2pgsql.exe",
         ['-a', '--slim', '-d', process.env.dbname!, '-P', process.env.DBport!, '-U', process.env.user!, '--password', '-H',
             process.env.hostname!, '--extra-attributes', '-S', parentDirectory + "\\src\\pages\\api\\data\\default.style", parentDirectory + "\\src\\pages\\api\\data\\map.osm"]);
 
@@ -33,7 +33,7 @@ async function updateToPostgis(parentDirectory: string) {
     });
 
     // Provide password input
-    childProcess.stdin.write('trivandeptrai\n');
+    childProcess.stdin.write(process.env.password!+"\n");
 
     // Handle process exit
     childProcess.on('exit', (code) => {
@@ -99,9 +99,29 @@ export default updatedDates;`,
         if ((dateMode==="byDay"&&diff >= 1000 * 60 * 60 * 24)||(dateMode==="byHour"&&diff >= 1000 * 60 * 60)) {
             // update the map
             console.log("Fetching new HCM city osm\n")
-            await fetchDataFromTPHCMOsm(parentDirectory)
+            // catch error
+            try {
+                await fetchDataFromTPHCMOsm(parentDirectory)
+            } catch (error) {
+                console.log(error)
+                res.status(500).json({
+                    state:"failed",
+                    message:"Error fetching new HCM city osm"
+                })
+                return
+            }
             console.log("Finished fetching new data, start updating to postgis\n")
-            await updateToPostgis(parentDirectory)
+            // catch error
+            try {
+                await updateToPostgis(parentDirectory)
+            } catch (error) {
+                console.log(error)
+                res.status(500).json({
+                    state:"failed",
+                    message:"Error updating to postgis"
+                })
+                return
+            }
             console.log("Finished updating to postgis\n")
             // update lastAppMapUpdatedDate
             fs.writeFileSync(parentDirectory + "\\src\\pages\\api\\data\\updatedDates.ts", `const updatedDates = {
