@@ -1,0 +1,94 @@
+.direction-container{
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    width: 26%;
+    height: 710px;
+}
+
+.direction-box{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid white;
+    border-radius: 4px;
+}
+
+.direction-tool{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.direction-button{
+    background-color: white;
+    width: 12%;
+    color: #17ad3a;
+    border: none;
+    padding: 9px 12px;
+    cursor: pointer;
+}
+
+.cancel-button{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background-color: white;
+    width: 12%;
+    color: #000;
+    border: none;
+    padding: 9px 12px;
+    cursor: pointer;
+}
+
+.direction-start{
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid white;
+    border-radius: 4px;
+}
+
+.direction-des{
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid white;
+    border-radius: 4px;
+}
+
+.icon-direction{
+    width: 10%;
+    color: rgb(37, 156, 193);
+    border: none;
+    padding: 9px 12px;
+}
+
+.icon-start{
+    width: 10%;
+    color: gray;
+    border: none;
+    padding: 9px 12px;
+}
+
+.search-input{
+    background-color: white;
+    padding: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    border: 1px solid gray;
+    width: 80%;
+    border-radius: 4px;
+}
+
+.search-button {
+    background-color: white;
+    width: 10%;
+    color: #000;
+    border: none;
+    padding: 9px 12px;
+    cursor: pointer;
+}
+
+.direction-address{
+    display: inline-flex;
+    border: 0px solid white;
+    margin-top: 10px;
+}
