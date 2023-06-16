@@ -18,7 +18,7 @@ export default function Home() {
   
   return (
     <div className="relative">
-      <div className="absolute z-1">
+      <div className="absolute" style={{zIndex:10000}}>
         {showDirectionBox ? (
           <DirectionBox onDirectionCancel={handleSearchCancel}/>
         ) : (

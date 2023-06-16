@@ -37,7 +37,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             props.onDirectionCancel()
         }
   return (
-    <div className="direction-container shadow-md">
+    <div className="direction-container shadow-xl">
         <div className="direction-tool">
             <button className="direction-button">
                 <FontAwesomeIcon icon={faDirections}/>
