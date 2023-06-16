@@ -5,60 +5,55 @@
 
 ## **Mission 1: OSM styles**
 
-**(Deadline: 2 days from 13->15/6)**
+**(Deadline: 3 days)**
 
 Description:
-- Integrate small current OSM data of VietName like only the area near Dormitory Zone A of National University HCMC on Postgis Online With PgAdmin4. (13/6/2023)
+- With the reference link in the bonus part: Explore, try to custom or work with some tools (maybe) the styles of OSM.
 
-  **=> Objective**: Build up slice to present about how to connect and guild the teammate. Eventually, everyone can access to the data on Postgis Online on their PgAdmin4. **(Remember to enable UpdatedTime config
-  of Osm2pgsql when import data to Postgis Online to track the realtime updated of OSM data)**
-- Connect GeoServer Online to Intergrated Data on Postgis Online. Following the experience gained from Week 1.
-
-  **=> Objective**: everyone can access to the Layer Previews of the integrated map on GeoServer Online.
+  **=> Objective**: Know how it works?, How to config map?, 
+  how to custom the css, or maybe with css osm tool?. If you have any questions, feel free to contact mentor Loc.
+  Remember to make a slice to present about what you have learned from this mission.
 
 
-## **Mission 2: Getting and Updating the newest OSM data manually or automaticcally to PostGis online data**
+## **Mission 2: Web setup layouts of geoserver**
 
-Description:
-- **Task 1**: One person will try to get the newest data from Openstreetmat with output format is application/json for convenience
-  
-  **(Deadline: 1.5 days from 14->15.5/6)**
-
-  **=> Objective**: Build up slice to present the format of the data and how to take the data from OSM by hourly, dayly or weekly and where you can get it.
-
-- **Task 2**: One person will try to update the newest data to Postgis Online with the data from Task 1. (Notice the format of Postgis Data, do we need tool or library to update data automatically or not? Remember the need of using Osm2pgsql before starting import, how to do it automatically?). 
-  
-  **(Deadline: 2 days from 14->16/6)**
-
-  **=> Objective**: Build up an API for updating with nodeJS inside NextJS as Mentor Loc required the system to be able to update manually and can think of using Schedule Library if you want to do it automatically. (Schedule Library is a library can help us to update the data automatically by time we set up, with the ability to run and inform to admin if there is any error when updating data). Make a slice to present how you build the API and the process also result of updating data.
-
-
-## **Mission 3: Web-Map-View**
-
-**(Deadline: 2 days from 13->15/6)**
+**(Deadline: 3 days)**
 
 Description:
--   Learning about Leaflet, How to integrate it on NextJs? With which library?
+- Explore deeply and implement a functionality based on the layouts of Geoserver
+
+  **=> Objective**: Know how to put layout in geoserver (manually or with wms, wfs or maybe wmts query). Geoserver Cache problem (in the bonus link has the reference link from Khoa which said about Geoserver Cache). Know how to put the style (remember for each layout, we have to put the style for it but the style has to be "no redundancy just enough or it will trigger error from zalo 16/6/2023" ). Implement a functionality that is able to help the user to choose many base layouts of a view map (like google map, osm map, etc.) and put it on the map (may be an api to retrieve all base layouts and an api to retrieve specific layout by name). Remember to make a slice to present about what you have learned from this mission.
+
+
+## **Mission 3: Address parser library *
+
+**(Deadline: 3 days)**
+
+Description:
+-   Research about address parser. if enough time you can try to learn how to use it proficiently.
   
-    **=> Objective**: Enable to get the map from OpenStreetMap Or GeoServer and view it on Leaflet Map on NextJs. Make a slice on the process you implemented it and does it related to those knowledge you learned from Week 1.
--   Exploring all the features of Leaflet and how to use it (Zoom, Edit, Popup, Marker, Draw Point or Line or Polygon etc.). Also know how to interact with the data of GeoServer through Leaflet map or WFS or WFS.
-  
-    **=> Objective**: Enable to use all the features of Leaflet to view the map on NextJs. Make a slice on the process you implemented each feature.
+    **=> Objective**: What does address parser library work for? what kind of data it use for search? compared it with
+    OSM data in postgis. This library is often built with C++ and C. How to use it in Nodejs? Learn about wrapper no need for trying write it for this week. If enough time you can try to use it. Remember to make a slice to present about what you have learned from this mission. 
 
 
-## **Mission 4: Web-Map-Basic-Layout**
+## **Mission 4: User Basic Apis**
 
-**(Deadline: 3 days from 13->16/6)**
+**(Deadline: 3 days)**
 
 Description: 
--   Mimic the UI of Google Map. Define the components you are going to build up for this. Build it with ReactJS on the client of NextJS project.
+-   Building some Apis related to user session and UX (web save the previous map location the user has recently viewed or searching-history)
   
-    **=> Objective**: Enable to build up the basic layout of Google Map on NextJs (at least the Searbar, Sidebar to show up the results of searching). You can make more like routing UI, Filter UI, Header, Footer bla bla. Make a slice on the process you implemented it and how to use each component.
+    **=> Objective**: API is able to store the last view center, zoom number of every single user on the map. This allows user to be always at the previous state on the map. In details, the table in postgres dbs must have at least userSessionId Lat Len Zoom UpdatedAt. That api must solve the problem when the session expired what would happen?. Remember to make a slice to present about what you have learned from this mission.
 
 # **Work Assignments**
 
--   **Mission 1 and 2:** Khoa & Van
--   **Mission 3:** Dung
--   **Mission 4:** Minh
+-   **Mission 1:** Not yet
+-   **Mission 2:** Not yet
+-   **Mission 3:** Not yet
+-   **Mission 4:** Not yet
 
-**Notification** If you find this lack of some information. You can help me to add it. Thank you very much. Tri Van (2pm 13/6/2023). Good luck to everyone. 
+**Notification** If you find this lack of some information. You can help me to add it. Thank you very much. Tri Van (2pm 16/6/2023). Good luck to everyone. 
+
+**Bonus links from mentor Loc**
+- [osm-styles](https://github.com/geosolutions-it/osm-styles)
+- [geoserver cache](https://www.youtube.com/watch?v=7Xk4FoDZAIo)
