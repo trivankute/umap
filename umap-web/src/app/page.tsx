@@ -2,6 +2,8 @@
 import React,{useState} from "react";
 import SearchBox from "@/components/SearchBox"
 import DirectionBox from "@/components/DirectionBox"
+import ViewMap from "../../components/map";
+import './styles.component.css'
 
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
@@ -15,12 +17,17 @@ export default function Home() {
   };
   
   return (
-    <main className="">
-      {showDirectionBox ? (
-        <DirectionBox onDirectionCancel={handleSearchCancel}/>
-      ) : (
-        <SearchBox onSearchDirection={handleSearchDirection} />
-      )}
-    </main>
+    <div className="relative">
+      <div className="absolute z-1">
+        {showDirectionBox ? (
+          <DirectionBox onDirectionCancel={handleSearchCancel}/>
+        ) : (
+          <SearchBox onSearchDirection={handleSearchDirection} />
+        )}
+      </div>
+      <div className="relative">
+        <ViewMap/>
+      </div>
+    </div>
   )
 }

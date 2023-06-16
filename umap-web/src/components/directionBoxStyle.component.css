@@ -1,9 +1,10 @@
 .direction-container{
     background-color: white;
+    position: fixed;
     display: flex;
     flex-direction: column;
     width: 26%;
-    height: 710px;
+    height: 100vh;
 }
 
 .direction-box{

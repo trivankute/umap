@@ -47,7 +47,7 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
   }
   return (
     <div className='container'>
-        <div className="search-container">
+        <div className="search-container shadow-md">
             <label htmlFor="search-input"></label>
             <input
                 type="text"

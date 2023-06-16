@@ -1,9 +1,10 @@
  .container {
     display: flex;
+    position: fixed; 
     flex-direction: column;
     width: 26%;
-    padding-left: 10px;
-    padding-top: 10px;
+    margin-top: 10px;
+    margin-left: 10px;
  }
 
   /*SEARCH BAR*/
