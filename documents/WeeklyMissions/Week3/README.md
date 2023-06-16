@@ -1,9 +1,9 @@
-# **Week 2 Missions 12/6->18/6**
+# **Week 3 Missions 19/6->26/6**
 
-**[Checkin on this intern team's google drive of Week 2](https://docs.google.com/spreadsheets/d/1pmXoyhfSgix3a2zq8Ud1LYfidF0I3x0ANpQIF2369Sc/edit#gid=1359045866)**
+**[Checkin on this intern team's google drive of Week 3](https://docs.google.com/spreadsheets/d/1pmXoyhfSgix3a2zq8Ud1LYfidF0I3x0ANpQIF2369Sc/edit#gid=462069141)**
 
 
-## **Mission 1: Onsite Data Initialization with Postgres Online and Geoserver Online**
+## **Mission 1: OSM styles**
 
 **(Deadline: 2 days from 13->15/6)**
 
@@ -62,8 +62,3 @@ Description:
 -   **Mission 4:** Minh
 
 **Notification** If you find this lack of some information. You can help me to add it. Thank you very much. Tri Van (2pm 13/6/2023). Good luck to everyone. 
-
-**Bonus links from mentor Loc**
-- [geoserver-node-client](https://github.com/meggsimum/geoserver-node-client)
-- [geoserver suppports rest api docs](https://docs.geoserver.org/stable/en/user/rest/index.html)
-- [OSMChange của chỉ việt nam thì ở đây nhé](https://download.geofabrik.de/asia/vietnam-updates/)
