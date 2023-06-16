@@ -63,7 +63,7 @@
 
 .icon-start{
     width: 10%;
-    color: gray;
+    color: rgb(193, 108, 108);
     border: none;
     padding: 9px 12px;
 }
@@ -79,10 +79,15 @@
 }
 
 .search-button {
+    display: inline-flex;
+    align-items: center;
     background-color: white;
     width: 10%;
+    height: 80%;
     color: #000;
-    border: none;
+    border: 1px solid gray;
+    border-radius: 4px;
+    margin-left: 4px;
     padding: 9px 12px;
     cursor: pointer;
 }
