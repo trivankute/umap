@@ -46,7 +46,7 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
     props.onSearchDirection();
   }
   return (
-    <div className='container'>
+    <div className='container md:w-96 w-72 p-2'>
         <div className="search-container shadow-md">
             <label htmlFor="search-input"></label>
             <input
@@ -57,10 +57,10 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
                 onChange={handleInputChange}
             />
 
-            <button className="search-button" onClick={handleSearch}>
+            <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
                 <FontAwesomeIcon icon={faSearch} className='faSearch'/>
             </button>
-            <button className="search-direction" onClick={handleDirection}>
+            <button className="search-direction d-flex justify-center items-center" onClick={handleDirection}>
                 <FontAwesomeIcon icon={faDirections} className='faDirections'/>
             </button>
         </div>

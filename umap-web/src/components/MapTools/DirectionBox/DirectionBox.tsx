@@ -39,10 +39,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
   return (
     <div className="direction-container shadow-xl">
         <div className="direction-tool">
-            <button className="direction-button">
+            <button className="direction-button d-flex justify-center items-center">
                 <FontAwesomeIcon icon={faDirections}/>
             </button>
-            <button className="cancel-button" onClick={handleCancel}>
+            <button className="cancel-button d-flex justify-center items-center" onClick={handleCancel}>
                 <FontAwesomeIcon icon={faTimes}/>
             </button>
         </div>
@@ -57,7 +57,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     placeholder='Chọn điểm bắt đầu...'
                     className='search-input' 
                 />
-                <button className="search-button" onClick={handleSearch}>
+                <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
                     <FontAwesomeIcon icon={faSearch}/>
                 </button>
             </div>
@@ -70,7 +70,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     placeholder='Chọn điểm đến...'
                     className='search-input'
                 />    
-                <button className="search-button" onClick={handleSearch}>
+                <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
                     <FontAwesomeIcon icon={faSearch}/>
                 </button>
             </div>

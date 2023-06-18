@@ -2,9 +2,6 @@
     display: flex;
     position: fixed; 
     flex-direction: column;
-    width: 26%;
-    margin-top: 10px;
-    margin-left: 10px;
  }
 
   /*SEARCH BAR*/

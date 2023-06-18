@@ -1,9 +1,9 @@
 'use client'
 import React,{useState} from "react";
-import SearchBox from "@/components/SearchBox"
-import DirectionBox from "@/components/DirectionBox"
-import ViewMap from "../../components/map";
+import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
+import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
 import './styles.component.css'
+import ViewMap from "@/components/Map/Map";
 
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
