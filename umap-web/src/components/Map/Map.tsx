@@ -1,8 +1,8 @@
 "use client";
-import React ,{ useState} from "react";
+import React ,{ useState, memo } from "react";
 import { MapContainer, TileLayer , ZoomControl} from "react-leaflet";
 import './Map.css';
-export default function ViewMap(){
+function ViewMap(){
     const [center, setCenter] = useState({lat:10.879961,lng:106.810877});
     const ZOOM_LEVEL = 9;
     return (
@@ -25,3 +25,4 @@ export default function ViewMap(){
         </>
       );
 }
+export default memo(ViewMap);

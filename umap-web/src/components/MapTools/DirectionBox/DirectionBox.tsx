@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
@@ -99,4 +99,4 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
   )
 }
 
-export default DirectionBox
+export default memo(DirectionBox)

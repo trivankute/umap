@@ -10,28 +10,25 @@
     background-color: white;
     align-items: center;
     border: 1px solid white;
-    border-radius: 4px;
+    /* border-radius: 4px; */
   }
 
   .search-input {
     background-color: white;
     padding: 8px;
-    width: 80%;
+    /* width: 80%; */
     border: 1px solid white;
   }
   
   .search-button {
     background-color: white;
-    width: 10%;
+    /* width: 10%; */
     color: #000;
     border: none;
     padding: 9px 12px;
     cursor: pointer;
   }
   
-  .search-button:hover {
-    background-color: #04B00F;
-  }
 
   .search-direction {
     background-color: white;

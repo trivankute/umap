@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faClock, faSearch, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
@@ -46,22 +46,22 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
     props.onSearchDirection();
   }
   return (
-    <div className='container md:w-96 w-72 p-2'>
-        <div className="search-container shadow-md">
+    <div className='container m-2 max-w-[300px] md:max-w-[400px]'>
+        <div className="search-container shadow-xl p-2 rounded-lg overflow-hidden gap-x-2 max-w-[100%]">
             <label htmlFor="search-input"></label>
             <input
                 type="text"
                 placeholder="Tìm kiếm"
-                className="search-input"
+                className="search-input outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent"
                 value={searchValue}
                 onChange={handleInputChange}
             />
 
-            <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
-                <FontAwesomeIcon icon={faSearch} className='faSearch'/>
+            <button className="group min-w-[40px] ml-0 search-button d-flex justify-center items-center hover:bg-green-200 hover:border-transparent" onClick={handleSearch}>
+                <FontAwesomeIcon icon={faSearch} className='faSearch group-hover:text-white'/>
             </button>
-            <button className="search-direction d-flex justify-center items-center" onClick={handleDirection}>
-                <FontAwesomeIcon icon={faDirections} className='faDirections'/>
+            <button className="group min-w-[40px] ml-0 search-direction d-flex justify-center items-center rounded-lg hover:bg-slate-100" onClick={handleDirection}>
+                <FontAwesomeIcon icon={faDirections} className='faDirections group-hover:text-green-400'/>
             </button>
         </div>
 
@@ -89,4 +89,4 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
   );
 }
 
-export default SearchBox
+export default memo(SearchBox)
