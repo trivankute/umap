@@ -3,7 +3,6 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-    width: 26%;
     height: 100vh;
 }
 
@@ -15,9 +14,9 @@
 }
 
 .direction-tool{
-    position: relative;
+    /* position: relative;
     display: flex;
-    flex-direction: row;
+    flex-direction: row; */
 }
 
 .direction-button{
@@ -30,7 +29,7 @@
 }
 
 .cancel-button{
-    position: absolute;
+    /* position: absolute; */
     right: 0;
     bottom: 0;
     background-color: white;
@@ -83,7 +82,7 @@
     display: inline-flex;
     align-items: center;
     background-color: white;
-    width: 10%;
+    /* width: 10%; */
     height: 80%;
     color: #000;
     border: 1px solid gray;

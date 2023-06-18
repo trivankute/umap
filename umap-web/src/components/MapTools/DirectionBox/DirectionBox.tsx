@@ -2,8 +2,8 @@
 import React, { useState, memo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import './directionBoxStyle.component.css'
+import AddressList from '../AddressList/AddressList';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -37,63 +37,46 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             props.onDirectionCancel()
         }
   return (
-    <div className="direction-container shadow-xl">
-        <div className="direction-tool">
-            <button className="direction-button d-flex justify-center items-center">
-                <FontAwesomeIcon icon={faDirections}/>
+    <div className="direction-container shadow-xl max-w-[300px] md:max-w-[500px]">
+        <div className="direction-tool flex items-center justify-between p-2 border-b-2">
+            <button className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100">
+                <FontAwesomeIcon icon={faDirections} className="group-hover:text-green-400"/>
             </button>
-            <button className="cancel-button d-flex justify-center items-center" onClick={handleCancel}>
-                <FontAwesomeIcon icon={faTimes}/>
+            <button className="cancel-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100" onClick={handleCancel}>
+                <FontAwesomeIcon icon={faTimes} className="group-hover:text-slate-400"/>
             </button>
         </div>
-        <div className="direction-box">
+        <div className="direction-box p-2">
             <div className="direction-start">
-                <div className="icon-start">
+                <div className="icon-start flex justify-center items-center">
                     <FontAwesomeIcon icon={faCircle} />
                 </div>
                 
                 <input 
                     type="text"
                     placeholder='Chọn điểm bắt đầu...'
-                    className='search-input' 
+                    className='search-input outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base' 
                 />
-                <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
-                    <FontAwesomeIcon icon={faSearch}/>
+                <button className="group search-button w-[40px] flex justify-center items-center hover:bg-green-200 hover:border-transparent" onClick={handleSearch}>
+                    <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
                 </button>
             </div>
             <div className="direction-des">
-                <div className="icon-direction">
+                <div className="icon-direction flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                 </div>
                 <input 
                     type="text"
                     placeholder='Chọn điểm đến...'
-                    className='search-input'
+                    className='search-input outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base'
                 />    
-                <button className="search-button d-flex justify-center items-center" onClick={handleSearch}>
-                    <FontAwesomeIcon icon={faSearch}/>
+                <button className="group search-button w-[40px] flex justify-center items-center hover:bg-green-200 hover:border-transparent" onClick={handleSearch}>
+                    <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
                 </button>
             </div>
         </div>
         <div className="direction-address">
-            <List className='list-address' component="nav" aria-label="main mailbox folders">
-                {listPlace.map((item) => {
-                return (
-                    <div key={item?.place_id}>
-                    <ListItem
-                        onClick={() => {
-                        }}
-                    >
-                        <ListItemIcon>
-                        <FontAwesomeIcon icon={faMapMarkerAlt} />
-                        </ListItemIcon>
-                        <ListItemText primary={item?.display_name} />
-                    </ListItem>
-                    <Divider />
-                    </div>
-                );
-                })}
-            </List>
+            <AddressList listPlace={listPlace}/>
         </div>
     </div>
   )
