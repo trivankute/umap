@@ -1,32 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faClock, faSearch, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import "./styles.component.css"
-
-interface SearchBoxProps {
-  onSearchDirection: () => void;
-}
-
-interface SearchResult {
-  place_id: string;
-  display_name: string;
-}
-
-let addresses: SearchResult[] = [
-  {
-    place_id: '1',
-    display_name: '147 Nguyen Cong Tru'
-  }, 
-  
-  {
-    place_id: '2',
-    display_name: '69 Tan Lap, Dong Hoa, Di An, Binh Duong'
-  }
-]
+import { SearchResult, SearchBoxProps } from '@/types/Types';
+import getAddresses from '@/services/addresses';
 
 const SearchBox: React.FC<SearchBoxProps> = (props) => {
   const [searchValue, setSearchValue] = useState('');
@@ -37,9 +17,11 @@ const SearchBox: React.FC<SearchBoxProps> = (props) => {
     setSearchValue(event.target.value);
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     console.log('Đã tìm kiếm:', searchValue);
-    setListPlace(addresses)
+    const address = await getAddresses()
+    console.log(address)
+    setListPlace(address)
   };
 
   const handleDirection = () => {

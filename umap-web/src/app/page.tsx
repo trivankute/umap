@@ -1,9 +1,8 @@
 'use client'
 import React,{useState} from "react";
-import SearchBox from "@/components/SearchBox"
-import DirectionBox from "@/components/DirectionBox"
-import ViewMap from "../../components/map";
-import './styles.component.css'
+import SearchBox from "@/components/Search/SearchBox"
+import DirectionBox from "@/components/Search/DirectionBox"
+import ViewMap from "@/components/Map/map";
 
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
@@ -18,7 +17,7 @@ export default function Home() {
   
   return (
     <div className="relative">
-      <div className="absolute z-1">
+      <div className="absolute" style={{zIndex:10000}}>
         {showDirectionBox ? (
           <DirectionBox onDirectionCancel={handleSearchCancel}/>
         ) : (
