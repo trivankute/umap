@@ -1,0 +1,63 @@
+
+
+ .container {
+    display: flex;
+    position: fixed; 
+    flex-direction: column;
+ }
+
+  /*SEARCH BAR*/
+ .search-container {
+    display: inline-flex;
+    background-color: white;
+    align-items: center;
+    border: 1px solid white;
+    /* border-radius: 4px; */
+  }
+
+  .search-input {
+    background-color: white;
+    padding: 8px;
+    /* width: 80%; */
+    border: 1px solid white;
+  }
+  
+  .search-button {
+    background-color: white;
+    /* width: 10%; */
+    color: #000;
+    border: none;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+  
+
+  .search-direction {
+    background-color: white;
+    width: 10%;
+    color: #04B00F;
+    border: none;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+
+  /*SEARCH BOX*/
+  .search-box {
+    display: inline-flex;
+    border: 0px solid white;
+  }
+
+  .list-address {
+    background: white;
+  }
+
+  .address-item {
+    background-color: white;
+  }
+
+  .icon-history {
+    background-color: white;
+    color: #000;
+    cursor: pointer;
+  }
+  
