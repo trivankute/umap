@@ -1,31 +1,37 @@
 'use client'
-import React,{useState} from "react";
-import SearchBox from "@/components/Search/SearchBox"
-import DirectionBox from "@/components/Search/DirectionBox"
-import ViewMap from "@/components/Map/map";
+import React, { useState } from "react";
+import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
+import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
+import ViewMap from "@/components/Map/Map"
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
-  const [showDirectionBox, setShowDirectionBox] = useState(false);
+  const [showDirectionBox, setShowDirectionBox] = useState(true);
 
   const handleSearchDirection = () => {
     setShowDirectionBox(true);
   };
-  
+
   const handleSearchCancel = () => {
     setShowDirectionBox(false);
   };
-  
+
   return (
     <div className="relative">
-      <div className="absolute" style={{zIndex:10000}}>
-        {showDirectionBox ? (
-          <DirectionBox onDirectionCancel={handleSearchCancel}/>
-        ) : (
-          <SearchBox onSearchDirection={handleSearchDirection} />
-        )}
+      <div className="absolute" style={{ zIndex: 10000 }}>
+        <AnimatePresence mode='wait'>
+          {showDirectionBox &&
+            <DirectionBox onDirectionCancel={handleSearchCancel} />
+          }
+        </AnimatePresence>
+        <AnimatePresence mode='wait'>
+          {!showDirectionBox &&
+            <SearchBox onSearchDirection={handleSearchDirection} />
+          }
+        </AnimatePresence>
       </div>
       <div className="relative">
-        <ViewMap/>
+        <ViewMap />
       </div>
     </div>
   )
