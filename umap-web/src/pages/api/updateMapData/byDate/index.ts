@@ -1,23 +1,48 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 import { urlForAxiosHCMOsm, urlForTrackingHCMOsmDate } from '../../data/updateRelatedUrl';
 import axios from 'axios';
-import fs from 'fs'
+import fs, { truncateSync } from 'fs'
 import updatedDates from '../../data/updatedDates';
 import { getParentDirectory } from '../getDates';
 import { defaultStyleUrl, mapDataUrl, osm2pgsqlUrl, updateDatesUrl } from '@/pages/fileUrlsConfig';
 
+let checkFetchTimeout = false
+// 10 minutes
+let checkFetchDelay = 600000
+let checkUpdatePostGisTimeout = false
+// 2 minutes
+let checkUpdatePostGisDelay = 120000
+
+
 async function fetchDataFromTPHCMOsm(parentDirectory: string) {
-    const response = await axios.get(urlForAxiosHCMOsm);
+    // set time out to kill process after 10 minutes
+    let forExit = setTimeout(() => {
+        checkFetchTimeout = true
+        clearTimeout(forExit)
+        return
+    }, checkFetchDelay);
+    const response = await axios.get(urlForAxiosHCMOsm, {
+        signal:AbortSignal.timeout(checkFetchDelay) 
+    });
     const data = await response.data
     fs.writeFile(parentDirectory + mapDataUrl, data, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
+        clearTimeout(forExit)
     }
     );
 }
 
 async function updateToPostgis(parentDirectory: string) {
+    // set time out to kill process after 2 minutes
+    let forExit = setTimeout(() => {
+        checkUpdatePostGisTimeout = true
+        childProcess.kill()
+        clearTimeout(forExit)
+        return
+    }, checkUpdatePostGisDelay);
+
     const childProcess = spawn(parentDirectory + osm2pgsqlUrl,
         ['-a', '--slim', '-d', process.env.dbname!, '-P', process.env.DBport!, '-U', process.env.user!, '--password', '-H',
             process.env.hostname!, '--extra-attributes', '-S', parentDirectory + defaultStyleUrl, parentDirectory + mapDataUrl]);
@@ -38,8 +63,10 @@ async function updateToPostgis(parentDirectory: string) {
 
     // Handle process exit
     childProcess.on('exit', (code) => {
+        clearTimeout(forExit)
         console.log(`Child process exited with code ${code}`);
     });
+
 }
 
 interface DateCustomRequest extends NextApiRequest {
@@ -111,6 +138,14 @@ export default updatedDates;`,
                 })
                 return
             }
+            if(checkFetchTimeout) {
+                checkFetchTimeout=false
+                res.status(500).json({
+                    state:"failed",
+                    message:"Fetching new HCM city osm timeout"
+                })
+                return
+            }
             console.log("Finished fetching new data, start updating to postgis\n")
             // catch error
             try {
@@ -120,6 +155,14 @@ export default updatedDates;`,
                 res.status(500).json({
                     state:"failed",
                     message:"Error updating to postgis"
+                })
+                return
+            }
+            if(checkUpdatePostGisTimeout) {
+                checkUpdatePostGisTimeout=false
+                res.status(500).json({
+                    state:"failed",
+                    message:"Updating to postgis timeout"
                 })
                 return
             }
