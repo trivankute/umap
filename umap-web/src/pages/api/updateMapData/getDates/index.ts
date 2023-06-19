@@ -4,13 +4,15 @@ import updatedDates from '../../data/updatedDates';
 import fs from 'fs'
 import { urlForTrackingHCMOsmDate } from '../../data/updateRelatedUrl';
 import path from 'path';
+import { updateDatesUrl } from '@/pages/fileUrlsConfig';
 
 export function getParentDirectory() {
-    let parentDirectory = path.resolve(__dirname).substring(0, path.resolve(__dirname).lastIndexOf('\\'))
-    parentDirectory = parentDirectory.substring(0, parentDirectory.lastIndexOf('\\'))
-    parentDirectory = parentDirectory.substring(0, parentDirectory.lastIndexOf('\\'))
-    parentDirectory = parentDirectory.substring(0, parentDirectory.lastIndexOf('\\'))
-    parentDirectory = parentDirectory.substring(0, parentDirectory.lastIndexOf('\\'))
+    let parentDirectory = path.resolve(__dirname)
+    // it becomes something like this D:\ThucTap\umap\umap-web\.next\server\pages\api
+    // substring until .next disappears
+    while(parentDirectory.includes(".next")) {
+        parentDirectory = parentDirectory.substring(0, parentDirectory.lastIndexOf('\\'))
+    }
     return parentDirectory
 }
 
@@ -32,7 +34,7 @@ export default async function getDates(req: NextApiRequest, res: NextApiResponse
     let parentDirectory = getParentDirectory()
     if (date > lastOsmMapUpdatedDate) {
         // write new date to ../../data/updatedDates.ts
-        fs.writeFileSync(parentDirectory + "\\src\\pages\\api\\data\\updatedDates.ts", `const updatedDates = {
+        fs.writeFileSync(parentDirectory + updateDatesUrl, `const updatedDates = {
     lastAppMapUpdatedDate: "${lastAppMapUpdatedDate.toISOString()}",
     lastOsmMapUpdatedDate: "${date.toISOString()}"
         }

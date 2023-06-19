@@ -5,11 +5,12 @@ import axios from 'axios';
 import fs from 'fs'
 import updatedDates from '../../data/updatedDates';
 import { getParentDirectory } from '../getDates';
+import { defaultStyleUrl, mapDataUrl, osm2pgsqlUrl, updateDatesUrl } from '@/pages/fileUrlsConfig';
 
 async function fetchDataFromTPHCMOsm(parentDirectory: string) {
     const response = await axios.get(urlForAxiosHCMOsm);
     const data = await response.data
-    fs.writeFile(parentDirectory + '\\src\\pages\\api\\data\\map.osm', data, (err) => {
+    fs.writeFile(parentDirectory + mapDataUrl, data, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
     }
@@ -17,9 +18,9 @@ async function fetchDataFromTPHCMOsm(parentDirectory: string) {
 }
 
 async function updateToPostgis(parentDirectory: string) {
-    const childProcess = spawn(parentDirectory + "\\src\\pages\\api\\osm2pgsql\\osm2pgsql-bin\\osm2pgsql.exe",
+    const childProcess = spawn(parentDirectory + osm2pgsqlUrl,
         ['-a', '--slim', '-d', process.env.dbname!, '-P', process.env.DBport!, '-U', process.env.user!, '--password', '-H',
-            process.env.hostname!, '--extra-attributes', '-S', parentDirectory + "\\src\\pages\\api\\data\\default.style", parentDirectory + "\\src\\pages\\api\\data\\map.osm"]);
+            process.env.hostname!, '--extra-attributes', '-S', parentDirectory + defaultStyleUrl, parentDirectory + mapDataUrl]);
 
     // Handle stdout data
     childProcess.stdout.on('data', (data) => {
@@ -80,7 +81,7 @@ export default async function byDate(req: DateCustomRequest, res: NextApiRespons
     if (date > lastAppMapUpdatedDate) {
         if(date > lastOsmMapUpdatedDate)
         // write new date to ../../data/updatedDates.ts
-        fs.writeFileSync(parentDirectory + "\\src\\pages\\api\\data\\updatedDates.ts", `const updatedDates = {
+        fs.writeFileSync(parentDirectory + updateDatesUrl, `const updatedDates = {
     lastAppMapUpdatedDate: "${lastAppMapUpdatedDate.toISOString()}",
     lastOsmMapUpdatedDate: "${date.toISOString()}"
         }
@@ -124,7 +125,7 @@ export default updatedDates;`,
             }
             console.log("Finished updating to postgis\n")
             // update lastAppMapUpdatedDate
-            fs.writeFileSync(parentDirectory + "\\src\\pages\\api\\data\\updatedDates.ts", `const updatedDates = {
+            fs.writeFileSync(parentDirectory + updateDatesUrl, `const updatedDates = {
     lastAppMapUpdatedDate: "${date.toISOString()}",
     lastOsmMapUpdatedDate: "${date.toISOString()}"
         }
