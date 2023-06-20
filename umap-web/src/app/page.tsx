@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
 import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
-import ViewMap from "@/components/Map/Map"
+import MapView from "@/components/Map/Map"
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
         </AnimatePresence>
       </div>
       <div className="relative">
-        <ViewMap />
+        <MapView />
       </div>
     </div>
   )
