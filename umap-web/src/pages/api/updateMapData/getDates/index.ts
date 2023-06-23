@@ -4,7 +4,7 @@ import updatedDates from '../../data/updatedDates';
 import fs from 'fs'
 import { urlForTrackingHCMOsmDate } from '../../data/updateRelatedUrl';
 import path from 'path';
-import { updateDatesUrl } from '@/pages/fileUrlsConfig';
+import { updateDatesUrl } from '@/fileUrlsConfig';
 
 export function getParentDirectory() {
     let parentDirectory = path.resolve(__dirname)
