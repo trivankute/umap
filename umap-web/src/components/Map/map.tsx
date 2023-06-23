@@ -11,12 +11,13 @@ function LocationMarkers() {
   const [markers, setMarkers] = useState([]);
   const map = useMapEvents({
     click(e) {
+      // @ts-ignore
       setMarkers(markers => markers.concat([e.latlng]));
       console.log(markers);
     }
   });
 
-  const removeMarker = (index) => {
+  const removeMarker = (index:any) => {
     const newMarkers = markers.filter((_, i) => i !== index);
     setMarkers(newMarkers);
   };
