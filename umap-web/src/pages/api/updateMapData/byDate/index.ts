@@ -5,7 +5,7 @@ import axios from 'axios';
 import fs, { truncateSync } from 'fs'
 import updatedDates from '../../data/updatedDates';
 import { getParentDirectory } from '../getDates';
-import { defaultStyleUrl, mapDataUrl, osm2pgsqlUrl, updateDatesUrl } from '@/pages/fileUrlsConfig';
+import { defaultStyleUrl, mapDataUrl, osm2pgsqlUrl, updateDatesUrl } from '@/fileUrlsConfig';
 
 let checkFetchTimeout = false
 // 10 minutes
