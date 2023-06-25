@@ -1,0 +1,5 @@
+{
+    "baseUrl": "https://umap.dientoan.vn/geoserver/gwc/rest",
+    "user": "admin",
+    "password": "Umap@123"
+}

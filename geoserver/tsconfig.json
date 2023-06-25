@@ -1,14 +1,19 @@
 {
   "compilerOptions": {
     "target": "es6",                          
-    "module": "commonjs",                    
+    "module": "ESNext",                    
     "lib": ["es6"],                     
     "allowJs": true,
     "outDir": "build",                          
-    "rootDir": "src",
+    "rootDir": "./",
     "strict": true,         
     "noImplicitAny": true,
     "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   }
 }
