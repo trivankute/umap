@@ -23,6 +23,7 @@
     "child_process": "^1.0.2",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
+    "fast-levenshtein": "^3.0.0",
     "framer-motion": "^10.12.16",
     "next": "13.4.5",
     "postcss": "8.4.24",
