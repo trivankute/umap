@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import nearestAddress from "../../utils/nearestAddressFromCoor";
+import nearestAddress from "../../../utils/nearestAddressFromCoor";
 
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
@@ -83,7 +83,11 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             results = results.filter((result:any)=>result.type===typeBuilding)
         }
         // return these points and polygons
-        res.status(200).json(results)
+        res.status(200).json({
+            state:"success",
+            message:"Your request is accepted",
+            data:results
+        })
     }
     else 
     {

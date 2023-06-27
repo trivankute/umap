@@ -130,19 +130,19 @@ from point, point_point, point_polygon, roads, wards, districts
         if (polygon_building && polygon_building !== "yes") {
             type = polygon_building
         }
-        if (polygon_amenity) {
+        else if (polygon_amenity) {
             type = polygon_amenity
         }
-        if (polygon_landuse) {
+        else if (polygon_landuse) {
             type = polygon_landuse
         }
-        if (polygon_leisure) {
+        else if (polygon_leisure) {
             type = polygon_leisure
         }
-        if (polygon_shop) {
+        else if (polygon_shop) {
             type = polygon_shop
         }
-        if (type === "") {
+        else if (type === "") {
             type = "unknown"
         }
 
@@ -186,19 +186,19 @@ from point, point_point, point_polygon, roads, wards, districts
         if (point_amenity) {
             type = point_amenity
         }
-        if (point_shop) {
+        else if (point_shop) {
             type = point_shop
         }
-        if (point_tourism) {
+        else if (point_tourism) {
             type = point_tourism
         }
-        if (point_historic) {
+        else if (point_historic) {
             type = point_historic
         }
-        if (type === "" && point_housenumber) {
+        else if (type === "" && point_housenumber) {
             type = "house"
         }
-        if (type === "") {
+        else if (type === "") {
             type = "unknown"
         }
 

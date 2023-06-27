@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import nearestAddress from "../../utils/nearestAddressFromCoor";
+import nearestAddress from "../../../utils/nearestAddressFromCoor";
 
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
@@ -24,7 +24,11 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             return
         }
         const result = await nearestAddress(prisma, lng, lat)
-        res.status(200).json(result)
+        res.status(200).json({
+            state:"success",
+            message:"Your request is accepted",
+            data:result
+        })
     }
     else 
     {
