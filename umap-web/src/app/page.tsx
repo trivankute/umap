@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
 import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
-import MapView from "@/components/Map/Map"
+import dynamic from "next/dynamic";
+const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Home() {
