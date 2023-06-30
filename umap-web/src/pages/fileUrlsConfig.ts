@@ -5,5 +5,4 @@ export const updateDatesUrl = "\\src\\pages\\api\\data\\updatedDates.ts"
 export const osm2pgsqlUrl = "\\src\\pages\\api\\osm2pgsql\\osm2pgsql-bin\\osm2pgsql.exe"
 export const mapDataUrl = "\\src\\pages\\api\\data\\map.osm"
 export const defaultStyleUrl = "\\src\\pages\\api\\data\\default.style"
-export const addressParserUrl = "\\src\\pages\\api\\addressParser\\address_parser.exe"
 
