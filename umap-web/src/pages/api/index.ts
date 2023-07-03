@@ -1,15 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { getParentDirectory } from "./updateMapData/getDates";
+import checkWardExist from "./utils/findWard";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // prisma call
-    const parentDirectory = getParentDirectory()
-    const data = await prisma.$queryRawUnsafe(`
-    select name from planet_osm_point
-    where boundary isnull and ( name notnull ) and admin_level isnull
-    `)
-    res.status(200).json(data)
+    // const parentDirectory = getParentDirectory()
+    let result = await checkWardExist(prisma, 'Phường 14', 'Quận 10')
+    
+    res.status(200).json(result)
 
     // const polygons = await prisma.$queryRawUnsafe(`
     // WITH
