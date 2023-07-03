@@ -134,7 +134,8 @@ export default async function addressParser(fullAddress) {
             // result[curType] = curString
 
             // for autocomplete
-            result[curType] = rightString
+            if(curType!==false)
+                result[curType] = rightString
             if (curType === 'street') {
                 if (result['housename'] === false)
                     result['housename'] = true
@@ -178,6 +179,31 @@ export default async function addressParser(fullAddress) {
 
     if (curType !== false) {
         result[curType] = rightString
+        ////////////////////////////////////////// test for rules check
+        if (curType === 'street') {
+            if (result['housename'] === false)
+                result['housename'] = true
+            if (result['housenumber'] === false)
+                result['housenumber'] = true
+        }
+        if (curType === 'ward') {
+            if (result['housename'] === false)
+                result['housename'] = true
+            if (result['housenumber'] === false)
+                result['housenumber'] = true
+            if (result['street'] === false)
+                result['street'] = true
+        }
+        if (curType === 'district') {
+            if (result['housename'] === false)
+                result['housename'] = true
+            if (result['housenumber'] === false)
+                result['housenumber'] = true
+            if (result['street'] === false)
+                result['street'] = true
+            if (result['ward'] === false)
+                result['ward'] = true
+        }
     }
     // console.log(curType, rightString)
     return result
