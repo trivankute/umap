@@ -370,8 +370,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     address: element.fullAddress,
                     type: element.type,
                     typeOfShape: element.typeOfShape,
-                    lat: element.lat,
-                    lng: element.lng,
+                    center: [element.lat, element.lng],
                     totalDistance: element.totalDistance
                 }
             }
@@ -422,11 +421,14 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
+                coorsArray = coorsArray.map((item:any)=>{
+                    return [item[1],item[0]]
+                })
                 resForStreet = {
                     state: "success",
                     searchMode: "street",
                     address: street + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForStreet[maxIndex].st_x, resForStreet[maxIndex].st_y],
+                    center: [resForStreet[maxIndex].st_y, resForStreet[maxIndex].st_x],
                     borderLine: coorsArray
                 }
                 res.status(200).json(resForStreet)
@@ -447,11 +449,14 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForWard[0].st_asgeojson)
+                geojson.coordinates = geojson.coordinates.map((item:any)=>{
+                    return [item[1],item[0]]
+                })
                 resForWard = {
                     state: "success",
                     searchMode: "ward",
                     address: ward + " " + district + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForWard[0].st_x, resForWard[0].st_y],
+                    center: [resForWard[0].st_y, resForWard[0].st_x],
                     borderLine: geojson.coordinates
                 }
                 res.status(200).json(resForWard)
@@ -472,11 +477,14 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForDistrict[0].st_asgeojson)
+                geojson.coordinates = geojson.coordinates.map((item:any)=>{
+                    return [item[1],item[0]]
+                })
                 resForDistrict = {
                     state: "success",
                     searchMode: "district",
                     address: district + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForDistrict[0].st_x, resForDistrict[0].st_y],
+                    center: [resForDistrict[0].st_y, resForDistrict[0].st_x],
                     borderLine: geojson.coordinates
                 }
                 res.status(200).json(resForDistrict)
