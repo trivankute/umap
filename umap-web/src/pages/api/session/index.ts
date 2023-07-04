@@ -1,6 +1,6 @@
 import { getSession } from "@/services/getSession";
 
-export default async function handler(req, res) {
+export default async function handler(req:any, res:any) {
     const session = await getSession(req, res);
     if(req.method==='GET'){
         res.status(200).json({
