@@ -391,7 +391,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // search for only street
             console.log(street)
             // check if street already include 'Đường'
-            if (typeof street === 'string' && street.includes('Đường')) {
+            if (typeof street === 'string' && !street.includes('Đường')) {
                 // add at first
                 street = 'Đường ' + street
             }
@@ -425,7 +425,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 resForStreet = {
                     state: "success",
                     searchMode: "street",
-                    address: street + " " + ward + " " + district + " " + "Thành phố Hồ Chí Minh",
+                    address: street + " " + "Thành phố Hồ Chí Minh",
                     center: [resForStreet[maxIndex].st_x, resForStreet[maxIndex].st_y],
                     borderLine: coorsArray
                 }
