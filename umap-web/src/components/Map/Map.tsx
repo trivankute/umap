@@ -4,7 +4,7 @@ import L, { popup } from "leaflet";
 import { MapContainer, Marker, TileLayer , ZoomControl, useMapEvents,Popup,useMap} from "react-leaflet";
 import { WMSTileLayer, LayersControl} from 'react-leaflet';
 const { BaseLayer, Overlay } = LayersControl;
-import './map.css';
+import './Map.css';
 
 function Event() {
   const map =  useMapEvents({
@@ -25,6 +25,7 @@ function LocationMarkers() {
   const [markers, setMarkers] = useState([]);
   const map = useMapEvents({
     click(e) {
+        // @ts-ignore
         setMarkers(markers => markers.concat([e.latlng]));
     }
   });
@@ -54,7 +55,7 @@ function LocationMarkers() {
 }
 
 export default function MapView(){
-    const mapRef=useRef(null)
+    const mapRef=useRef<any>(null)
     const [center, setCenter] = useState({lat:10.879961,lng:106.810877});
     const [zoom, setZoom] = useState(12);
 
