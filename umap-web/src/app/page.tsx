@@ -4,7 +4,7 @@ import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
 import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(true);
