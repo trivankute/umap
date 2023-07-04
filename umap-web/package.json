@@ -14,6 +14,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/material": "^5.13.5",
+    "@prisma/client": "^4.16.1",
     "@types/node": "20.3.0",
     "@types/react": "18.2.11",
     "@types/react-dom": "18.2.4",
@@ -22,7 +23,9 @@
     "child_process": "^1.0.2",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
+    "fast-levenshtein": "^3.0.0",
     "framer-motion": "^10.12.16",
+    "fuse.js": "^6.6.2",
     "next": "13.4.5",
     "postcss": "8.4.24",
     "react": "18.2.0",
@@ -33,6 +36,7 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^6.4.0",
-    "@types/leaflet": "^1.9.3"
+    "@types/leaflet": "^1.9.3",
+    "prisma": "^4.16.1"
   }
 }
