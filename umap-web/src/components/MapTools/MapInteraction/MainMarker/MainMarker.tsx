@@ -8,14 +8,14 @@ import { motion } from 'framer-motion'
 function PopUpData({ data }: { data: PopupInfor }) {
   return (
     <div className="space-y-2">
-      <div className="flex space-x-1">
-        <div className="font-semibold  w-28">Địa chỉ:</div>
+      <div className="flex flex-col space-y-1">
+        <div className="font-semibold">Địa chỉ:</div>
         <div>
           {data.address}
         </div>
       </div>
       <div className="flex space-x-1">
-        <div className="font-semibold  w-15">Vĩ độ:</div>
+        <div className="font-semibold w-15">Vĩ độ:</div>
         <div>
           {data.lat}
         </div>
@@ -30,7 +30,7 @@ function PopUpData({ data }: { data: PopupInfor }) {
   )
 }
 
-function SetPopup({ position, markerRef, setCirclePos }: { position: number[], markerRef: any, setCirclePos:any }) {
+function SetPopup({ position, markerRef, setCirclePos }: { position: number[], markerRef: any, setCirclePos: any }) {
 
   const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
 
@@ -38,11 +38,12 @@ function SetPopup({ position, markerRef, setCirclePos }: { position: number[], m
     = useSWR(`/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, fetcher)
 
   useEffect(() => {
-    markerRef.current.openPopup()
-  }, [position[0], position[1]])
+    if(markerRef&&markerRef.current)
+      markerRef?.current?.openPopup()
+  }, [position[0], position[1], markerRef&&markerRef.current, isLoading])
 
   useEffect(() => {
-    if (data) { 
+    if (data) {
       setCirclePos([data.data.lat, data.data.lng])
     }
   }, [data])
@@ -98,7 +99,7 @@ function MainMarker({ mapRef }: { mapRef: any }) {
             }
           }
         >
-          <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos}/>
+          <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
           {
             circlePos.length > 0 &&
             <Circle
