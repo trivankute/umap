@@ -1,6 +1,34 @@
 'use client'
 import { useState } from "react";
-import { useMapEvents, Marker } from "react-leaflet";
+import { useMapEvents, Marker, Popup} from "react-leaflet";
+import { PopupInfor } from "@/types/Types";
+import useSWR from "swr"
+
+function PopUpData({data}:{data:PopupInfor}){
+  return (
+    <>
+      <p>Địa chỉ: {data.address}</p>
+      <p>Vĩ độ: {data.lat} <br/>Kinh độ: {data.lng}</p>
+    </>
+  )
+}
+
+function SetPopup({latlng}){
+
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+  const { data, error, isLoading }
+              = useSWR(`/api/map/getAddress/fromCoor?lat=${latlng.lat}&lng=${latlng.lng}`, fetcher)
+
+  // render data
+  return (
+    <Popup>
+      {error && "There is some error"}
+      {isLoading && "Loading..."}
+      {data && <PopUpData data={data.data}/>}
+    </Popup>
+  );
+}
 
 export default function LocationMarkers() {
     const [markers, setMarkers] = useState([]);
@@ -25,12 +53,16 @@ export default function LocationMarkers() {
           position={marker} 
           eventHandlers={
             {
-              click(){
+              dblclick(){
                 removeMarker(idx);
               }
             }
           }
-        />)}
+        >  
+          <SetPopup latlng={marker}/>
+        </Marker>
+        
+        )}
       </>
     );
   }
