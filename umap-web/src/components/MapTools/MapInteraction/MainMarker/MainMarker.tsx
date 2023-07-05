@@ -1,20 +1,36 @@
 'use client'
 import { useState, memo, useRef, useEffect, useCallback } from "react";
-import { useMapEvents, Marker, Popup } from "react-leaflet";
+import { useMapEvents, Marker, Popup, Circle } from "react-leaflet";
 import { PopupInfor } from "@/types/Types";
 import useSWR from "swr"
 import { motion } from 'framer-motion'
 
 function PopUpData({ data }: { data: PopupInfor }) {
   return (
-    <>
-      <p><p className="font-semibold">Địa chỉ:</p> {data.address}</p>
-      <p><p className="font-semibold">Vĩ độ:</p> {data.lat} <br /><p className="font-semibold">Kinh độ:</p> {data.lng}</p>
-    </>
+    <div className="space-y-2">
+      <div className="flex space-x-1">
+        <div className="font-semibold  w-28">Địa chỉ:</div>
+        <div>
+          {data.address}
+        </div>
+      </div>
+      <div className="flex space-x-1">
+        <div className="font-semibold  w-15">Vĩ độ:</div>
+        <div>
+          {data.lat}
+        </div>
+      </div>
+      <div className="flex space-x-1">
+        <div className="font-semibold w-15">Kinh độ:</div>
+        <div>
+          {data.lng}
+        </div>
+      </div>
+    </div>
   )
 }
 
-function SetPopup({ position, markerRef }: { position: number[], markerRef: any }) {
+function SetPopup({ position, markerRef, setCirclePos }: { position: number[], markerRef: any, setCirclePos:any }) {
 
   const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
 
@@ -24,6 +40,12 @@ function SetPopup({ position, markerRef }: { position: number[], markerRef: any 
   useEffect(() => {
     markerRef.current.openPopup()
   }, [position[0], position[1]])
+
+  useEffect(() => {
+    if (data) { 
+      setCirclePos([data.data.lat, data.data.lng])
+    }
+  }, [data])
 
   // render data
   return (
@@ -44,6 +66,7 @@ function SetPopup({ position, markerRef }: { position: number[], markerRef: any 
 
 function MainMarker({ mapRef }: { mapRef: any }) {
   const [position, setPosition] = useState<any>([]);
+  const [circlePos, setCirclePos] = useState<any>([]);
   const markerRef = useRef<any>(null)
 
   useMapEvents({
@@ -75,7 +98,14 @@ function MainMarker({ mapRef }: { mapRef: any }) {
             }
           }
         >
-          <SetPopup position={position} markerRef={markerRef} />
+          <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos}/>
+          {
+            circlePos.length > 0 &&
+            <Circle
+              center={{ lat: circlePos[0], lng: circlePos[1] }}
+              pathOptions={{ color: 'green' }}
+              radius={10} />
+          }
         </Marker>
       }
     </>
