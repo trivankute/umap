@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMapEvents, Marker, Popup} from "react-leaflet";
 import { PopupInfor } from "@/types/Types";
 import useSWR from "swr"
+import { LatLng } from "leaflet";
 
 function PopUpData({data}:{data:PopupInfor}){
   return (
@@ -13,9 +14,9 @@ function PopUpData({data}:{data:PopupInfor}){
   )
 }
 
-function SetPopup({latlng}){
+function SetPopup({latlng}:{latlng:LatLng}){
 
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const fetcher = (...args:[any]) => fetch(...args).then((res) => res.json());
 
   const { data, error, isLoading }
               = useSWR(`/api/map/getAddress/fromCoor?lat=${latlng.lat}&lng=${latlng.lng}`, fetcher)
