@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "umap"]
 }
 
 model tilepage {
@@ -23,6 +25,7 @@ model tilepage {
   @@index([frequency_of_use(sort: Desc)], map: "tilepage_frequency")
   @@index([last_access_time_minutes(sort: Desc)], map: "tilepage_last_access")
   @@index([tileset_id, fill_factor], map: "tilepage_tileset")
+  @@schema("umap")
 }
 
 model tileset {
@@ -35,6 +38,7 @@ model tileset {
   tilepage      tilepage[]
 
   @@index([layer_name], map: "tileset_layer")
+  @@schema("umap")
 }
 
 model user_sessions {
@@ -44,11 +48,578 @@ model user_sessions {
   zoom         Float?
   updated_date DateTime @db.Date
   expires      String?
+
+  @@schema("umap")
 }
 
 model Session {
   id        String   @id
   sid       String   @unique
   data      String
-  expiresAt   DateTime
+  expiresAt DateTime
+
+  @@schema("umap")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model amenity {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model buildings {
+  osm_id      BigInt?
+  name        String?
+  uppername   String?
+  housename   String?
+  housenumber String?
+  way         Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model districts {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model districts_forsearch {
+  district          String?
+  district_geometry Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model forestpark {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lakes {
+  osm_id   BigInt?
+  name     String?
+  way_area Float?                   @db.Real
+  way      Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+model lisbon_2po_4pgr {
+  id            Int                      @id(map: "pkey_lisbon_2po_4pgr")
+  osm_id        BigInt?
+  osm_name      String?                  @db.VarChar
+  osm_meta      String?                  @db.VarChar
+  osm_source_id BigInt?
+  osm_target_id BigInt?
+  clazz         Int?
+  flags         Int?
+  source        Int?
+  target        Int?
+  km            Float?
+  kmh           Int?
+  cost          Float?
+  reverse_cost  Float?
+  x1            Float?
+  y1            Float?
+  x2            Float?
+  y2            Float?
+  geom_way      Unsupported("geometry")?
+
+  @@index([source], map: "idx_lisbon_2po_4pgr_source")
+  @@index([target], map: "idx_lisbon_2po_4pgr_target")
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model minor_roads {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model motorway {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model pedestrian {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model planet_osm_line {
+  osm_id             BigInt?
+  osm_uid            String?
+  osm_version        String?
+  osm_timestamp      String?
+  access             String?
+  addr_housenumber   String?                  @map("addr:housenumber")
+  addr_housename     String?                  @map("addr:housename")
+  addr_street        String?                  @map("addr:street")
+  addr_city          String?                  @map("addr:city")
+  addr_country       String?                  @map("addr:country")
+  addr_province      String?                  @map("addr:province")
+  addr_district      String?                  @map("addr:district")
+  addr_county        String?                  @map("addr:county")
+  addr_interpolation String?                  @map("addr:interpolation")
+  addr_flats         String?                  @map("addr:flats")
+  addr_place         String?                  @map("addr:place")
+  addr_suburb        String?                  @map("addr:suburb")
+  addr_full          String?                  @map("addr:full")
+  admin_level        String?
+  aerialway          String?
+  aeroway            String?
+  amenity            String?
+  area               String?
+  barrier            String?
+  bicycle            String?
+  brand              String?
+  bridge             String?
+  boundary           String?
+  building           String?
+  construction       String?
+  covered            String?
+  culvert            String?
+  cutting            String?
+  denomination       String?
+  disused            String?
+  embankment         String?
+  foot               String?
+  generator_source   String?                  @map("generator:source")
+  harbour            String?
+  highway            String?
+  historic           String?
+  horse              String?
+  intermittent       String?
+  junction           String?
+  landuse            String?
+  layer              String?
+  leisure            String?
+  lock               String?
+  man_made           String?
+  military           String?
+  motorcar           String?
+  name               String?
+  natural            String?
+  office             String?
+  oneway             String?
+  operator           String?
+  place              String?
+  population         String?
+  power              String?
+  power_source       String?
+  public_transport   String?
+  railway            String?
+  ref                String?
+  religion           String?
+  route              String?
+  service            String?
+  shop               String?
+  sport              String?
+  surface            String?
+  toll               String?
+  tourism            String?
+  tower_type         String?                  @map("tower:type")
+  tracktype          String?
+  tunnel             String?
+  water              String?
+  waterway           String?
+  wetland            String?
+  width              String?
+  wood               String?
+  z_order            Int?
+  way_area           Float?                   @db.Real
+  way                Unsupported("geometry")?
+
+  @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model planet_osm_point {
+  osm_id             BigInt?
+  osm_uid            String?
+  osm_version        String?
+  osm_timestamp      String?
+  access             String?
+  addr_housenumber   String?                  @map("addr:housenumber")
+  addr_housename     String?                  @map("addr:housename")
+  addr_street        String?                  @map("addr:street")
+  addr_city          String?                  @map("addr:city")
+  addr_country       String?                  @map("addr:country")
+  addr_province      String?                  @map("addr:province")
+  addr_district      String?                  @map("addr:district")
+  addr_county        String?                  @map("addr:county")
+  addr_interpolation String?                  @map("addr:interpolation")
+  addr_flats         String?                  @map("addr:flats")
+  addr_place         String?                  @map("addr:place")
+  addr_suburb        String?                  @map("addr:suburb")
+  addr_full          String?                  @map("addr:full")
+  admin_level        String?
+  aerialway          String?
+  aeroway            String?
+  amenity            String?
+  area               String?
+  barrier            String?
+  bicycle            String?
+  brand              String?
+  bridge             String?
+  boundary           String?
+  building           String?
+  capital            String?
+  construction       String?
+  covered            String?
+  culvert            String?
+  cutting            String?
+  denomination       String?
+  disused            String?
+  ele                String?
+  embankment         String?
+  foot               String?
+  generator_source   String?                  @map("generator:source")
+  harbour            String?
+  highway            String?
+  historic           String?
+  horse              String?
+  intermittent       String?
+  junction           String?
+  landuse            String?
+  layer              String?
+  leisure            String?
+  lock               String?
+  man_made           String?
+  military           String?
+  motorcar           String?
+  name               String?
+  natural            String?
+  office             String?
+  oneway             String?
+  operator           String?
+  place              String?
+  poi                String?
+  population         String?
+  power              String?
+  power_source       String?
+  public_transport   String?
+  railway            String?
+  ref                String?
+  religion           String?
+  route              String?
+  service            String?
+  shop               String?
+  sport              String?
+  surface            String?
+  toll               String?
+  tourism            String?
+  tower_type         String?                  @map("tower:type")
+  tunnel             String?
+  water              String?
+  waterway           String?
+  wetland            String?
+  width              String?
+  wood               String?
+  z_order            Int?
+  way                Unsupported("geometry")?
+
+  @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model planet_osm_polygon {
+  osm_id             BigInt?
+  osm_uid            String?
+  osm_version        String?
+  osm_timestamp      String?
+  access             String?
+  addr_housenumber   String?                  @map("addr:housenumber")
+  addr_housename     String?                  @map("addr:housename")
+  addr_street        String?                  @map("addr:street")
+  addr_city          String?                  @map("addr:city")
+  addr_country       String?                  @map("addr:country")
+  addr_province      String?                  @map("addr:province")
+  addr_district      String?                  @map("addr:district")
+  addr_county        String?                  @map("addr:county")
+  addr_interpolation String?                  @map("addr:interpolation")
+  addr_flats         String?                  @map("addr:flats")
+  addr_place         String?                  @map("addr:place")
+  addr_suburb        String?                  @map("addr:suburb")
+  addr_full          String?                  @map("addr:full")
+  admin_level        String?
+  aerialway          String?
+  aeroway            String?
+  amenity            String?
+  area               String?
+  barrier            String?
+  bicycle            String?
+  brand              String?
+  bridge             String?
+  boundary           String?
+  building           String?
+  construction       String?
+  covered            String?
+  culvert            String?
+  cutting            String?
+  denomination       String?
+  disused            String?
+  embankment         String?
+  foot               String?
+  generator_source   String?                  @map("generator:source")
+  harbour            String?
+  highway            String?
+  historic           String?
+  horse              String?
+  intermittent       String?
+  junction           String?
+  landuse            String?
+  layer              String?
+  leisure            String?
+  lock               String?
+  man_made           String?
+  military           String?
+  motorcar           String?
+  name               String?
+  natural            String?
+  office             String?
+  oneway             String?
+  operator           String?
+  place              String?
+  population         String?
+  power              String?
+  power_source       String?
+  public_transport   String?
+  railway            String?
+  ref                String?
+  religion           String?
+  route              String?
+  service            String?
+  shop               String?
+  sport              String?
+  surface            String?
+  toll               String?
+  tourism            String?
+  tower_type         String?                  @map("tower:type")
+  tracktype          String?
+  tunnel             String?
+  water              String?
+  waterway           String?
+  wetland            String?
+  width              String?
+  wood               String?
+  z_order            Int?
+  way_area           Float?                   @db.Real
+  way                Unsupported("geometry")?
+
+  @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model planet_osm_roads {
+  osm_id             BigInt?
+  osm_uid            String?
+  osm_version        String?
+  osm_timestamp      String?
+  access             String?
+  addr_housenumber   String?                  @map("addr:housenumber")
+  addr_housename     String?                  @map("addr:housename")
+  addr_street        String?                  @map("addr:street")
+  addr_city          String?                  @map("addr:city")
+  addr_country       String?                  @map("addr:country")
+  addr_province      String?                  @map("addr:province")
+  addr_district      String?                  @map("addr:district")
+  addr_county        String?                  @map("addr:county")
+  addr_interpolation String?                  @map("addr:interpolation")
+  addr_flats         String?                  @map("addr:flats")
+  addr_place         String?                  @map("addr:place")
+  addr_suburb        String?                  @map("addr:suburb")
+  addr_full          String?                  @map("addr:full")
+  admin_level        String?
+  aerialway          String?
+  aeroway            String?
+  amenity            String?
+  area               String?
+  barrier            String?
+  bicycle            String?
+  brand              String?
+  bridge             String?
+  boundary           String?
+  building           String?
+  construction       String?
+  covered            String?
+  culvert            String?
+  cutting            String?
+  denomination       String?
+  disused            String?
+  embankment         String?
+  foot               String?
+  generator_source   String?                  @map("generator:source")
+  harbour            String?
+  highway            String?
+  historic           String?
+  horse              String?
+  intermittent       String?
+  junction           String?
+  landuse            String?
+  layer              String?
+  leisure            String?
+  lock               String?
+  man_made           String?
+  military           String?
+  motorcar           String?
+  name               String?
+  natural            String?
+  office             String?
+  oneway             String?
+  operator           String?
+  place              String?
+  population         String?
+  power              String?
+  power_source       String?
+  public_transport   String?
+  railway            String?
+  ref                String?
+  religion           String?
+  route              String?
+  service            String?
+  shop               String?
+  sport              String?
+  surface            String?
+  toll               String?
+  tourism            String?
+  tower_type         String?                  @map("tower:type")
+  tracktype          String?
+  tunnel             String?
+  water              String?
+  waterway           String?
+  wetland            String?
+  width              String?
+  wood               String?
+  z_order            Int?
+  way_area           Float?                   @db.Real
+  way                Unsupported("geometry")?
+
+  @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model rails {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model roads {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model trunk_primary {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model wards {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model wards_forsearch {
+  ward          String?
+  ward_geometry Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model water {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model waterway {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
 }
