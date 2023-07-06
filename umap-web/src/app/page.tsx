@@ -7,7 +7,7 @@ const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
 import { AnimatePresence } from "framer-motion";
 
 export default function Home({views}:{views:number}) {
-  const [showDirectionBox, setShowDirectionBox] = useState(true);
+  const [showDirectionBox, setShowDirectionBox] = useState(false);
 
   const handleSearchDirection = () => {
     setShowDirectionBox(true);
