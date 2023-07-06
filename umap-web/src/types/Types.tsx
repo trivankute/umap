@@ -3,9 +3,14 @@ export interface SearchBoxProps {
 }
   
 export interface SearchResult {
-    place_id: string;
-    display_name: string;
+    osm_id: string;
+    address: string;
+    center: number[]
+    totalDistance: number
+    type: string 
+    typeOfShape: string
 }
+
 export interface Infor {
     name: string,
     number?: string,

@@ -16,7 +16,7 @@ export default function MapView(){
       const response = await fetch("http://localhost:3000/api/session/", {method: 'GET'})
       .then(response=>response.json())
       .then(result=>result)
-      console.log(response)
+      console.log("response",response)
       if(response.zoom===null){
         console.log('null')
       }else{
