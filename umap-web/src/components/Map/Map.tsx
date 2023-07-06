@@ -1,8 +1,8 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
 import Event from "../MapTools/Event/Event";
-import LocationMarkers from "../MapTools/LocationMarker/LocationMarker";
-import { MapContainer, ZoomControl, WMSTileLayer, LayersControl } from "react-leaflet";
+import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
+import { MapContainer,ZoomControl,WMSTileLayer, LayersControl} from "react-leaflet";
 import './Map.css';
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
 
@@ -58,9 +58,10 @@ export default function MapView() {
             </BaseLayer>
           </LayersControl>
 
-          <ZoomControl position="topright" />
-          <LocationMarkers />
-          <Event />
+        <ZoomControl position="topright" />
+        {/* marker for  */}
+        <MainMarker mapRef={mapRef}/>
+        <Event />
         </MapContainer>
       }
     </>
