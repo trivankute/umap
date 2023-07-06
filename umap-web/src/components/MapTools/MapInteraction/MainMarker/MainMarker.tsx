@@ -65,22 +65,26 @@ function SetPopup({ position, markerRef, setCirclePos }: { position: number[], m
   );
 }
 
-function MainMarker({ mapRef }: { mapRef: any }) {
+function MainMarker({ mapRef, interactMode, setInteractMode }: 
+  { mapRef: any, interactMode:'click'|'filter'|'none', setInteractMode:any }) {
   const [position, setPosition] = useState<any>([]);
   const [circlePos, setCirclePos] = useState<any>([]);
   const markerRef = useRef<any>(null)
-
+  console.log(position)
   useMapEvents({
     click(e) {
       // @ts-ignore
       setPosition([e.latlng.lat, e.latlng.lng]);
       // fly but current zoom
       mapRef.current.flyTo([e.latlng.lat, e.latlng.lng], mapRef.current.getZoom())
+      setInteractMode('click')
     }
   });
 
   const removeMarker = useCallback(() => {
     setPosition([]);
+    setCirclePos([]);
+    setInteractMode('none')
   }, []);
 
 
@@ -89,23 +93,32 @@ function MainMarker({ mapRef }: { mapRef: any }) {
       {
         position.length > 0 &&
         <Marker
+          draggable={interactMode==='filter'?true:false}
           ref={markerRef}
           position={position}
           eventHandlers={
             {
               dblclick() {
                 removeMarker();
+              },
+              dragend(e) {
+                setPosition([e.target._latlng.lat, e.target._latlng.lng])
               }
             }
           }
         >
-          <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
           {
-            circlePos.length > 0 &&
-            <Circle
-              center={{ lat: circlePos[0], lng: circlePos[1] }}
-              pathOptions={{ color: 'green' }}
-              radius={10} />
+            interactMode === 'click' &&
+            <>
+              <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
+              {
+                circlePos.length > 0 &&
+                <Circle
+                  center={{ lat: circlePos[0], lng: circlePos[1] }}
+                  pathOptions={{ color: 'green' }}
+                  radius={10} />
+              }
+            </>
           }
         </Marker>
       }
