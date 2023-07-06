@@ -1,15 +1,190 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "umap"]
+}
+
+model tilepage {
+  key                      String   @id @db.VarChar(320)
+  tileset_id               String?  @db.VarChar(320)
+  page_z                   Int?     @db.SmallInt
+  page_x                   Int?
+  page_y                   Int?
+  creation_time_minutes    Int?
+  frequency_of_use         Float?
+  last_access_time_minutes Int?
+  fill_factor              Float?
+  num_hits                 Decimal? @db.Decimal(64, 0)
+  tileset                  tileset? @relation(fields: [tileset_id], references: [key], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([frequency_of_use(sort: Desc)], map: "tilepage_frequency")
+  @@index([last_access_time_minutes(sort: Desc)], map: "tilepage_last_access")
+  @@index([tileset_id, fill_factor], map: "tilepage_tileset")
+  @@schema("umap")
+}
+
+model tileset {
+  key           String     @id @db.VarChar(320)
+  layer_name    String?    @db.VarChar(128)
+  gridset_id    String?    @db.VarChar(32)
+  blob_format   String?    @db.VarChar(64)
+  parameters_id String?    @db.VarChar(41)
+  bytes         Decimal    @default(0) @db.Decimal(21, 0)
+  tilepage      tilepage[]
+
+  @@index([layer_name], map: "tileset_layer")
+  @@schema("umap")
+}
+
+model user_sessions {
+  session_key  String   @id(map: "user_sessions_pk") @db.VarChar(100)
+  lat          Float?
+  lng          Float?
+  zoom         Float?
+  updated_date DateTime @db.Date
+  expires      String?
+
+  @@schema("umap")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+
+  @@schema("umap")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model amenity {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model buildings {
+  osm_id      BigInt?
+  name        String?
+  uppername   String?
+  housename   String?
+  housenumber String?
+  way         Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model districts {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model districts_forsearch {
+  district          String?
+  district_geometry Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model forestpark {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model lakes {
+  osm_id   BigInt?
+  name     String?
+  way_area Float?                   @db.Real
+  way      Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+model lisbon_2po_4pgr {
+  id            Int                      @id(map: "pkey_lisbon_2po_4pgr")
+  osm_id        BigInt?
+  osm_name      String?                  @db.VarChar
+  osm_meta      String?                  @db.VarChar
+  osm_source_id BigInt?
+  osm_target_id BigInt?
+  clazz         Int?
+  flags         Int?
+  source        Int?
+  target        Int?
+  km            Float?
+  kmh           Int?
+  cost          Float?
+  reverse_cost  Float?
+  x1            Float?
+  y1            Float?
+  x2            Float?
+  y2            Float?
+  geom_way      Unsupported("geometry")?
+
+  @@index([source], map: "idx_lisbon_2po_4pgr_source")
+  @@index([target], map: "idx_lisbon_2po_4pgr_target")
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model minor_roads {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model motorway {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model pedestrian {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model planet_osm_line {
-  osm_id             BigInt                @id
+  osm_id             BigInt?
   osm_uid            String?
   osm_version        String?
   osm_timestamp      String?
@@ -93,11 +268,13 @@ model planet_osm_line {
   way                Unsupported("geometry")?
 
   @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model planet_osm_point {
-  osm_id             BigInt @id
+  osm_id             BigInt?
   osm_uid            String?
   osm_version        String?
   osm_timestamp      String?
@@ -182,11 +359,13 @@ model planet_osm_point {
   way                Unsupported("geometry")?
 
   @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model planet_osm_polygon {
-  osm_id             BigInt @id
+  osm_id             BigInt?
   osm_uid            String?
   osm_version        String?
   osm_timestamp      String?
@@ -270,11 +449,13 @@ model planet_osm_polygon {
   way                Unsupported("geometry")?
 
   @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model planet_osm_roads {
-  osm_id             BigInt @id
+  osm_id             BigInt?
   osm_uid            String?
   osm_version        String?
   osm_timestamp      String?
@@ -358,4 +539,87 @@ model planet_osm_roads {
   way                Unsupported("geometry")?
 
   @@index([way], type: Gist)
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model rails {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model roads {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model trunk_primary {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model wards {
+  osm_id    BigInt?
+  name      String?
+  uppername String?
+  way       Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model wards_forsearch {
+  ward          String?
+  ward_geometry Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model water {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model waterway {
+  osm_id BigInt?
+  name   String?
+  way    Unsupported("geometry")?
+
+  @@ignore
+  @@schema("public")
 }

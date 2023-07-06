@@ -2,4 +2,5 @@
 -   use "npx prisma db pull" to generate prisma client
 -   use "npx prisma db push" to update db if change schema
 -   use "npx prisma studio" to open prisma studio
+-   "npx prisma migrate dev" to sync between db and schema
 -   click outside prisma folder or file and click to random .TS file and type ctrl + P + ">typescript: restart TS server" if prisma client does not update after updating schema.prisma
