@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
 import { AnimatePresence } from "framer-motion";
 
-export default function Home() {
+export default function Home({views}:{views:number}) {
   const [showDirectionBox, setShowDirectionBox] = useState(true);
 
   const handleSearchDirection = () => {
@@ -32,7 +32,7 @@ export default function Home() {
         </AnimatePresence>
       </div>
       <div className="relative">
-        <MapView />
+        <MapView/>
       </div>
     </div>
   )

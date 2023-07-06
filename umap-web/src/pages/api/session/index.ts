@@ -1,7 +1,13 @@
 import { getSession } from "@/services/getSession";
+export const config = {
+    api: {
+      externalResolver: true,
+    },
+};
 
 export default async function handler(req:any, res:any) {
     const session = await getSession(req, res);
+    console.log(session)
     if(req.method==='GET'){
         res.status(200).json({
             'center': session.center??null,
