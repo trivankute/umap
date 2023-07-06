@@ -20,3 +20,11 @@ export interface Infor {
     province?: string,
     country?: string
 }
+
+export interface PopupInfor{
+    address: string,
+    lng: string,
+    lat: string,
+    type: string,
+    typeOfShape: string
+}
