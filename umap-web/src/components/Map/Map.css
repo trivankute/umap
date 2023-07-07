@@ -1,1 +1,10 @@
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+
+.leaflet-grab {
+    cursor: auto;
+ }
+ .leaflet-dragging .leaflet-grab{
+    cursor: move;
+ }
+ 
+ 

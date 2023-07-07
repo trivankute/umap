@@ -4,6 +4,9 @@ import { useMapEvents, Marker, Popup, Circle } from "react-leaflet";
 import { PopupInfor } from "@/types/Types";
 import useSWR from "swr"
 import { motion } from 'framer-motion'
+import './MainMarker.css'
+
+
 
 function PopUpData({ data }: { data: PopupInfor }) {
   return (
@@ -87,40 +90,41 @@ function MainMarker({ mapRef, interactMode, setInteractMode }:
     setInteractMode('none')
   }, []);
 
-
   return (
     <>
       {
         position.length > 0 &&
-        <Marker
-          draggable={interactMode==='filter'?true:false}
-          ref={markerRef}
-          position={position}
-          eventHandlers={
-            {
-              dblclick() {
-                removeMarker();
-              },
-              dragend(e) {
-                setPosition([e.target._latlng.lat, e.target._latlng.lng])
+        <div className='marker'>
+          <Marker
+            draggable={interactMode==='filter'?true:false}
+            ref={markerRef}
+            position={position}
+            eventHandlers={
+              {
+                dblclick() {
+                  removeMarker();
+                },
+                dragend(e) {
+                  setPosition([e.target._latlng.lat, e.target._latlng.lng])
+                }
               }
             }
-          }
-        >
-          {
-            interactMode === 'click' &&
-            <>
-              <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
-              {
-                circlePos.length > 0 &&
-                <Circle
-                  center={{ lat: circlePos[0], lng: circlePos[1] }}
-                  pathOptions={{ color: 'green' }}
-                  radius={10} />
-              }
-            </>
-          }
-        </Marker>
+          >
+            {
+              interactMode === 'click' &&
+              <>
+                <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
+                {
+                  circlePos.length > 0 &&
+                  <Circle
+                    center={{ lat: circlePos[0], lng: circlePos[1] }}
+                    pathOptions={{ color: 'green' }}
+                    radius={10} />
+                }
+              </>
+            }
+            </Marker>
+          </div>
       }
     </>
   );
