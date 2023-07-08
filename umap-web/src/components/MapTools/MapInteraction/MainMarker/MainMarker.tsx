@@ -68,52 +68,48 @@ function SetPopup({ position, markerRef, setCirclePos }: { position: number[], m
   );
 }
 
-function MainMarker({ mapRef, interactMode, setInteractMode }: 
-  { mapRef: any, interactMode:'click'|'filter'|'none', setInteractMode:any }) {
-  const [position, setPosition] = useState<any>([]);
+function MainMarker(props:any) {
   const [circlePos, setCirclePos] = useState<any>([]);
   const markerRef = useRef<any>(null)
-  console.log(position)
   useMapEvents({
     click(e) {
       // @ts-ignore
-      setPosition([e.latlng.lat, e.latlng.lng]);
+      props.setPosition([e.latlng.lat,e.latlng.lng]);
       // fly but current zoom
-      mapRef.current.flyTo([e.latlng.lat, e.latlng.lng], mapRef.current.getZoom())
-      setInteractMode('click')
+      props.mapRef.current.flyTo([e.latlng.lat, e.latlng.lng], props.mapRef.current.getZoom())
+      props.setInteractMode('mainMarkerOn')
     }
   });
 
-  const removeMarker = useCallback(() => {
-    setPosition([]);
+  const removeMarker = () => {
+    props.setPosition([]);
     setCirclePos([]);
-    setInteractMode('none')
-  }, []);
+    props.setInteractMode('mainMarkerOff')
+  };
 
   return (
     <>
       {
-        position.length > 0 &&
+        props.interactMode !== 'mainMarkerOff' &&
         <div className='marker'>
           <Marker
-            draggable={interactMode==='filter'?true:false}
+            draggable={props.interactMode==='filter'?true:false}
             ref={markerRef}
-            position={position}
+            position={props.position}
             eventHandlers={
               {
                 dblclick() {
                   removeMarker();
                 },
                 dragend(e) {
-                  setPosition([e.target._latlng.lat, e.target._latlng.lng])
+                  props.setPosition([e.target._latlng.lat, e.target._latlng.lng])
                 }
               }
             }
           >
             {
-              interactMode === 'click' &&
               <>
-                <SetPopup position={position} markerRef={markerRef} setCirclePos={setCirclePos} />
+                <SetPopup position={props.position} markerRef={markerRef} setCirclePos={setCirclePos} />
                 {
                   circlePos.length > 0 &&
                   <Circle

@@ -1,24 +1,49 @@
 import { memo, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
+import useSWR from "swr"
+import AddressList from "../../AddressList/AddressList";
 
 interface FilterMenuProps {
     show: boolean,
     setShow: (show: boolean) => void,
-    setInteractMode: (mode: 'click' | 'filter' | 'none') => void,
-    interactMode: 'click' | 'filter' | 'none',
+    setInteractMode: any, 
+    interactMode: 'mainMarkerOn' | 'mainMarkerOff' | 'filter',
     position: { top: number, left: number }
+    mainMarkerPosition: any,
+    setAddressList: any
 }
 
-function FilterMenu({ show, setShow, setInteractMode, interactMode, position }: FilterMenuProps) {
+
+function FilterMenu(props: FilterMenuProps) {
     const [radius, setRadius] = useState<number | boolean>(50)
     const [type, setType] = useState<string>('none')
-    console.log(radius, type)
+
+    const fetchData = async (radius:any,type:any) => {
+        // const req = await fetch(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lng=${props.mainMarkerPosition[0]}&lat=${props.mainMarkerPosition[1]}&radius=${radius}`)
+        // console.log('req: ',req);
+        // const addressList = await req.json();
+        const addressList = [
+            {lat:10.724013699479638,lng:106.65269949999998,type:'hospital'},
+            {lat:10.733137699480237,lng:106.6485241,type:'cafe'} 
+        ]
+        let filteredAddressList = null;
+        if(type!=='none')
+            filteredAddressList = addressList.filter(address => address.type===type)
+        else
+            filteredAddressList = addressList;
+        props.setAddressList(filteredAddressList);
+    };
+
+    const handleClick = (radius:any,type:any)=>{
+       fetchData(radius,type); 
+    }
+
     return (
         <>
             <AnimatePresence>
                 {
-                    show &&
+                    props.show &&
                     <motion.div
                         // transform origin on top left
                         initial={{ scale: 0, opacity: 0.5 }}
@@ -26,7 +51,7 @@ function FilterMenu({ show, setShow, setInteractMode, interactMode, position }: 
                         exit={{ opacity: 0 }}
                         transition={{ type: "spring", stiffness: 100 }}
                         className={"w-fit h-fit bg-white absolute rounded-md shadow-xl drop-shadow-xl overflow-hidden"}
-                        style={{ zIndex: 10001, top: position.top, left: position.left, originX: 0, originY: 0 }}>
+                        style={{ zIndex: 10001, top: props.position.top, left: props.position.left, originX: 0, originY: 0 }}>
                         <div className="w-full h-fit text-xs flex items-center p-2">
                             Choose radius:
                         </div>
@@ -44,7 +69,8 @@ function FilterMenu({ show, setShow, setInteractMode, interactMode, position }: 
                                 100m
                             </div>
 
-                            <div className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
+                            <div onClick={()=>handleClick(radius,type)} 
+                            className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
                                 <div className="flex items-center justify-center">
                                     <svg className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />

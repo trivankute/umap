@@ -7,7 +7,7 @@ interface ContextMenuProps {
   setShow: any,
   setShowFilterMenu:any,
   setInteractMode: any,
-  interactMode: 'click' | 'filter' | 'none',
+  interactMode: 'mainMarkerOn' | 'mainMarkerOff' | 'filter',
   position: { top: number, left: number }
 }
 
@@ -27,16 +27,16 @@ function ContextMenu({ show, setShow, setInteractMode, setShowFilterMenu, intera
           <ContextMenuItem disabled text="Chỉ đường từ Marker này" />
           <ContextMenuItem disabled text="Chỉ đường tới Marker này" />
           {
-            interactMode !== 'none' &&
+            interactMode !== 'mainMarkerOff' &&
             <ContextMenuItem setShowFilterMenu={setShowFilterMenu} setShowContextMenu={setShow} setInteractMode={setInteractMode} text="Lọc trong bán kính" modeForMarker="filter" />
           }
           {
-            interactMode !== 'click' && interactMode !== 'none' &&
+              interactMode === 'filter' &&
               <ContextMenuItem setShowContextMenu={setShow} setInteractMode={setInteractMode}
                 text="Chuyển sang xem địa chỉ" modeForMarker="click" />
           }
           {
-            interactMode === 'none' && <ContextMenuItem text="Click vào map để xem địa chỉ" />
+            interactMode === 'mainMarkerOff' && <ContextMenuItem text="Click vào map để xem địa chỉ" />
           }
         </motion.div>
       }

@@ -10,7 +10,7 @@ interface ContextMenuItemProps {
     setShowFilterMenu?:any
 }
 function ContextMenuItem({ setShowFilterMenu, text, setInteractMode, modeForMarker, setShowContextMenu, disabled }: ContextMenuItemProps) {
-    const handleOnClick = useCallback(()=>{
+    const handleOnClick = ()=>{
         if(setInteractMode&&modeForMarker){
             setInteractMode(modeForMarker)
         }
@@ -20,7 +20,7 @@ function ContextMenuItem({ setShowFilterMenu, text, setInteractMode, modeForMark
         if(setShowFilterMenu){
             setShowFilterMenu(true)
         }
-    },[])
+    }
     return ( <>
         <div onClick={handleOnClick} className={clsx("w-full h-8 p-2 text-sm hover:bg-neutral-200 flex items-center", {
             "text-gray-400 bg-gray-100 cursor-not-allowed": disabled,

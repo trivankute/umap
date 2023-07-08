@@ -5,17 +5,21 @@ import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents } from "react-leaflet";
 import './Map.css';
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
+import MapFilter from "../MapTools/MapFilter/MapFilter";
 
 const { BaseLayer } = LayersControl;
 
 interface MapViewProps {
-  interactMode: 'click' | 'filter'|'none',
+  interactMode: 'mainMarkerOff' | 'mainMarkerOn'|'filter',
   setInteractMode: any,
   setShowContextMenu: any,
   setShowFilterMenu: any,
+  setMainMarkerPosition:any,
+  mainMarkerPosition:any,
+  addressList:any
 }
 
-export default function MapView({interactMode, setShowContextMenu, setInteractMode, setShowFilterMenu}: MapViewProps) {
+export default function MapView(props: MapViewProps) {
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
 
@@ -39,6 +43,10 @@ export default function MapView({interactMode, setShowContextMenu, setInteractMo
     }
     fetchData()
   }, [])
+
+  useEffect(()=>{
+    console.log("Address list from Map: ",props.addressList);
+  },[props.addressList])
 
   return (
     <>
@@ -68,9 +76,12 @@ export default function MapView({interactMode, setShowContextMenu, setInteractMo
 
             <ZoomControl position="topright" />
             {/* marker for  */}
-            <MainMarker mapRef={mapRef} interactMode={interactMode} 
-            setInteractMode={setInteractMode}/>
-            <Event setShowContextMenu={setShowContextMenu} setShowFilterMenu={setShowFilterMenu}/>
+            <MainMarker mapRef={mapRef} interactMode={props.interactMode} 
+            setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
+            position={props.mainMarkerPosition} />
+            <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
+            {props.interactMode === 'filter' &&
+              <MapFilter mafRef={mapRef} addressList={props.addressList}/>}
           </MapContainer>
       }
     </>
