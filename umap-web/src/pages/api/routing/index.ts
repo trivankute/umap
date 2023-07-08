@@ -20,6 +20,8 @@ export default async function handler(req: NextRoutingRequest, res: any) {
     4326) as geometry)
         select geometry::text from startPoint
     `)
+    await prisma.$disconnect()
+
     let endPoint = await prisma.$queryRawUnsafe(`
     with 
     endPoint as
@@ -28,6 +30,8 @@ export default async function handler(req: NextRoutingRequest, res: any) {
     4326) as geometry)
         select geometry::text from endPoint
     `)
+    await prisma.$disconnect()
+
     let nearStartPoint = await prisma.$queryRawUnsafe(`
     with 
     nearStartPoint as (select st_closestPoint(st_transform(planet_osm_line.way,4326), $1) as start_geometry from planet_osm_line
@@ -36,6 +40,8 @@ export default async function handler(req: NextRoutingRequest, res: any) {
     limit 1)
     select start_geometry::text from nearStartPoint
     `, startPoint[0].geometry)
+    await prisma.$disconnect()
+
     let nearEndPoint = await prisma.$queryRawUnsafe(`
     with
     nearEndPoint as (select st_closestPoint(st_transform(planet_osm_line.way,4326), $1) as end_geometry from planet_osm_line
@@ -44,6 +50,8 @@ export default async function handler(req: NextRoutingRequest, res: any) {
     limit 1)
     select end_geometry::text from nearEndPoint
     `, endPoint[0].geometry)
+    await prisma.$disconnect()
+
     let routes = await prisma.$queryRawUnsafe(`
     with
     -- find he nearest vertex to the start longitude/latitude
@@ -73,28 +81,32 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         directed := true) as di
     JOIN lisbon_2po_4pgr as topo
     ON di.edge = topo.id)
-    select id, osm_name, km, geom_way::text from directedTable
+    select osm_name, km, geom_way::text from directedTable
     `, nearStartPoint[0].start_geometry, nearEndPoint[0].end_geometry)
 
     // line from start point to near start point
     let lineFromStartPoint = await prisma.$queryRawUnsafe(`
     select st_makeline($1, $2)::text as geometry
     `, startPoint[0].geometry, nearStartPoint[0].start_geometry)
+    await prisma.$disconnect()
 
     // line from end point to near end point
     let lineFromEndPoint = await prisma.$queryRawUnsafe(`
     select st_makeline($1, $2)::text as geometry
     `, nearEndPoint[0].end_geometry, endPoint[0].geometry)
+    await prisma.$disconnect()
 
     // check if the line from start point to near start point intersects with the route
     let intersectAtStart = await prisma.$queryRawUnsafe(`
     select ST_Intersects($1, $2)`,
         routes[0].geom_way, lineFromStartPoint[0].geometry)
+    await prisma.$disconnect()
 
     // check if the line from end point to near end point intersects with the route
     let intersectAtEnd = await prisma.$queryRawUnsafe(`
     select ST_Intersects($1, $2)`,
         routes[routes.length - 1].geom_way, lineFromEndPoint[0].geometry)
+    await prisma.$disconnect()
 
     // time to connect the routes if they intersect at start
     if (intersectAtStart[0].st_intersects === true) {
@@ -102,10 +114,13 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         let lineConnectAtStart = await prisma.$queryRawUnsafe(`
         select st_makeline(st_endpoint($1), st_startpoint($2))::text as geometry
         `, lineFromStartPoint[0].geometry, routes[1].geom_way)
+        await prisma.$disconnect()
         // count length of the line
         let length = await prisma.$queryRawUnsafe(`
         select st_length(st_setsrid($1::geography,4326)) as length
         `, lineConnectAtStart[0].geometry)
+        await prisma.$disconnect()
+
         // replace the routes[0]
         routes[0] = {
             osm_name: 'near_start',
@@ -118,10 +133,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         let lineConnectAtStart = await prisma.$queryRawUnsafe(`
         select st_makeline(st_endpoint($1), st_startpoint($2))::text as geometry
         `, lineFromStartPoint[0].geometry, routes[0].geom_way)
+        await prisma.$disconnect()
+
         // count length of the line
         let length = await prisma.$queryRawUnsafe(`
         select st_length(st_setsrid($1::geography,4326)) as length
         `, lineConnectAtStart[0].geometry)
+        await prisma.$disconnect()
+
         // unshift the routes[0] for lineConnectAtStart
         routes.unshift({
             osm_name: 'start',
@@ -142,10 +161,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         let lineConnectAtEnd = await prisma.$queryRawUnsafe(`
         select st_makeline(st_endpoint($1), st_startpoint($2))::text as geometry
         `, routes[routes.length - 2].geom_way, lineFromEndPoint[0].geometry)
+        await prisma.$disconnect()
+
         // count length of the line
         let length = await prisma.$queryRawUnsafe(`
         select st_length(st_setsrid($1::geography,4326)) as length
         `, lineConnectAtEnd[0].geometry)
+        await prisma.$disconnect()
+
         // replace the routes[routes.length - 1]
         routes[routes.length - 1] = {
             osm_name: 'near_end',
@@ -158,10 +181,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         let lineConnectAtEnd = await prisma.$queryRawUnsafe(`
         select st_makeline(st_endpoint($1), st_startpoint($2))::text as geometry
         `, routes[routes.length - 1].geom_way, lineFromEndPoint[0].geometry)
+        await prisma.$disconnect()
+
         // count length of the line
         let length = await prisma.$queryRawUnsafe(`
         select st_length(st_setsrid($1::geography,4326)) as length
         `, lineConnectAtEnd[0].geometry)
+        await prisma.$disconnect()
+
         // push the routes[routes.length - 1] for lineConnectAtEnd
         routes.push({
             osm_name: 'near_end',
@@ -189,6 +216,8 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             SELECT degrees(ST_Azimuth( st_startpoint($1), st_centroid($1) )) AS degA_B,
             degrees(ST_Azimuth( st_startpoint($2), st_centroid($2) )) AS degB_A`,
                 route.geom_way, routes[index - 1].geom_way)
+            await prisma.$disconnect()
+
             let direction = ''
             // count degress between 2 routes
             let deg = degrees[0].dega_b - degrees[0].degb_a
@@ -259,70 +288,40 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         }
     })
 
-    await prisma.$disconnect()
-    res.json(newRoutes)
+    // loop over newRoutes to convert geom_way to json
+    newRoutes = await newRoutes.map(async (route: any) => {
+        if(Array.isArray(route)) {
+            let geojsonText = await prisma.$queryRawUnsafe(`
+            select ST_MakeLine($1)::text as geojson`, route.map((r:any)=>r.geom_way))
+            await prisma.$disconnect()
+            let geojson = await prisma.$queryRawUnsafe(`
+            select ST_AsGeoJSON($1) as geojson`, geojsonText[0].geojson)
+            await prisma.$disconnect()
+            let newLength = await route.reduce((acc:any, cur:any)=>acc+cur.km, 0)
 
+            return {
+                osm_name: route[0].osm_name,
+                km: newLength,
+                direction: route[0].direction,
+                coors: JSON.parse(geojson[0].geojson).coordinates,
+                geom_way: geojsonText[0].geojson
+            }
+        }
+        else
+        {
+            let geojson = await prisma.$queryRawUnsafe(`
+            select ST_AsGeoJSON($1) as geojson`, route.geom_way)
+            await prisma.$disconnect()
+            return {
+                osm_name: route.osm_name,
+                km: route.km,
+                direction: route.direction,
+                coors: JSON.parse(geojson[0].geojson).coordinates,
+                geom_way: route.geom_way
+            }
+        }
+    })
+    newRoutes = await Promise.all(newRoutes)
 
-    // with
-    // startPoint as
-    // (select ST_SetSRID(
-    // ST_GeomFromText('POINT (106.809692 10.875660)'),
-    // 4326) as geometry) ,
-    // nearStartPoint as (select st_closestPoint(st_transform(planet_osm_line.way,4326), startPoint.geometry) as start_geometry from planet_osm_line, startPoint
-    // where boundary isnull and name notnull
-    // order by st_closestPoint(st_transform(planet_osm_line.way,4326), startPoint.geometry) <-> startPoint.geometry
-    // limit 1),
-    // endPoint as
-    // (select ST_SetSRID(
-    // ST_GeomFromText('POINT (106.806743 10.879248)'),
-    // 4326) as geometry) ,
-    // nearEndPoint as (select st_closestPoint(st_transform(planet_osm_line.way,4326), endPoint.geometry) as end_geometry from planet_osm_line, endPoint
-    // where boundary isnull and name notnull
-    // order by st_closestPoint(st_transform(planet_osm_line.way,4326), endPoint.geometry) <-> endPoint.geometry
-    // limit 1),
-    // -- find he nearest vertex to the start longitude/latitude
-    // start AS (
-    //   SELECT topo.source --could also be topo.target
-    //   FROM nearStartPoint, lisbon_2po_4pgr as topo
-    //   ORDER BY topo.geom_way <-> nearStartPoint.start_geometry
-    //   LIMIT 1
-    // ),
-    // -- find the nearest vertex to the destination longitude/latitude
-    // destination AS (
-    //   SELECT topo.source --could also be topo.target
-    //   FROM nearEndPoint, lisbon_2po_4pgr as topo
-    //   ORDER BY topo.geom_way <-> nearEndPoint.end_geometry
-    //   LIMIT 1
-    // ),
-    // -- use Dijsktra and join with the geometries
-    // directedTable as (SELECT *
-    // FROM pgr_dijkstra('
-    //     SELECT id,
-    //         source,
-    //         target,
-    //         cost
-    //         FROM lisbon_2po_4pgr',
-    //     array(SELECT * FROM start),
-    //     array(SELECT * FROM destination),
-    //     directed := true) as di
-    // JOIN lisbon_2po_4pgr as topo
-    // ON di.edge = topo.id)
-
-    // -- unionTable as (
-    // -- 	select geometry from (
-    // -- 		select st_makeline(startPoint.geometry, nearStartPoint.start_geometry) as geometry from startPoint, nearStartPoint
-    // -- 	) as lol1
-    // -- 	union
-    // -- 	select geometry from (
-    // -- 		select st_makeline(endPoint.geometry, nearEndPoint.end_geometry) as geometry from endPoint, nearEndPoint
-    // -- 	) as lol2
-    // -- 	UNION
-    // -- 	select geom_way from directedTable
-    // -- ),
-    // -- forCheckIntersect as (select geometry from (
-    // -- 		select st_makeline(startPoint.geometry, nearStartPoint.start_geometry) as geometry from startPoint, nearStartPoint
-    // -- ) as lol)
-    // -- select ST_Intersects(geom_way, forCheckIntersect.geometry) from unionTable, forCheckIntersect
-
-    // select * from directedTable
+    res.status(200).json(newRoutes)
 }
