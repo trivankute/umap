@@ -1,4 +1,4 @@
-export default async function handler(prisma:any, ward:string, district:string) {
+export default async function handler(prisma: any, ward: string, district: string) {
     let result = await prisma.$queryRawUnsafe(`
     WITH
     specific_district as (
@@ -13,6 +13,7 @@ export default async function handler(prisma:any, ward:string, district:string) 
 	select ward, st_x(st_transform(st_centroid(ward_geometry),4326)), 
     st_y(st_transform(st_centroid(ward_geometry),4326)),st_asgeojson(ST_Boundary(st_transform(ward_geometry,4326))) from specific_ward
     `, district, ward)
+    await prisma.$disconnect()
     return result
-    
+
 }
