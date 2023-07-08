@@ -118,6 +118,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // @ts-ignore
             let resultCheckWard = await findWard(prisma, ward, district)
             if (resultCheckWard.length === 0) {
+                await prisma.$disconnect()
                 res.status(400).json({
                     state: "failed",
                     message: `Ward ${ward} in district ${district} is not exist`
@@ -273,7 +274,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             result = result.filter((element: any) => {
                 return element.totalDistance <= 10
             })
-            if(result.length === 0) {
+            if (result.length === 0) {
+                await prisma.$disconnect()
                 res.status(400).json({
                     state: "failed",
                     message: "Not found any address match your request"
@@ -377,6 +379,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             )
             // wait for all promises to resolve
             result = await Promise.all(result)
+            await prisma.$disconnect()
             res.status(200).json({
                 state: "success",
                 searchMode: "full",
@@ -396,8 +399,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             // @ts-ignore
             let resForStreet = await findStreet(prisma, street)
+            await prisma.$disconnect()
             // connect all coors
-            let coorsArray:any = []
+            let coorsArray: any = []
             // we will intend to get the center of which have most coors
             let maxLength = -999
             let maxIndex = -999
@@ -414,6 +418,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             // return result
             if (resForStreet.length === 0) {
+                await prisma.$disconnect()
                 res.status(400).json({
                     state: "failed",
                     message: `Street ${street} is not exist`
@@ -421,8 +426,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
-                coorsArray = coorsArray.map((item:any)=>{
-                    return [item[1],item[0]]
+                coorsArray = coorsArray.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForStreet = {
                     state: "success",
@@ -431,6 +436,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     center: [resForStreet[maxIndex].st_y, resForStreet[maxIndex].st_x],
                     borderLine: coorsArray
                 }
+                await prisma.$disconnect()
                 res.status(200).json(resForStreet)
             }
         }
@@ -440,6 +446,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             console.log(ward, district)
             // @ts-ignore
             let resForWard = await findWard(prisma, ward, district)
+            await prisma.$disconnect()
             if (resForWard.length === 0) {
                 res.status(400).json({
                     state: "failed",
@@ -449,8 +456,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForWard[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item:any)=>{
-                    return [item[1],item[0]]
+                geojson.coordinates = geojson.coordinates.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForWard = {
                     state: "success",
@@ -468,6 +475,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             console.log(district)
             // @ts-ignore
             let resForDistrict = await findDistrict(prisma, district)
+            await prisma.$disconnect()
             if (resForDistrict.length === 0) {
                 res.status(400).json({
                     state: "failed",
@@ -477,8 +485,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForDistrict[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item:any)=>{
-                    return [item[1],item[0]]
+                geojson.coordinates = geojson.coordinates.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForDistrict = {
                     state: "success",

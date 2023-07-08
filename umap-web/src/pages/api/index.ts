@@ -7,6 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // prisma call
     // const parentDirectory = getParentDirectory()
     let result = await checkWardExist(prisma, 'Phường 14', 'Quận 10')
+    await prisma.$disconnect()
     
     res.status(200).json(result)
 

@@ -186,13 +186,13 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         }
         else {
             let degrees = await prisma.$queryRawUnsafe(`
-            SELECT degrees(ST_Azimuth( st_startpoint($1), st_endpoint($1) )) AS degA_B,
-            degrees(ST_Azimuth( st_startpoint($2), st_endpoint($2) )) AS degB_A`,
+            SELECT degrees(ST_Azimuth( st_startpoint($1), st_centroid($1) )) AS degA_B,
+            degrees(ST_Azimuth( st_startpoint($2), st_centroid($2) )) AS degB_A`,
                 route.geom_way, routes[index - 1].geom_way)
             let direction = ''
             // count degress between 2 routes
             let deg = degrees[0].dega_b - degrees[0].degb_a
-            console.log(route.id, deg)
+            // console.log(route.id, deg)
             let isLeftSide = false // if the previous route is on the left side of the current route
             if (deg <= 180 && deg >= 0)
                 isLeftSide = true
@@ -202,14 +202,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             }
             else if (deg >= -180) {
                 deg = 0 - deg
-                isLeftSide = true
+                isLeftSide = false
             }
             else if (deg >= -360) {
                 deg = 360 + deg
-                isLeftSide = false
+                isLeftSide = true
             }
             if (isLeftSide) {
-                if (deg <= 45)
+                if (deg <= 30)
                     direction = 'straight'
                 else if (deg <= 135)
                     direction = 'right'
@@ -217,7 +217,7 @@ export default async function handler(req: NextRoutingRequest, res: any) {
                     direction = 'u turn right'
             }
             else {
-                if (deg <= 45)
+                if (deg <= 30)
                     direction = 'straight'
                 else if (deg <= 135)
                     direction = 'left'
@@ -229,58 +229,38 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             }
         }
     })
+    routes = await Promise.all(routes)
 
     // connect those consecutive whose direction is straight and have same name
-    // and make geometry become json
-    // let newRoutes:any = []
-    // let temp:any = []
-    // await routes.forEach(async (route: any, index: number) => {
-    // if(route.direction === 'straight')
-    // {
-    // if(temp.length===0){
-    // let jsonRoute = await prisma.$queryRawUnsafe(`
-    // select st_asgeojson($1) as geometry
-    // `, route.geom_way)
-    // newRoutes.push({
-    //     ...route,
-    //     geom_way: jsonRoute[0].geometry
-    // })
-    //     }
-    //     else
-    //     {
-    //         if(temp[temp.length-1].osm_name === route.osm_name)
-    //         {
-    //             temp.push(route)
-    //         }
-    //         else
-    //         {
-    //             // process temp
-    //             let tempLength = 0
-    //             let tempName = temp[temp.length-1].osm_name
-    //             let tempGeometry = ''
-    //             await temp.forEach(async (tempRoute:any)=>{
-    //                 tempLength += tempRoute.km
+    let newRoutes: any = []
+    let temp: any = []
+    routes.forEach((route: any, index: number) => {
+        if (route.direction === 'straight') {
+            if (temp.length === 0) {
+                temp.push(route)
+            }
+            else {
+                if (temp[temp.length - 1].osm_name === route.osm_name) {
+                    temp.push(route)
+                }
+                else {
+                    newRoutes.push(temp)
+                    temp = []
+                    temp.push(route)
+                }
+            }
+        }
+        else {
+            if (temp.length > 0) {
+                newRoutes.push(temp)
+                temp = []
+            }
+            newRoutes.push(route)
+        }
+    })
 
-    //             })
-    //             temp = []
-    //             temp.push(route)
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     if(temp.length>0)
-    //     {
-    //         newRoutes.push(temp)
-    //         temp = []
-    //     }
-    //     newRoutes.push(route)
-    // }
-    // })
-    // await those routes
-    routes = await Promise.all(routes)
-    // routes = newRoutes
-    res.json(routes)
+    await prisma.$disconnect()
+    res.json(newRoutes)
 
 
     // with
