@@ -11,6 +11,12 @@ interface NextRoutingRequest extends NextRequest {
 
 export default async function handler(req: NextRoutingRequest, res: any) {
     const { lng1, lat1, lng2, lat2 } = req.query
+    // check validation
+    if(!lng1 || !lat1 || !lng2 || !lat2)
+    {
+        res.status(400).json({message: 'You must provide all lng1, lat1, lng2, lat2'})
+        return
+    }
     let totalLength = 0
     let startPoint = await prisma.$queryRawUnsafe(`
     with 
