@@ -5,16 +5,16 @@ interface NextRoutingRequest extends NextRequest {
         lng1: number,
         lat1: number,
         lng2: number,
-        lat2: number
+        lat2: number,
+        mode: "car" | "foot"
     }
 }
 
 export default async function handler(req: NextRoutingRequest, res: any) {
-    const { lng1, lat1, lng2, lat2 } = req.query
+    const { lng1, lat1, lng2, lat2, mode } = req.query
     // check validation
-    if(!lng1 || !lat1 || !lng2 || !lat2)
-    {
-        res.status(400).json({message: 'You must provide all lng1, lat1, lng2, lat2'})
+    if (!lng1 || !lat1 || !lng2 || !lat2 || !mode) {
+        res.status(400).json({ message: 'You must provide all lng1, lat1, lng2, lat2, mode' })
         return
     }
     let totalLength = 0
@@ -84,11 +84,51 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             FROM lisbon_2po_4pgr',
         array(SELECT * FROM start),
         array(SELECT * FROM destination),
-        directed := true) as di
+        directed := false) as di
     JOIN lisbon_2po_4pgr as topo
     ON di.edge = topo.id)
-    select osm_name, km, geom_way::text from directedTable
+    select osm_name, km, geom_way::text, directedTable.source::text as routeSource, directedTable.target::text as routeTarget,
+    start.source as startSource
+    from directedTable, start
     `, nearStartPoint[0].start_geometry, nearEndPoint[0].end_geometry)
+    await prisma.$disconnect()
+
+    // sort every string in routes in correct direction
+    let sortedRoutes:any = []
+    routes = await routes.map(async (route: any, index:number) => {
+        // if target of route = target of the previous route then route is reversed
+        if(index===0)
+        {
+            if(route.routesource === route.startsource)
+            {
+                let geom_way = await prisma.$queryRawUnsafe(`
+                select st_reverse($1)::text as geom_way
+                `, route.geom_way)
+                await prisma.$disconnect()
+                sortedRoutes.push({
+                    ...route, geom_way: geom_way[0].geom_way
+                })
+            }
+            else
+            sortedRoutes.push(route)
+        }
+        else {
+            if(route.routetarget === sortedRoutes[index-1].routetarget)
+            {
+                let geom_way = await prisma.$queryRawUnsafe(`
+                select st_reverse($1)::text as geom_way
+                `, route.geom_way)
+                await prisma.$disconnect()
+                sortedRoutes.push({
+                    ...route, geom_way: geom_way[0].geom_way
+                })
+            }
+            else   
+            sortedRoutes.push(route)
+        }
+    })
+    routes = await Promise.all(routes)
+    routes = sortedRoutes
 
     // line from start point to near start point
     let lineFromStartPoint = await prisma.$queryRawUnsafe(`
@@ -219,11 +259,10 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         }
         else {
             let degrees = await prisma.$queryRawUnsafe(`
-            SELECT degrees(ST_Azimuth( st_startpoint($1), st_centroid($1) )) AS degA_B,
-            degrees(ST_Azimuth( st_startpoint($2), st_centroid($2) )) AS degB_A`,
+                SELECT degrees(ST_Azimuth( st_startpoint($1), st_centroid($1) )) AS degA_B,
+                degrees(ST_Azimuth( st_startpoint($2), st_centroid($2) )) AS degB_A`,
                 route.geom_way, routes[index - 1].geom_way)
             await prisma.$disconnect()
-
             let direction = ''
             // count degress between 2 routes
             let deg = degrees[0].dega_b - degrees[0].degb_a
@@ -296,14 +335,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
 
     // loop over newRoutes to convert geom_way to json
     newRoutes = await newRoutes.map(async (route: any) => {
-        if(Array.isArray(route)) {
+        if (Array.isArray(route)) {
             let geojsonText = await prisma.$queryRawUnsafe(`
-            select ST_MakeLine($1)::text as geojson`, route.map((r:any)=>r.geom_way))
+            select ST_MakeLine($1)::text as geojson`, route.map((r: any) => r.geom_way))
             await prisma.$disconnect()
             let geojson = await prisma.$queryRawUnsafe(`
             select ST_AsGeoJSON($1) as geojson`, geojsonText[0].geojson)
             await prisma.$disconnect()
-            let newLength = await route.reduce((acc:any, cur:any)=>acc+cur.km, 0)
+            let newLength = await route.reduce((acc: any, cur: any) => acc + cur.km, 0)
 
             return {
                 osm_name: route[0].osm_name,
@@ -313,8 +352,7 @@ export default async function handler(req: NextRoutingRequest, res: any) {
                 geom_way: geojsonText[0].geojson
             }
         }
-        else
-        {
+        else {
             let geojson = await prisma.$queryRawUnsafe(`
             select ST_AsGeoJSON($1) as geojson`, route.geom_way)
             await prisma.$disconnect()
