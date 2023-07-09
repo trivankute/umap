@@ -142,6 +142,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
 
                 select osm_id::text, "addr:housenumber", "addr:street", name from specific_points
                 `, district, ward)
+            await prisma.$disconnect()
             // loop points and find the nearest street also fulfil null street by nearest street
             points = points.map(async (point: any) => {
                 let nearestStreet
@@ -194,6 +195,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
 
                 select osm_id::text, "addr:housenumber", "addr:street", name from specific_polygons
                 `, district, ward)
+            await prisma.$disconnect()
             // // loop polygons and find the nearest street also fulfil null street by nearest street
             polygons = polygons.map(async (polygon: any) => {
                 let nearestStreet
@@ -273,7 +275,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             result = result.filter((element: any) => {
                 return element.totalDistance <= 10
             })
-            if(result.length === 0) {
+            if (result.length === 0) {
                 res.status(400).json({
                     state: "failed",
                     message: "Not found any address match your request"
@@ -291,6 +293,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                         amenity, shop, tourism, historic,
                         st_y(st_transform(way,4326)) as lat, 
                         st_x(st_transform(way,4326)) as lng from planet_osm_point where osm_id = $1`, id)
+                    await prisma.$disconnect()
                     // for type
                     let type = ""
                     if (forResult[0].amenity) {
@@ -320,6 +323,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                         landuse, building, amenity, leisure, shop,
                         st_y(st_transform(st_centroid(way),4326)) as lat, 
                         st_x(st_transform(st_centroid(way),4326)) as lng from planet_osm_polygon where osm_id = $1`, id)
+                    await prisma.$disconnect()
                     // for type
                     let type = ""
                     if (forResult[0].building && forResult[0].building !== "yes") {
@@ -397,7 +401,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // @ts-ignore
             let resForStreet = await findStreet(prisma, street)
             // connect all coors
-            let coorsArray:any = []
+            let coorsArray: any = []
             // we will intend to get the center of which have most coors
             let maxLength = -999
             let maxIndex = -999
@@ -421,8 +425,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
-                coorsArray = coorsArray.map((item:any)=>{
-                    return [item[1],item[0]]
+                coorsArray = coorsArray.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForStreet = {
                     state: "success",
@@ -449,8 +453,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForWard[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item:any)=>{
-                    return [item[1],item[0]]
+                geojson.coordinates = geojson.coordinates.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForWard = {
                     state: "success",
@@ -477,8 +481,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             }
             else {
                 let geojson = JSON.parse(resForDistrict[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item:any)=>{
-                    return [item[1],item[0]]
+                geojson.coordinates = geojson.coordinates.map((item: any) => {
+                    return [item[1], item[0]]
                 })
                 resForDistrict = {
                     state: "success",
