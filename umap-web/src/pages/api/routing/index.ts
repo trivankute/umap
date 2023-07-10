@@ -17,6 +17,7 @@ export default async function handler(req: NextRoutingRequest, res: any) {
         res.status(400).json({ message: 'You must provide all lng1, lat1, lng2, lat2, mode' })
         return
     }
+    let databaseName = mode === 'car' ? 'lisbon_2po_4pgr' : 'forFoot_2po_4pgr'
     let totalLength = 0
     let startPoint = await prisma.$queryRawUnsafe(`
     with 
@@ -63,14 +64,14 @@ export default async function handler(req: NextRoutingRequest, res: any) {
     -- find he nearest vertex to the start longitude/latitude
     start AS (
     SELECT topo.source --could also be topo.target
-    FROM lisbon_2po_4pgr as topo
+    FROM ${databaseName} as topo
     ORDER BY topo.geom_way <-> $1
     LIMIT 1
     ),
     -- find the nearest vertex to the destination longitude/latitude
     destination AS (
     SELECT topo.source --could also be topo.target
-    FROM lisbon_2po_4pgr as topo
+    FROM ${databaseName} as topo
     ORDER BY topo.geom_way <-> $2
     LIMIT 1
     ),
@@ -81,10 +82,10 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             source,
             target,
             cost
-            FROM lisbon_2po_4pgr',
+            FROM ${databaseName}',
         array(SELECT * FROM start),
         array(SELECT * FROM destination),
-        directed := false)
+        directed := $3)
     ),
     directedTable as (SELECT *,
         case 
@@ -92,12 +93,12 @@ export default async function handler(req: NextRoutingRequest, res: any) {
             else st_reverse(topo.geom_way)
         end as route_geom
     FROM dijkstra as di
-    JOIN lisbon_2po_4pgr as topo
+    JOIN ${databaseName} as topo
     ON di.edge = topo.id)
     select osm_name, km, route_geom::text as geom_way, directedTable.source::text as routeSource, directedTable.target::text as routeTarget,
     start.source as startSource
     from directedTable, start
-    `, nearStartPoint[0].start_geometry, nearEndPoint[0].end_geometry)
+    `, nearStartPoint[0].start_geometry, nearEndPoint[0].end_geometry, mode === 'car' ? true : false)
     await prisma.$disconnect()
 
     // line from start point to near start point
