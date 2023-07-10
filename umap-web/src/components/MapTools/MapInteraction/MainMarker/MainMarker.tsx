@@ -5,6 +5,7 @@ import { PopupInfor } from "@/types/Types";
 import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
+import CircleFilter from "../CircleFilter/CircleFilter";
 
 function PopUpData({ data }: { data: PopupInfor }) {
   return (
@@ -144,7 +145,13 @@ function MainMarker(props: any) {
             }
             {
               props.interactMode === 'filter' && props.fetchingFilter &&
+              <>
               <PopUpForLoading markerRef={markerRef} />
+              </>
+            }
+            {props.interactMode === 'filter' &&
+              <CircleFilter mapRef={props.mapRef} addressList={props.addressList} 
+              fetchingFilter={props.fetchingFilter} mainMarker={props.position}/>
             }
           </Marker>
         </div>
