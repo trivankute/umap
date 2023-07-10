@@ -5,6 +5,7 @@ import { PopupInfor } from "@/types/Types";
 import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
+import Loading from "@/components/ForLoading/Loading/Loading";
 
 
 
@@ -68,6 +69,26 @@ function SetPopup({ position, markerRef, setCirclePos }: { position: number[], m
   );
 }
 
+function PopUpForLoading({markerRef}:{markerRef:any})
+{
+  useEffect(()=>{
+    markerRef?.current?.openPopup()
+  },[])
+
+  return (<>
+    <motion.div
+      initial={{ scale: 0.5, opacity: 0.5 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.5, opacity: 0.5 }}
+      transition={{ duration: 1 }}
+    >
+      <Popup className="drop-shadow-md">
+        <Loading/>
+      </Popup>
+    </motion.div>
+  </>)
+}
+
 function MainMarker(props:any) {
   const [circlePos, setCirclePos] = useState<any>([]);
   const markerRef = useRef<any>(null)
@@ -118,6 +139,10 @@ function MainMarker(props:any) {
                     radius={10} />
                 }
               </>
+            }
+            {
+              props.interactMode === 'filter' && props.fetchingFilter &&
+              <PopUpForLoading markerRef={markerRef}/>
             }
             </Marker>
           </div>

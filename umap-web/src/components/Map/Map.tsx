@@ -73,7 +73,7 @@ export default function MapView(props: MapViewProps) {
             <ZoomControl position="topright" />
             <MainMarker mapRef={props.mapRef} interactMode={props.interactMode} 
             setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
-            position={props.mainMarkerPosition} />
+            position={props.mainMarkerPosition} fetchingFilter={props.fetchingFilter}/>
             <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
             {props.interactMode === 'filter' &&
               <MapFilter mapRef={props.mapRef} addressList={props.addressList} 

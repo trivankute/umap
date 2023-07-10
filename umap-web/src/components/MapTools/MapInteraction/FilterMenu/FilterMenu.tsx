@@ -1,9 +1,7 @@
 import { memo, useState } from "react";
-import { AnimatePresence, filterProps, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
-import AddressList from "../../AddressList/AddressList";
-import { Circle } from "react-leaflet";
 
 interface FilterMenuProps {
     show: boolean,
