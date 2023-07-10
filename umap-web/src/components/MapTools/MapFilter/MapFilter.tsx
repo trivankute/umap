@@ -1,18 +1,29 @@
-import { marker } from "leaflet";
-import { Marker } from "react-leaflet"
+import { Marker, Circle } from "react-leaflet"
+import {icon} from "./CustomMarker"
+
 
 interface MapFilterProps{
-    mafRef:any,
-    addressList:any
+    mapRef:any,
+    addressList:any,
+    fetchingFilter: any,
+    mainMarker:any,
 }
-export default function MapFilter({addressList}:MapFilterProps){
-    if(addressList.length > 0){
-        console.log(addressList);
-        let markerList = addressList.map((address:any) =>
-                <Marker position={[address.lat,address.lng]}/>
-        )
-        return markerList;
-    }
-    else 
-        return <></>
+export default function MapFilter(props:MapFilterProps){
+    return (
+        <>
+        {props.fetchingFilter ?
+            <Circle
+            center={{ lat: props.mainMarker[0], lng: props.mainMarker[1] }}
+            pathOptions={{ color: 'red' }}
+            radius={100} />
+            :
+            props.addressList.map((address:any) =>
+                <Marker position={[address.lat,address.lng]}
+                //icon={icon}
+                />
+            )
+            
+        }    
+        </>
+    )
 }

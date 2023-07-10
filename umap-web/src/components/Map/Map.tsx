@@ -16,19 +16,18 @@ interface MapViewProps {
   setShowFilterMenu: any,
   setMainMarkerPosition:any,
   mainMarkerPosition:any,
-  addressList:any
+  addressList:any,
+  mapRef: any,
+  fetchingFilter:any,
 }
 
 export default function MapView(props: MapViewProps) {
-  const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
-
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("http://localhost:3000/api/session/", { method: 'GET' })
         .then(response => response.json())
         .then(result => result)
-      console.log(response)
       if (response.zoom === null || response.center === null) {
         setView({
           center: { lat: 10.879961, lng: 106.810877 },
@@ -44,9 +43,6 @@ export default function MapView(props: MapViewProps) {
     fetchData()
   }, [])
 
-  useEffect(()=>{
-    console.log("Address list from Map: ",props.addressList);
-  },[props.addressList])
 
   return (
     <>
@@ -62,7 +58,7 @@ export default function MapView(props: MapViewProps) {
             scrollWheelZoom={true}
             zoomControl={false}
             style={{ height: "100vh", width: "100vw" }}
-            ref={mapRef}
+            ref={props.mapRef}
           >
 
             <LayersControl>
@@ -75,13 +71,14 @@ export default function MapView(props: MapViewProps) {
             </LayersControl>
 
             <ZoomControl position="topright" />
-            {/* marker for  */}
-            <MainMarker mapRef={mapRef} interactMode={props.interactMode} 
+            <MainMarker mapRef={props.mapRef} interactMode={props.interactMode} 
             setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
             position={props.mainMarkerPosition} />
             <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
             {props.interactMode === 'filter' &&
-              <MapFilter mafRef={mapRef} addressList={props.addressList}/>}
+              <MapFilter mapRef={props.mapRef} addressList={props.addressList} 
+              fetchingFilter={props.fetchingFilter} mainMarker={props.mainMarkerPosition}/>
+            }
           </MapContainer>
       }
     </>

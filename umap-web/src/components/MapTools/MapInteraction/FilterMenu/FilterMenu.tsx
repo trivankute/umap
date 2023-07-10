@@ -1,8 +1,9 @@
 import { memo, useState } from "react";
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, filterProps, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
 import AddressList from "../../AddressList/AddressList";
+import { Circle } from "react-leaflet";
 
 interface FilterMenuProps {
     show: boolean,
@@ -11,36 +12,43 @@ interface FilterMenuProps {
     interactMode: 'mainMarkerOn' | 'mainMarkerOff' | 'filter',
     position: { top: number, left: number }
     mainMarkerPosition: any,
-    setAddressList: any
+    setAddressList: any,
+    mapRef:any,
+    setFetchingFilter:any,
+    fetchingFilter:any
 }
 
+function FetchFilter(props:any){
+    props.mapRef.current.flyTo(props.mainMarker, 18);
 
-function FilterMenu(props: FilterMenuProps) {
-    const [radius, setRadius] = useState<number | boolean>(50)
-    const [type, setType] = useState<string>('none')
-
-    const fetchData = async (radius:any,type:any) => {
-        // const req = await fetch(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lng=${props.mainMarkerPosition[0]}&lat=${props.mainMarkerPosition[1]}&radius=${radius}`)
-        // console.log('req: ',req);
-        // const addressList = await req.json();
-        const addressList = [
-            {lat:10.724013699479638,lng:106.65269949999998,type:'hospital'},
-            {lat:10.733137699480237,lng:106.6485241,type:'cafe'} 
-        ]
+    const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
+    const { data, error, isLoading }
+    = useSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, fetcher)
+    if(data){
+        const addressList = data.data;
         let filteredAddressList = null;
-        if(type!=='none')
-            filteredAddressList = addressList.filter(address => address.type===type)
+        if(props.type!=='none')
+            filteredAddressList = addressList.filter((address:any) => address.type===props.type)
         else
             filteredAddressList = addressList;
         props.setAddressList(filteredAddressList);
-    };
+        props.setFetchingFilter(false);
+    }
+    return <></>
+}
 
-    const handleClick = (radius:any,type:any)=>{
-       fetchData(radius,type); 
+function FilterMenu(props: FilterMenuProps) {
+    const [radius, setRadius] = useState<number | boolean>(50);
+    const [type, setType] = useState<string>('none');
+
+    const handleClick = ()=>{
+       props.setFetchingFilter(true);
     }
 
     return (
         <>
+            {props.fetchingFilter && <FetchFilter radius={radius} mainMarker={props.mainMarkerPosition} 
+            mapRef={props.mapRef} setAddressList={props.setAddressList} type={type} setFetchingFilter={props.setFetchingFilter}/>}
             <AnimatePresence>
                 {
                     props.show &&
@@ -69,7 +77,7 @@ function FilterMenu(props: FilterMenuProps) {
                                 100m
                             </div>
 
-                            <div onClick={()=>handleClick(radius,type)} 
+                            <div onClick={handleClick} 
                             className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
                                 <div className="flex items-center justify-center">
                                     <svg className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

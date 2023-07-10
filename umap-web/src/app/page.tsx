@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef} from "react";
 import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
 import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
 import dynamic from "next/dynamic";
@@ -16,6 +16,8 @@ export default function Home() {
   const [interactMode, setInteractMode] = useState<'mainMarkerOff' | 'filter' | 'mainMarkerOn'>('mainMarkerOff');
   const [mainMarkerPosition, setMainMarkerPosition] = useState<any>([]);
   const [addressList, setAddressList] = useState<any>([]);
+  const [fetchingFilter, setFetchingFilter] = useState<any>(false);
+  const mapRef = useRef<any>(null)
 
   const MapviewProps = {
     interactMode,
@@ -24,7 +26,9 @@ export default function Home() {
     setShowFilterMenu,
     setMainMarkerPosition,
     mainMarkerPosition,
-    addressList
+    addressList,
+    mapRef,
+    fetchingFilter,
   };
 
   const ContextMenuProps = {
@@ -43,7 +47,10 @@ export default function Home() {
     interactMode,
     position: menuPosition,
     setAddressList,
-    mainMarkerPosition
+    mainMarkerPosition,
+    mapRef,
+    fetchingFilter,
+    setFetchingFilter,
   };
 
   const handleSearchDirection = useCallback(() => {
