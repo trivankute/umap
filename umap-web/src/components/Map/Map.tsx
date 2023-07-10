@@ -5,7 +5,7 @@ import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents } from "react-leaflet";
 import './Map.css';
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
-import MapFilter from "../MapTools/MapFilter/MapFilter";
+import MapFilter from "../MapTools/MapInteraction/MapFilter/MapFilter";
 
 const { BaseLayer } = LayersControl;
 
