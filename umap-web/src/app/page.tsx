@@ -16,7 +16,7 @@ export default function Home() {
   const [interactMode, setInteractMode] = useState<'mainMarkerOff' | 'filter' | 'mainMarkerOn'>('mainMarkerOff');
   const [mainMarkerPosition, setMainMarkerPosition] = useState<any>([]);
   const [addressList, setAddressList] = useState<any>([]);
-  const [fetchingFilter, setFetchingFilter] = useState<any>(false);
+  const [fetchingFilter, setFetchingFilter] = useState<false|number>(false);
   const mapRef = useRef<any>(null)
 
   const MapviewProps = {

@@ -5,7 +5,7 @@ import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents } from "react-leaflet";
 import './Map.css';
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
-import MapFilter from "../MapTools/MapInteraction/MapFilter/MapFilter";
+import CircleFilter from "../MapTools/MapInteraction/CircleFilter/CircleFilter";
 
 const { BaseLayer } = LayersControl;
 
@@ -76,7 +76,7 @@ export default function MapView(props: MapViewProps) {
             position={props.mainMarkerPosition} fetchingFilter={props.fetchingFilter}/>
             <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
             {props.interactMode === 'filter' &&
-              <MapFilter mapRef={props.mapRef} addressList={props.addressList} 
+              <CircleFilter mapRef={props.mapRef} addressList={props.addressList} 
               fetchingFilter={props.fetchingFilter} mainMarker={props.mainMarkerPosition}/>
             }
           </MapContainer>

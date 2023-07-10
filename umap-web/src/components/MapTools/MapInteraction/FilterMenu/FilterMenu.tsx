@@ -40,7 +40,7 @@ function FilterMenu(props: FilterMenuProps) {
     const [type, setType] = useState<string>('none');
 
     const handleClick = ()=>{
-       props.setFetchingFilter(true);
+       props.setFetchingFilter(radius);
     }
 
     return (
