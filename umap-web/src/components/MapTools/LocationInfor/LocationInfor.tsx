@@ -1,7 +1,7 @@
-import { Infor, SearchResult } from "@/types/Types";
+import { SearchResult } from "@/types/Types";
 import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCity, faGlobe, faHouse, faMap, faMapMarkedAlt, faNetworkWired, faRoad } from "@fortawesome/free-solid-svg-icons";
+import { faMapMarkedAlt} from "@fortawesome/free-solid-svg-icons";
 
 export default function LocationInfor({item}:{item: SearchResult}){
     return(

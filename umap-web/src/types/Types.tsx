@@ -1,3 +1,5 @@
+import { LatLngExpression } from "leaflet";
+
 export interface SearchBoxProps {
     onSearchDirection: () => void;
 }
@@ -5,23 +7,24 @@ export interface SearchBoxProps {
 export interface SearchResult {
     osm_id: string;
     address: string;
-    center: number[]
+    center: any
     totalDistance: number
     type: string 
     typeOfShape: string
+    state?: string
+    searchMode?: string
+    borderLine?: any
 }
 
-export interface Infor {
-    name: string,
-    number?: string,
-    streetName?: string,
-    District?: string,
-    City?: string,
-    province?: string,
-    country?: string
+export interface SearchAreaResult {
+    state: string, 
+    searchMode: string,
+    address: string,
+    center: number[],
+    borderLine: number[][]
 }
 
-export interface PopupInfor{
+export interface PopupInfor {
     address: string,
     lng: string,
     lat: string,

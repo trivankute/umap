@@ -4,10 +4,13 @@ import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer,ZoomControl,WMSTileLayer, LayersControl} from "react-leaflet";
 import './Map.css';
+import { motion } from "framer-motion";
+import MarkerElement from "../MapTools/MapInteraction/MarkerElement/MarkerElement";
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
+import { SearchResult } from "@/types/Types";
 
 const { BaseLayer } = LayersControl;
-export default function MapView() {
+export default function MapView({itemMarker}:{itemMarker: SearchResult}) {
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
 
@@ -51,7 +54,7 @@ export default function MapView() {
 
           <LayersControl>
             <BaseLayer checked name="U-MAP">
-              <WMSTileLayer url="https://umap.dientoan.vn/geoserver/ows?" layers='TVtesting:planet_osm_line' />
+              <WMSTileLayer url="https://umap.dientoan.vn/geoserver/ows?" layers='umap:hochiminh-basemap' />
             </BaseLayer>
             <BaseLayer checked name="OSM">
               <WMSTileLayer url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" />
@@ -61,6 +64,7 @@ export default function MapView() {
         <ZoomControl position="topright" />
         {/* marker for  */}
         <MainMarker mapRef={mapRef}/>
+        {itemMarker && <MarkerElement mapRef={mapRef} item={itemMarker}/>}
         <Event />
         </MapContainer>
       }
