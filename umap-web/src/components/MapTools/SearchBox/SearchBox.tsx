@@ -1,4 +1,3 @@
-'use client'
 import React, { useState, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -8,29 +7,32 @@ import getAddresses from '@/services/getAddresses';
 import { SearchBoxProps, SearchResult } from '@/types/Types';
 import LocationInfor from '../LocationInfor/LocationInfor';
 
-export default function SearchBox ({props, setItemMarker}:{
-  props: SearchBoxProps,
+export default function SearchBox({ onSearchDirection, setItemMarker }: {
+  onSearchDirection: () => void,
   setItemMarker: (item: SearchResult) => void
 }) {
   const [searchValue, setSearchValue] = useState('');
   const [listPlace, setListPlace] = useState<SearchResult[]>([]);
   const [list, setList] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
   };
 
   const handleSearch = async () => {
+    setIsLoading(true); // Set isLoading to true when starting the search
     const listAddresses = await getAddresses(searchValue);
     console.log(listAddresses);
     setList(true);
     setListPlace(listAddresses);
-    setSelectedItem(null)
+    setSelectedItem(null);
+    setIsLoading(false); // Set isLoading to false after the search is complete
   };
 
   const handleDirection = () => {
-    props.onSearchDirection();
+    onSearchDirection();
   };
 
   return (
@@ -66,13 +68,15 @@ export default function SearchBox ({props, setItemMarker}:{
         </button>
       </div>
 
-      {selectedItem ? (
+      {isLoading ? (
+        <div className="text-center mt-2 bg-white">Loading...</div> 
+      ) : selectedItem ? (
         <LocationInfor item={selectedItem} />
       ) : (
         <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
-          {list && <AddressList listPlace={listPlace} setSelectedItem={setSelectedItem} setItemMarker = {setItemMarker}/>}
+          {list && <AddressList listPlace={listPlace} setSelectedItem={setSelectedItem} setItemMarker={setItemMarker} />}
         </div>
       )}
     </motion.div>
   );
-};
+}
