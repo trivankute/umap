@@ -51,6 +51,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         select st_x(st_transform(way,4326)) as lng, st_y(st_transform(way,4326)) as lat
          from nearPoints
         `, "SRID=4326;POINT("+lng+" "+lat+")", radius)
+        await prisma.$disconnect()
     
         // find all polygons within 50m of this point
         const polygons:any = await prisma.$queryRawUnsafe(`with
@@ -67,6 +68,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         select st_x(st_transform(st_centroid(way),4326)) as lng, st_y(st_transform(st_centroid(way),4326)) as lat
         from nearPolygons
         `, "SRID=4326;POINT("+lng+" "+lat+")", radius)
+        await prisma.$disconnect()
         
         // use nearestAddress to convert these lng and lat of points and polygons to addresses
         let results:any = []

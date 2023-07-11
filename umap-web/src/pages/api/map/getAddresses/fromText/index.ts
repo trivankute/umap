@@ -143,6 +143,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
 
                 select osm_id::text, "addr:housenumber", "addr:street", name from specific_points
                 `, district, ward)
+            await prisma.$disconnect()
             // loop points and find the nearest street also fulfil null street by nearest street
             points = points.map(async (point: any) => {
                 let nearestStreet
@@ -195,6 +196,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
 
                 select osm_id::text, "addr:housenumber", "addr:street", name from specific_polygons
                 `, district, ward)
+            await prisma.$disconnect()
             // // loop polygons and find the nearest street also fulfil null street by nearest street
             polygons = polygons.map(async (polygon: any) => {
                 let nearestStreet
@@ -275,7 +277,6 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return element.totalDistance <= 10
             })
             if (result.length === 0) {
-                await prisma.$disconnect()
                 res.status(400).json({
                     state: "failed",
                     message: "Not found any address match your request"
@@ -293,6 +294,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                         amenity, shop, tourism, historic,
                         st_y(st_transform(way,4326)) as lat, 
                         st_x(st_transform(way,4326)) as lng from planet_osm_point where osm_id = $1`, id)
+                    await prisma.$disconnect()
                     // for type
                     let type = ""
                     if (forResult[0].amenity) {
@@ -322,6 +324,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                         landuse, building, amenity, leisure, shop,
                         st_y(st_transform(st_centroid(way),4326)) as lat, 
                         st_x(st_transform(st_centroid(way),4326)) as lng from planet_osm_polygon where osm_id = $1`, id)
+                    await prisma.$disconnect()
                     // for type
                     let type = ""
                     if (forResult[0].building && forResult[0].building !== "yes") {
