@@ -3,13 +3,15 @@ import { List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/materi
 import { SearchResult } from "@/types/Types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-import { setLocation } from "@/services/locations";
 
-function AddressList({listPlace}:{
-    listPlace: SearchResult[]
+function AddressList({listPlace, setSelectedItem, setItemMarker}:{
+    listPlace: SearchResult[],
+    setSelectedItem: (item: SearchResult) => void,
+    setItemMarker: (item: SearchResult) => void
 }) {
-    const handleLocation = (item: SearchResult)=>{
-        setLocation(item)
+    const handleLocation = (item: SearchResult) => {
+        setSelectedItem(item);
+        setItemMarker(item)
     }
 
     return ( <>
@@ -18,7 +20,7 @@ function AddressList({listPlace}:{
             <List className='list-address bg-white' component="nav" aria-label="main mailbox folders">
                 {listPlace.map((item) => {
                 return (
-                    <div key={item?.place_id}>
+                    <div key={item?.osm_id}>
                     <ListItem
                         onClick={()=>handleLocation(item)}
                         className="hover:bg-gray-100 cursor-pointer"
@@ -26,13 +28,19 @@ function AddressList({listPlace}:{
                         <ListItemIcon>
                         <FontAwesomeIcon icon={faMapMarkerAlt} />
                         </ListItemIcon>
-                        <ListItemText primary={item?.display_name} />
+                        <ListItemText primary={item?.address} />
                     </ListItem>
                     <Divider />
                     </div>
                 );
                 })}
             </List>
+        }
+        {
+            listPlace.length === 0 && 
+            <div className="bg-white ">
+                <p>NOT FOUND</p> 
+            </div>
         }
         </> );
 }
