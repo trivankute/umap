@@ -22,10 +22,10 @@ function ContextMenu({ show, setShow, setInteractMode, setShowFilterMenu, intera
           animate={{ scale: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ type: "spring", stiffness: 100 }}
-          className={"w-fit h-fit bg-white absolute rounded-md shadow-xl drop-shadow-xl overflow-hidden"}
+          className={"w-fit h-fit bg-white absolute rounded-tr-md rounded-b-md shadow-xl drop-shadow-xl overflow-hidden"}
           style={{ zIndex: 10001, top: position.top, left: position.left, originX: 0, originY: 0 }}>
-          <ContextMenuItem disabled text="Chỉ đường từ Marker này" />
-          <ContextMenuItem disabled text="Chỉ đường tới Marker này" />
+          <ContextMenuItem text="Chỉ đường từ Marker này" />
+          <ContextMenuItem text="Chỉ đường tới Marker này" />
           {
             interactMode !== 'mainMarkerOff' &&
             <ContextMenuItem setShowFilterMenu={setShowFilterMenu} setShowContextMenu={setShow} setInteractMode={setInteractMode} text="Lọc trong bán kính" modeForMarker="filter" />
