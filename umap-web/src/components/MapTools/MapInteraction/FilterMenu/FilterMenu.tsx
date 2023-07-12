@@ -2,31 +2,34 @@ import { memo, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
+import Draggable from "react-draggable";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface FilterMenuProps {
     show: boolean,
     setShow: (show: boolean) => void,
-    setInteractMode: any, 
+    setInteractMode: any,
     interactMode: 'mainMarkerOn' | 'mainMarkerOff' | 'filter',
-    position: { top: number, left: number }
+    position: { top: number, left: number },
+    setPosition: any,
     mainMarkerPosition: any,
     setAddressList: any,
-    mapRef:any,
-    setFetchingFilter:any,
-    fetchingFilter:any
+    mapRef: any,
+    setFetchingFilter: any,
+    fetchingFilter: any,
 }
 
-function FetchFilter(props:any){
+function FetchFilter(props: any) {
     props.mapRef.current.flyTo(props.mainMarker, 18);
 
     const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
     const { data, error, isLoading }
-    = useSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, fetcher)
-    if(data){
+        = useSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, fetcher)
+    if (data) {
         const addressList = data.data;
         let filteredAddressList = null;
-        if(props.type!=='none')
-            filteredAddressList = addressList.filter((address:any) => address.type===props.type)
+        if (props.type !== 'none')
+            filteredAddressList = addressList.filter((address: any) => address.type === props.type)
         else
             filteredAddressList = addressList;
         props.setAddressList(filteredAddressList);
@@ -38,15 +41,34 @@ function FetchFilter(props:any){
 function FilterMenu(props: FilterMenuProps) {
     const [radius, setRadius] = useState<number | boolean>(50);
     const [type, setType] = useState<string>('none');
+    const [dragging, setDragging] = useState(false);
 
-    const handleClick = ()=>{
-       props.setFetchingFilter(radius);
+    const handleClick = () => {
+        props.setFetchingFilter(radius);
     }
 
+    const onDrag = (event: any, ui: any) => {
+        const { x, y } = ui;
+        props.setPosition({ top: props.position.top + y, left: props.position.left + x });
+        if (event.type === 'mousemove' || event.type === 'touchmove') {
+            setDragging(true)
+        }
+
+        if (event.type === 'mouseup' || event.type === 'touchend') {
+            setTimeout(() => {
+                setDragging(false);
+            }, 100);
+
+        }
+    }
+
+    const dragHandlers = {
+        onDrag: onDrag
+    };
     return (
         <>
-            {props.fetchingFilter && <FetchFilter radius={radius} mainMarker={props.mainMarkerPosition} 
-            mapRef={props.mapRef} setAddressList={props.setAddressList} type={type} setFetchingFilter={props.setFetchingFilter}/>}
+            {props.fetchingFilter && <FetchFilter radius={radius} mainMarker={props.mainMarkerPosition}
+                mapRef={props.mapRef} setAddressList={props.setAddressList} type={type} setFetchingFilter={props.setFetchingFilter} />}
             <AnimatePresence>
                 {
                     props.show &&
@@ -58,7 +80,13 @@ function FilterMenu(props: FilterMenuProps) {
                         transition={{ type: "spring", stiffness: 100 }}
                         className={"w-fit h-fit bg-white absolute rounded-md shadow-xl drop-shadow-xl overflow-hidden"}
                         style={{ zIndex: 10001, top: props.position.top, left: props.position.left, originX: 0, originY: 0 }}>
+                        <Draggable {...dragHandlers}>
+                            <div className="w-full h-10 bg-pink-200 cursor-grab">Drag here</div>
+                        </Draggable>
                         <div className="w-full h-fit text-xs flex items-center p-2">
+                            <ArrowBackIcon
+                                className="rounded-full border border-slate-200 cursor-pointer hover:border-slate-200 text-base"
+                            />
                             Choose radius:
                         </div>
                         <div className="w-full h-fit border-b border-gray-300 flex justify-around items-center space-x-2 p-2">
@@ -75,8 +103,8 @@ function FilterMenu(props: FilterMenuProps) {
                                 100m
                             </div>
 
-                            <div onClick={handleClick} 
-                            className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
+                            <div onClick={handleClick}
+                                className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
                                 <div className="flex items-center justify-center">
                                     <svg className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />

@@ -7,9 +7,12 @@ interface ContextMenuItemProps {
     modeForMarker?: 'filter' | 'click',
     setShowContextMenu?: any,
     disabled?: boolean,
-    setShowFilterMenu?:any
+    setShowFilterMenu?:any,
+    setStartPoint?:any,
+    setEndPoint?:any,
+    remove?:boolean,
 }
-function ContextMenuItem({ setShowFilterMenu, text, setInteractMode, modeForMarker, setShowContextMenu, disabled }: ContextMenuItemProps) {
+function ContextMenuItem({ remove,setStartPoint, setEndPoint, setShowFilterMenu, text, setInteractMode, modeForMarker, setShowContextMenu, disabled }: ContextMenuItemProps) {
     const handleOnClick = ()=>{
         if(setInteractMode&&modeForMarker){
             setInteractMode(modeForMarker)
@@ -19,6 +22,20 @@ function ContextMenuItem({ setShowFilterMenu, text, setInteractMode, modeForMark
         }
         if(setShowFilterMenu){
             setShowFilterMenu(true)
+        }
+        if(setStartPoint&&!remove){
+            setStartPoint("readyToSet")
+        }
+        else if(setStartPoint&&remove)
+        {
+            setStartPoint(null)
+        }
+        if(setEndPoint&&!remove){
+            setEndPoint("readyToSet")
+        }
+        else if(setEndPoint&&remove)
+        {
+            setEndPoint(null)
         }
     }
     return ( <>

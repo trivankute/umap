@@ -1,10 +1,12 @@
 "use client";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents } from "react-leaflet";
 import './Map.css';
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
+import StartPoint from "../MapTools/Routing/StartPoint/StartPoint";
+import EndPoint from "../MapTools/Routing/EndPoint/EndPoint";
 
 const { BaseLayer } = LayersControl;
 
@@ -18,6 +20,11 @@ interface MapViewProps {
   addressList:any,
   mapRef: any,
   fetchingFilter:any,
+
+  startPoint:any,
+  setStartPoint:any,
+  endPoint:any,
+  setEndPoint:any
 }
 
 export default function MapView(props: MapViewProps) {
@@ -70,9 +77,19 @@ export default function MapView(props: MapViewProps) {
             </LayersControl>
 
             <ZoomControl position="topright" />
-            <MainMarker mapRef={props.mapRef} interactMode={props.interactMode} 
+            <MainMarker startPoint={props.startPoint} endPoint={props.endPoint}
+            setStartPoint={props.setStartPoint} setEndPoint={props.setEndPoint}
+            mapRef={props.mapRef} interactMode={props.interactMode} 
             setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
             position={props.mainMarkerPosition} fetchingFilter={props.fetchingFilter} addressList={props.addressList}/>
+            {
+              props.startPoint && Array.isArray(props.startPoint) &&
+              <StartPoint position={props.startPoint} setPosition={props.setStartPoint}/>
+            }
+            {
+              props.endPoint && Array.isArray(props.endPoint) &&
+              <EndPoint position={props.endPoint} setPosition={props.setEndPoint}/>
+            }
             <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
           </MapContainer>
       }

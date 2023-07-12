@@ -6,7 +6,7 @@ import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
 import CircleFilter from "../CircleFilter/CircleFilter";
-import L, { map } from 'leaflet'
+import L from 'leaflet'
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -112,11 +112,24 @@ function MainMarker(props: any) {
   const markerRef = useRef<any>(null)
   useMapEvents({
     click(e) {
-      // @ts-ignore
-      props.setPosition([e.latlng.lat, e.latlng.lng]);
-      // fly but current zoom
-      props.mapRef.current.flyTo([e.latlng.lat, e.latlng.lng], props.mapRef.current.getZoom())
-      props.setInteractMode('mainMarkerOn')
+      console.log(e, props.startPoint)
+      if(props.startPoint==="readyToSet")
+      {
+        props.setStartPoint([e.latlng.lat, e.latlng.lng])
+        return;
+      }
+      else if(props.endPoint==="readyToSet")
+      {
+        props.setEndPoint([e.latlng.lat, e.latlng.lng])
+        return;
+      }
+      else {
+        // @ts-ignore
+        props.setPosition([e.latlng.lat, e.latlng.lng]);
+        // fly but current zoom
+        props.mapRef.current.flyTo([e.latlng.lat, e.latlng.lng], props.mapRef.current.getZoom())
+        props.setInteractMode('mainMarkerOn')
+      }
     }
   });
 

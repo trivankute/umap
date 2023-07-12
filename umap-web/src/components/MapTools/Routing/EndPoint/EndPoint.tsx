@@ -2,8 +2,8 @@ import { memo } from "react";
 import { Marker } from "react-leaflet";
 import L from 'leaflet'
 
-const blueIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+const redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
     iconSize: [22, 40],
     iconAnchor: [12, 41],
@@ -11,13 +11,13 @@ const blueIcon = new L.Icon({
     shadowSize: [41, 41],
   });
 
-function StartPoint({position, setPosition}:{position:any, setPosition:any}) {
+function EndPoint({position, setPosition}:{position:any, setPosition:any}) {
     const removeMarker = () => {
         setPosition(null)
     }
     return ( <>
         <Marker position={position}
-        icon={blueIcon}
+        icon={redIcon}
         draggable={true}
         eventHandlers={
           {
@@ -33,4 +33,4 @@ function StartPoint({position, setPosition}:{position:any, setPosition:any}) {
     </> );
 }
 
-export default memo(StartPoint);
+export default memo(EndPoint);

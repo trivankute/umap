@@ -7,6 +7,7 @@ const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
 import { AnimatePresence } from "framer-motion";
 import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/ContextMenu";
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
+import { LatLngExpression } from "leaflet";
 
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
@@ -18,6 +19,9 @@ export default function Home() {
   const [addressList, setAddressList] = useState<any>([]);
   const [fetchingFilter, setFetchingFilter] = useState<false|number>(false);
   const mapRef = useRef<any>(null)
+  // for startPoint
+  const [startPoint, setStartPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
+  const [endPoint, setEndPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
 
   const MapviewProps = {
     interactMode,
@@ -29,6 +33,11 @@ export default function Home() {
     addressList,
     mapRef,
     fetchingFilter,
+
+    startPoint,
+    setStartPoint,
+    endPoint,
+    setEndPoint
   };
 
   const ContextMenuProps = {
@@ -37,7 +46,13 @@ export default function Home() {
     setShowFilterMenu,
     setInteractMode,
     interactMode,
-    position: menuPosition
+    position: menuPosition,
+    setPosition: setMenuPosition,
+
+    startPoint,
+    setStartPoint,
+    endPoint,
+    setEndPoint
   };
 
   const FilterMenuProps = {
@@ -46,6 +61,7 @@ export default function Home() {
     setInteractMode,
     interactMode,
     position: menuPosition,
+    setPosition: setMenuPosition,
     setAddressList,
     mainMarkerPosition,
     mapRef,
@@ -76,6 +92,25 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(()=>{
+    function dispatch() {
+      // fake click event
+      const event = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        clientX: menuPosition.left,
+        clientY: menuPosition.top
+      });
+      // leaflet-container dispatch
+      document.getElementsByClassName('leaflet-container')[0].dispatchEvent(event);
+    }
+    if(startPoint==="readyToSet"||endPoint==="readyToSet")
+    {
+      dispatch();
+    }
+  },[startPoint, endPoint])
+
 
   return (
     <div className="relative">
@@ -93,8 +128,14 @@ export default function Home() {
       </div>
       <div className="relative">
         <MapView {...MapviewProps} />
-        <ContextMenu {...ContextMenuProps} />
-        <FilterMenu {...FilterMenuProps} />
+        {
+          showContextMenu &&
+          <ContextMenu {...ContextMenuProps} />
+        }
+        {
+          showFilterMenu && 
+          <FilterMenu {...FilterMenuProps} />
+        }
       </div>
     </div>
   )
