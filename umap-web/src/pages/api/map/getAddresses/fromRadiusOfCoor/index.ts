@@ -84,6 +84,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         if (typeBuilding!=="all") {
             results = results.filter((result:any)=>result.type===typeBuilding)
         }
+        await prisma.$disconnect()
         // return these points and polygons
         res.status(200).json({
             state:"success",
