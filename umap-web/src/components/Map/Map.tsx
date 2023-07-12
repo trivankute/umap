@@ -10,7 +10,7 @@ import PageLoading from "../ForLoading/PageLoading/PageLoading";
 import { SearchResult } from "@/types/Types";
 
 const { BaseLayer } = LayersControl;
-export default function MapView({itemMarker}:{itemMarker: SearchResult}) {
+export default function MapView({itemMarker}:{itemMarker: SearchResult|null}) {
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
 
