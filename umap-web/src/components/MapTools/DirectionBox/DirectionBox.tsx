@@ -1,8 +1,10 @@
 'use client'
-import React, { useState, memo } from 'react'
+import React, { useState, memo, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
+// import { useRoutingContext } from '@/context/RoutingContext';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddressList from '../AddressList/AddressList';
 import { motion } from 'framer-motion';
 
@@ -28,8 +30,11 @@ interface SearchResult {
   ]
 
 const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
+        // const { source, destination, swapOrder } = useRoutingContext()
         const [listPlace, setListPlace] = useState<SearchResult[]>([]);
-        
+        const srcSearchRef = useRef<HTMLInputElement>(null)
+        const destSearchRef = useRef<HTMLInputElement>(null)
+
         const handleSearch = () => {
             setListPlace(addresses)
         };
@@ -37,6 +42,18 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const handleCancel = () => {
             props.onDirectionCancel()
         }
+
+        // useEffect(() => {
+        //     console.log(source, destination)
+        //     if(srcSearchRef.current != null && source?.address != null) {
+        //         srcSearchRef.current.value = source.address
+        //     }
+        //     if(destSearchRef.current != null && destination?.address != null) {
+        //         destSearchRef.current.value = destination.address
+        //     }
+        // }, [source?.address, destination?.address])
+
+
   return (
     <motion.div 
         initial={{opacity:0, x: -500}}
@@ -68,6 +85,13 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
                 </button>
             </div>
+
+            <div className='border border-red-500 rounded-full w-fit hover:bg-red-300 cursor-pointer ml-auto mr-2'
+                    // onClick={swapOrder}
+                >
+                    <SwapHorizIcon className='text-red-500'/>
+            </div>
+
             <div className="direction-des">
                 <div className="icon-direction w-[40px] flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -83,7 +107,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             </div>
         </div>
         <div className="direction-address  max-w-[300px] md:max-w-[500px]">
-            <AddressList listPlace={listPlace}/>
+            {/* <AddressList listPlace={listPlace}/> */}
         </div>
     </motion.div>
   )
