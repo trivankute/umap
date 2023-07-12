@@ -3,6 +3,9 @@
 .leaflet-grab {
     cursor: auto;
  }
+ .leaflet-marker-icon:hover {
+      cursor: grab;
+ }
  .leaflet-dragging .leaflet-grab{
     cursor: move;
  }

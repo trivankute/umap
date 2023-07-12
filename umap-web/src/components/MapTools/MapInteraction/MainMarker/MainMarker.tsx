@@ -6,7 +6,7 @@ import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
 import CircleFilter from "../CircleFilter/CircleFilter";
-import L from 'leaflet'
+import L, { map } from 'leaflet'
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -48,7 +48,7 @@ function PopUpData({ data }: { data: PopupInfor }) {
   )
 }
 
-function SetPopup({ position, markerRef, setCirclePos }: { position: number[], markerRef: any, setCirclePos: any }) {
+function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, position: number[], markerRef: any, setCirclePos: any }) {
 
   const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
 
@@ -57,12 +57,17 @@ function SetPopup({ position, markerRef, setCirclePos }: { position: number[], m
 
   useEffect(() => {
     if (markerRef && markerRef.current)
-      markerRef?.current?.openPopup()
+      {
+        markerRef?.current?.openPopup()
+        mapRef.current.flyTo([position[0], position[1]], mapRef.current.getZoom())
+      }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
   useEffect(() => {
     if (data) {
-      setCirclePos([data.data.lat, data.data.lng])
+      {
+        setCirclePos([data.data.lat, data.data.lng])
+      }
     }
   }, [data])
 
@@ -127,7 +132,7 @@ function MainMarker(props: any) {
         props.interactMode !== 'mainMarkerOff' &&
         <div className='marker'>
           <Marker
-            draggable={props.interactMode === 'filter' ? true : false}
+            draggable={true}
             ref={markerRef}
             position={props.position}
             icon={redIcon}
@@ -144,7 +149,7 @@ function MainMarker(props: any) {
           >
             {
               <>
-                <SetPopup position={props.position} markerRef={markerRef} setCirclePos={setCirclePos} />
+                <SetPopup mapRef={props.mapRef} position={props.position} markerRef={markerRef} setCirclePos={setCirclePos} />
                 {
                   circlePos.length > 0 &&
                   <Circle
