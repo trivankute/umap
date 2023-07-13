@@ -2,8 +2,6 @@ import { memo, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
-import Draggable from "react-draggable";
-//import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface FilterMenuProps {
     show: boolean,
@@ -123,31 +121,36 @@ function FilterMenu(props: FilterMenuProps) {
                             <div className="flex items-center">
                                 <input onChange={(e: any) => {
                                     setType(e.target.value)
-                                }} checked id="none" type="radio" value="none" name="filter" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
+                                }} checked={type==="none"} id="none" type="radio" value="none" name="filter" 
+                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
                                 <label htmlFor="none" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">none</label>
                             </div>
                             <div className="flex items-center">
                                 <input onChange={(e: any) => {
                                     setType(e.target.value)
-                                }} id="cafe" type="radio" value="cafe" name="filter" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
+                                }} checked={type==="cafe"} id="cafe" type="radio" value="cafe" name="filter" 
+                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
                                 <label htmlFor="cafe" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">cafe</label>
                             </div>
                             <div className="flex items-center">
                                 <input onChange={(e: any) => {
                                     setType(e.target.value)
-                                }} id="hospital" type="radio" value="hospital" name="filter" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
+                                }} checked={type==="hospital"} id="hospital" type="radio" value="hospital" name="filter" 
+                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
                                 <label htmlFor="hospital" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">hospital</label>
                             </div>
                             <div className="flex items-center">
                                 <input onChange={(e: any) => {
                                     setType(e.target.value)
-                                }} id="school" type="radio" value="school" name="filter" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
+                                }} checked={type==="school"} id="school" type="radio" value="school" name="filter" 
+                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
                                 <label htmlFor="school" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">school</label>
                             </div>
                             <div className="flex items-center">
                                 <input onChange={(e: any) => {
                                     setType(e.target.value)
-                                }} id="store" type="radio" value="store" name="filter" className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
+                                }} checked={type==="store"} id="store" type="radio" value="store" name="filter" 
+                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
                                 <label htmlFor="store" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">store</label>
                             </div>
                         </div>

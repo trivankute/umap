@@ -36,9 +36,6 @@ function ContextMenu(props: ContextMenuProps) {
               className={"w-fit h-fit bg-white absolute rounded-tr-md rounded-b-md shadow-xl drop-shadow-xl overflow-hidden"}
               style={{ zIndex: 10001, top: props.position.top, left: props.position.left, originX: 0, originY: 0 }}>
               <div className="w-full h-10 bg-white cursor-grab p-1">
-                {/* <CloseButton style={{float:'right',
-                backgroundSize:"cover", 
-                width:"40px", height:"40px"}}></CloseButton> */}
                 <button onClick={closeHandler} type="button" className="hover:bg-neutral-200" 
                 aria-label="Close" style={{float:'right'}}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">

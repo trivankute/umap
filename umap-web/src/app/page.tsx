@@ -8,10 +8,12 @@ import { AnimatePresence } from "framer-motion";
 import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/ContextMenu";
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
 import { LatLngExpression } from "leaflet";
-// Bootstrap CSS
+// Bootstrap Stuffs
 import "bootstrap/dist/css/bootstrap.min.css";
-// Bootstrap Bundle JS
 import "bootstrap/dist/js/bootstrap.bundle.min";
+
+//-------------------------------------------------------------------------------------------------------------------
+
 export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
   const [showContextMenu, setShowContextMenu] = useState(false);
@@ -36,7 +38,6 @@ export default function Home() {
     addressList,
     mapRef,
     fetchingFilter,
-
     startPoint,
     setStartPoint,
     endPoint,
