@@ -30,9 +30,7 @@ export default function Home() {
 
   const MapviewProps = {
     interactMode,
-    setShowContextMenu,
     setInteractMode,
-    setShowFilterMenu,
     setMainMarkerPosition,
     mainMarkerPosition,
     addressList,

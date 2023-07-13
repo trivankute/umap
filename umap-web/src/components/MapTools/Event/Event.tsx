@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useMapEvents } from "react-leaflet"
 let timeBeforeClear = 2000
-export default function Event({setShowContextMenu, setShowFilterMenu}:{setShowContextMenu:any, setShowFilterMenu:any}) {
+export default function Event() {
   const [readyToSave, setReadyToSave] = useState(false)
   const [event, setEvent] = useState<any>(null)
   useEffect(() => {
@@ -32,8 +32,6 @@ export default function Event({setShowContextMenu, setShowFilterMenu}:{setShowCo
     movestart(event) {
       setReadyToSave(false)
       setEvent(null)
-      setShowContextMenu(false)
-      setShowFilterMenu(false)
     },
     zoomstart(event) {
       setReadyToSave(false)

@@ -13,8 +13,6 @@ const { BaseLayer } = LayersControl;
 interface MapViewProps {
   interactMode: 'mainMarkerOff' | 'mainMarkerOn'|'filter',
   setInteractMode: any,
-  setShowContextMenu: any,
-  setShowFilterMenu: any,
   setMainMarkerPosition:any,
   mainMarkerPosition:any,
   addressList:any,
@@ -90,7 +88,7 @@ export default function MapView(props: MapViewProps) {
               props.endPoint && Array.isArray(props.endPoint) &&
               <EndPoint position={props.endPoint} setPosition={props.setEndPoint}/>
             }
-            <Event setShowContextMenu={props.setShowContextMenu} setShowFilterMenu={props.setShowFilterMenu}/>
+            <Event/>
           </MapContainer>
       }
     </>
