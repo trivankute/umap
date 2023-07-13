@@ -1,2 +1,2 @@
-const AmentitiesList = ['school','cafe','hospital','store'];
+const AmentitiesList = ['none','school','cafe','hospital','store'];
 export default AmentitiesList;

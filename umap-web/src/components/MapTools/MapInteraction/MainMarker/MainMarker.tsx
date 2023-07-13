@@ -73,18 +73,18 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, p
 
   // render data
   return (
-    // <motion.div
-    //   initial={{ scale: 0.5, opacity: 0.5 }}
-    //   animate={{ scale: 1, opacity: 1 }}
-    //   exit={{ scale: 0.5, opacity: 0.5 }}
-    //   transition={{ duration: 1 }}
-    // >
+    <motion.div
+      initial={{ scale: 0.5, opacity: 0.5 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.5, opacity: 0.5 }}
+      transition={{ duration: 1 }}
+    >
       <Popup className="drop-shadow-md">
         {error && "There is some error"}
         {isLoading && "Loading..."}
         {data && <PopUpData data={data.data} />}
       </Popup>
-    //</motion.div>
+    </motion.div>
   );
 }
 
