@@ -2,6 +2,8 @@ import { memo, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
+import AmentitiesList from "./Amenities";
+import FilterMenuItem from "./FilterMenuItem";
 
 interface FilterMenuProps {
     show: boolean,
@@ -20,7 +22,6 @@ interface FilterMenuProps {
 
 function FetchFilter(props: any) {
     props.mapRef.current.flyTo(props.mainMarker, 18);
-
     const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
     const { data, error, isLoading }
         = useSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, fetcher)
@@ -118,41 +119,14 @@ function FilterMenu(props: FilterMenuProps) {
                             Choose type of building:
                         </div>
                         <div className="w-full max-h-64 p-2 flex flex-col overflow-auto space-y-2">
-                            <div className="flex items-center">
-                                <input onChange={(e: any) => {
-                                    setType(e.target.value)
-                                }} checked={type==="none"} id="none" type="radio" value="none" name="filter" 
-                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
-                                <label htmlFor="none" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">none</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input onChange={(e: any) => {
-                                    setType(e.target.value)
-                                }} checked={type==="cafe"} id="cafe" type="radio" value="cafe" name="filter" 
-                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
-                                <label htmlFor="cafe" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">cafe</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input onChange={(e: any) => {
-                                    setType(e.target.value)
-                                }} checked={type==="hospital"} id="hospital" type="radio" value="hospital" name="filter" 
-                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
-                                <label htmlFor="hospital" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">hospital</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input onChange={(e: any) => {
-                                    setType(e.target.value)
-                                }} checked={type==="school"} id="school" type="radio" value="school" name="filter" 
-                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
-                                <label htmlFor="school" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">school</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input onChange={(e: any) => {
-                                    setType(e.target.value)
-                                }} checked={type==="store"} id="store" type="radio" value="store" name="filter" 
-                                className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"></input>
-                                <label htmlFor="store" className="ml-2 text-xs font-semibold text-gray-400 dark:text-gray-500 capitalize">store</label>
-                            </div>
+                            {
+                                AmentitiesList.map((amenity)=>
+                                                                <FilterMenuItem amenity={amenity}
+                                                                            setType = {setType}
+                                                                            type={type}
+                                                                />
+                                                    )
+                            }
                         </div>
                     </motion.div>
                 }
