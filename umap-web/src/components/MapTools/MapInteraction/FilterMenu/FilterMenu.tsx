@@ -42,8 +42,11 @@ function FilterMenu(props: FilterMenuProps) {
     const [radius, setRadius] = useState<number | boolean>(50);
     const [type, setType] = useState<string>('none');
 
-    const handleClick = () => {
-        props.setFetchingFilter(radius);
+    const fetchHandler = () => {
+        if(props.fetchingFilter > 0)
+            props.setFetchingFilter(false);
+        else
+            props.setFetchingFilter(radius);
     }
 
     const closeHandler = () => {
@@ -106,12 +109,19 @@ function FilterMenu(props: FilterMenuProps) {
                                 100m
                             </div>
 
-                            <div onClick={handleClick}
+                            <div onClick={fetchHandler}
                                 className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden")}>
                                 <div className="flex items-center justify-center">
-                                    <svg className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
+                                    {
+                                        props.fetchingFilter?
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
+                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                        </svg>
+                                        :
+                                        <svg className="w-4 h-4 cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                        </svg>
+                                    }
                                 </div>
                             </div>
                         </div>

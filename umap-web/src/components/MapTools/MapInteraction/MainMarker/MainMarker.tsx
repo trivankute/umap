@@ -88,7 +88,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, p
   );
 }
 
-function PopUpForLoading({ markerRef }: { markerRef: any }) {
+function PopUpForLoading({ markerRef}: { markerRef: any, setFetchingFilter:any }) {
   useEffect(() => {
     markerRef?.current?.openPopup()
   }, [])
@@ -175,7 +175,7 @@ function MainMarker(props: any) {
             {
               props.interactMode === 'filter' && props.fetchingFilter &&
               <>
-              <PopUpForLoading markerRef={markerRef} />
+              <PopUpForLoading markerRef={markerRef} setFetchingFilter={props.setFetchingFilter}/>
               </>
             }
             {props.interactMode === 'filter' &&
