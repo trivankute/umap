@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import clsx from "clsx";
 import useSWR from "swr"
 import Draggable from "react-draggable";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+//import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface FilterMenuProps {
     show: boolean,
@@ -74,21 +74,22 @@ function FilterMenu(props: FilterMenuProps) {
                     props.show &&
                     <motion.div
                         // transform origin on top left
+                        drag
+                        dragMomentum={false}
                         initial={{ scale: 0, opacity: 0.5 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ type: "spring", stiffness: 100 }}
                         className={"w-fit h-fit bg-white absolute rounded-md shadow-xl drop-shadow-xl overflow-hidden"}
                         style={{ zIndex: 10001, top: props.position.top, left: props.position.left, originX: 0, originY: 0 }}>
-                        <Draggable {...dragHandlers}>
-                            <div className="w-full h-10 bg-pink-200 cursor-grab">Drag here</div>
-                        </Draggable>
-                        <div className="w-full h-fit text-xs flex items-center p-2">
+
+                        <div className="w-full h-10 bg-pink-200 cursor-grab">Drag here</div>
+                        {/* <div className="w-full h-fit text-xs flex items-center p-2">
                             <ArrowBackIcon
                                 className="rounded-full border border-slate-200 cursor-pointer hover:border-slate-200 text-base"
                             />
                             Choose radius:
-                        </div>
+                        </div> */}
                         <div className="w-full h-fit border-b border-gray-300 flex justify-around items-center space-x-2 p-2">
                             <div onClick={() => { setRadius(50) }} className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden",
                                 {

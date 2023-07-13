@@ -19,38 +19,48 @@ interface ContextMenuProps {
 
 function ContextMenu({startPoint, endPoint, setStartPoint, setEndPoint, setPosition, show, setShow, setInteractMode, setShowFilterMenu, interactMode, position }: ContextMenuProps) {
   const [dragging, setDragging] = useState(false);
+  let x:any,y:any;
   const onDrag = (event: any, ui: any) => {
     const { x, y } = ui;
     setPosition({ top: position.top+ y, left: position.left+x });
-    if (event.type === 'mousemove' || event.type === 'touchmove') {
-      setDragging(true)
-    }
+    // if (event.type === 'mousemove' || event.type === 'touchmove') {
+    //   setDragging(true)
+    // }
 
-    if (event.type === 'mouseup' || event.type === 'touchend') {
-      setTimeout(() => {
-        setDragging(false);
-      }, 100);
+    // if (event.type === 'mouseup' || event.type === 'touchend') {
+    //   setTimeout(() => {
+    //     setDragging(false);
+    //   }, 0);
 
-    }
+    // }
   }
-  const dragHandlers = {
-   onDrag: onDrag 
+  function dragHandlers(e:any){
+   //onDrag: onDrag 
+    //setTimeout(setPosition({top: e.clientY, left: e.clientX}),100);
+    x = e.clientX;
+    y = e.clientY;
   };
+
+  function dragEndHandler(){
+    setPosition({top:y,left:x});
+  }
+
   return (<>
-    <AnimatePresence>
       {
         show &&
+      // <div draggable onDrag={dragHandlers} onDragEnd={dragEndHandler}>
+    <AnimatePresence >
         <motion.div
           // transform origin on top left
-          initial={{ scale: 0, opacity: 0.5 }}
+          drag
+          dragMomentum={false}
+          initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ type: "spring", stiffness: 100 }}
+          transition={{ type: "spring", stiffness: 100}}
           className={"w-fit h-fit bg-white absolute rounded-tr-md rounded-b-md shadow-xl drop-shadow-xl overflow-hidden"}
           style={{ zIndex: 10001, top: position.top, left: position.left, originX: 0, originY: 0 }}>
-          <Draggable {...dragHandlers}>
-              <div className="w-full h-10 bg-pink-200 cursor-grab">Drag here</div>
-          </Draggable>
+          <div className="w-full h-10 bg-pink-200 cursor-grab">Drag here</div>
           <ContextMenuItem setStartPoint={setStartPoint} text="Chỉ đường từ đây" />
           {
             startPoint !== null &&
@@ -73,9 +83,11 @@ function ContextMenu({startPoint, endPoint, setStartPoint, setEndPoint, setPosit
           {
             interactMode === 'mainMarkerOff' && <ContextMenuItem text="Click vào map để xem địa chỉ" />
           }
+          {/* </div> */}
         </motion.div>
-      }
     </AnimatePresence >
+        //</div>
+      }
   </>);
 }
 
