@@ -57,20 +57,13 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             dispatch(setState('destination'))
         };
 
+        const handleDirection = () => {
+
+        }
+        
         const handleCancel = () => {
             props.onDirectionCancel()
         }
-
-        // useEffect(() => {
-        //     console.log(source, destination)
-        //     if(srcSearchRef.current != null && source?.address != null) {
-        //         srcSearchRef.current.value = source.address
-        //     }
-        //     if(destSearchRef.current != null && destination?.address != null) {
-        //         destSearchRef.current.value = destination.address
-        //     }
-        // }, [source?.address, destination?.address])
-
 
   return (
     <motion.div 
@@ -81,7 +74,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         key="direction-box"
         className="bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]">
         <div className="direction-tool flex items-center justify-between p-2 border-b-2">
-            <button className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100">
+            <button 
+                className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100"
+                onClick={handleDirection}
+            >
                 <FontAwesomeIcon icon={faDirections} className="group-hover:text-green-400"/>
             </button>
             <button 
