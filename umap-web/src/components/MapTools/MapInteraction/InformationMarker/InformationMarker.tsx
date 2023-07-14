@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 import L from 'leaflet';
 
 function InformationMarker({
-    position, text, type
+    position, text, type, mainMarkerPos
 }: {
     position: any,
     text: string,
-    type: string
+    type: string,
+    mainMarkerPos: any
 }) {
     const markerRef = useRef<any>(null);
     useEffect(() => {
@@ -60,6 +61,12 @@ function InformationMarker({
                             <div className="font-semibold w-15">Kinh độ:</div>
                             <div>
                                 {position[1]}
+                            </div>
+                        </div>
+                        <div className="flex space-x-1">
+                            <div className="font-semibold w-15">Khoảng cách so với mainMarker:</div>
+                            <div>
+                                {Math.round(L.latLng({lat:mainMarkerPos.lat, lng:mainMarkerPos.lng}).distanceTo(L.latLng(parseFloat(position[0]), parseFloat(position[1]))))}m
                             </div>
                         </div>
                     </div>

@@ -27,7 +27,7 @@ export default function Home() {
   // for startPoint
   const [startPoint, setStartPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
   const [endPoint, setEndPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
-
+  
   const MapviewProps = {
     interactMode,
     setInteractMode,

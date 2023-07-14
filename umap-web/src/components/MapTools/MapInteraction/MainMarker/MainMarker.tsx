@@ -17,7 +17,7 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-function PopUpData({ data }: { data: PopupInfor }) {
+function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos:any }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-col space-y-1">
@@ -42,6 +42,12 @@ function PopUpData({ data }: { data: PopupInfor }) {
         <div className="font-semibold w-15">Kinh độ:</div>
         <div>
           {data.lng}
+        </div>
+      </div>
+      <div className="flex space-x-1">
+        <div className="font-semibold w-15">Khoảng cách so với mainMarker:</div>
+        <div>
+          {Math.round(L.latLng(mainMarkerPos[0], mainMarkerPos[1]).distanceTo(L.latLng(parseFloat(data.lat), parseFloat(data.lng))))}m
         </div>
       </div>
     </div>
@@ -82,7 +88,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, p
       <Popup className="drop-shadow-md">
         {error && "There is some error"}
         {isLoading && "Loading..."}
-        {data && <PopUpData data={data.data} />}
+        {data && <PopUpData data={data.data} mainMarkerPos={position}/>}
       </Popup>
     </motion.div>
   );
@@ -112,7 +118,6 @@ function MainMarker(props: any) {
   const markerRef = useRef<any>(null)
   useMapEvents({
     click(e) {
-      console.log(e, props.startPoint)
       if(props.startPoint==="readyToSet")
       {
         props.setStartPoint([e.latlng.lat, e.latlng.lng])

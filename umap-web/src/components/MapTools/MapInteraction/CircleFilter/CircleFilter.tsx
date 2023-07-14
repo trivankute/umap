@@ -22,6 +22,7 @@ export default function CircleFilter(props:CircleFilterProps){
                 <InformationMarker position={[address.lat,address.lng]}
                     text={address.address}
                     type={address.type}
+                    mainMarkerPos={{ lat: props.mainMarker[0], lng: props.mainMarker[1] }}
                 //icon={icon}
                 />
             )
