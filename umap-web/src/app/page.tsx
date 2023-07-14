@@ -27,7 +27,7 @@ export default function Home() {
   // for startPoint
   const [startPoint, setStartPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
   const [endPoint, setEndPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
-  
+
   const MapviewProps = {
     interactMode,
     setInteractMode,
@@ -88,12 +88,15 @@ export default function Home() {
       setMenuPosition({ top: e.clientY, left: e.clientX });
       setShowContextMenu(true);
       setShowFilterMenu(false);
+      setAddressList([]);
+      if(interactMode!=='mainMarkerOff')
+        setInteractMode('mainMarkerOn');
     }
     window.addEventListener("contextmenu", handleContextMenu);
     return () => {
       window.removeEventListener("contextmenu", handleContextMenu);
     }
-  }, [])
+  }, [interactMode])
 
   useEffect(()=>{
     function dispatch() {

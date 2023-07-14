@@ -17,7 +17,7 @@ const redIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos:any }) {
+function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-col space-y-1">
@@ -54,7 +54,7 @@ function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos:an
   )
 }
 
-function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, position: number[], markerRef: any, setCirclePos: any }) {
+function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, position: number[], markerRef: any, setCirclePos: any }) {
 
   const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
 
@@ -62,11 +62,10 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, p
     = useSWR(`/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, fetcher)
 
   useEffect(() => {
-    if (markerRef && markerRef.current)
-      {
-        markerRef?.current?.openPopup()
-        mapRef.current.flyTo([position[0], position[1]], mapRef.current.getZoom())
-      }
+    if (markerRef && markerRef.current) {
+      markerRef?.current?.openPopup()
+      mapRef.current.flyTo([position[0], position[1]], mapRef.current.getZoom())
+    }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
   useEffect(() => {
@@ -88,13 +87,13 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef:any, p
       <Popup className="drop-shadow-md">
         {error && "There is some error"}
         {isLoading && "Loading..."}
-        {data && <PopUpData data={data.data} mainMarkerPos={position}/>}
+        {data && <PopUpData data={data.data} mainMarkerPos={position} />}
       </Popup>
     </motion.div>
   );
 }
 
-function PopUpForLoading({ markerRef}: { markerRef: any, setFetchingFilter:any }) {
+function PopUpForLoading({ markerRef }: { markerRef: any, setFetchingFilter: any }) {
   useEffect(() => {
     markerRef?.current?.openPopup()
   }, [])
@@ -118,17 +117,15 @@ function MainMarker(props: any) {
   const markerRef = useRef<any>(null)
   useMapEvents({
     click(e) {
-      if(props.startPoint==="readyToSet")
-      {
+      if (props.startPoint === "readyToSet") {
         props.setStartPoint([e.latlng.lat, e.latlng.lng])
         return;
       }
-      else if(props.endPoint==="readyToSet")
-      {
+      else if (props.endPoint === "readyToSet") {
         props.setEndPoint([e.latlng.lat, e.latlng.lng])
         return;
       }
-      else {
+      else if (props.interactMode !== 'filter') {
         // @ts-ignore
         props.setPosition([e.latlng.lat, e.latlng.lng]);
         // fly but current zoom
@@ -166,6 +163,7 @@ function MainMarker(props: any) {
             }
           >
             {
+              props.interactMode === 'mainMarkerOn' &&
               <>
                 <SetPopup mapRef={props.mapRef} position={props.position} markerRef={markerRef} setCirclePos={setCirclePos} />
                 {
@@ -180,12 +178,12 @@ function MainMarker(props: any) {
             {
               props.interactMode === 'filter' && props.fetchingFilter &&
               <>
-              <PopUpForLoading markerRef={markerRef} setFetchingFilter={props.setFetchingFilter}/>
+                <PopUpForLoading markerRef={markerRef} setFetchingFilter={props.setFetchingFilter} />
               </>
             }
             {props.interactMode === 'filter' &&
-              <CircleFilter mapRef={props.mapRef} addressList={props.addressList} 
-              fetchingFilter={props.fetchingFilter} mainMarker={props.position}/>
+              <CircleFilter mapRef={props.mapRef} addressList={props.addressList}
+                fetchingFilter={props.fetchingFilter} mainMarker={props.position} />
             }
           </Marker>
         </div>

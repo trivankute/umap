@@ -52,12 +52,15 @@ function FilterMenu(props: FilterMenuProps) {
 
     const closeHandler = () => {
         props.setShow(false);
+        props.setAddressList([]);
+        props.setInteractMode('mainMarkerOn');
     }
 
     const turnBackHandler = () => {
         props.setShow(false);
         props.setShowContextMenu(true);
-
+        props.setAddressList([]);
+        props.setInteractMode('mainMarkerOn');
     }
 
     return (
