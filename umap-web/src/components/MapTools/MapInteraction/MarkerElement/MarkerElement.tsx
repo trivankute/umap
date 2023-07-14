@@ -1,9 +1,28 @@
 import { SearchResult } from "@/types/Types";
 import { memo } from "react";
 import { Marker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
+import L from "leaflet";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [30, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [58, 50],
+});
+
+const blueIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [30, 50],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [58, 50],
+});
+
 function PopUpData({ data }: { data: SearchResult }) {
   return (
     <div className="space-y-2">
@@ -31,7 +50,7 @@ function PopUpData({ data }: { data: SearchResult }) {
 
 function MarkerElement({ mapRef, item }: { mapRef: any, item: SearchResult }) {
     const map =useMap()
-    
+    console.log("Border line: ", item.borderLine)
     map.panTo(item.center)
   
     return (
@@ -41,6 +60,7 @@ function MarkerElement({ mapRef, item }: { mapRef: any, item: SearchResult }) {
           <Marker
             ref={mapRef}
             position={item.center}
+            icon={blueIcon}
           >
             <Popup className="drop-shadow-md">
               <PopUpData data={item}/>

@@ -15,7 +15,7 @@ function AddressList() {
 
     const handleLocation = (item: SearchResult) => {
         dispatch(setAddress(item))
-        dispatch(setSelect(true))
+        dispatch(setSelect('infoBox'))
 
         const location = {
             address: item.address,
@@ -57,7 +57,7 @@ function AddressList() {
         {
             listPlace && listPlace.length === 0 && 
             <div className="bg-white ">
-                <p>NOT FOUND</p> 
+                <p>Không tìm thấy Kết quả</p> 
             </div>
         }
         </> );
