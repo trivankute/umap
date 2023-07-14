@@ -4,16 +4,13 @@ import { faDirections, faSearch } from '@fortawesome/free-solid-svg-icons';
 import AddressList from '../AddressList/AddressList';
 import { motion } from 'framer-motion';
 import getAddresses from '@/services/getAddresses';
-import { SearchResult } from '@/types/Types';
 import LocationInfor from '../LocationInfor/LocationInfor';
 import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { setState } from '@/redux/slices/routingSlice';
 
 export default function SearchBox({ onSearchDirection}: {
   onSearchDirection: () => void
 }) {
-  
   const [searchValue, setSearchValue] = useState('');
 
   const select = useAppSelector(state => state.search.select)
@@ -23,22 +20,23 @@ export default function SearchBox({ onSearchDirection}: {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
     if(searchValue===''){
-      dispatch(setSelect(false))
+      dispatch(setSelect(null))
       dispatch(setAddressList(null))
       dispatch(setAddress(null))
+
     }
   };
 
   const handleSearch = async () => {
     const listAddresses = await getAddresses(searchValue);
 
-    dispatch(setSelect(false))
+    dispatch(setSelect('list'))
     dispatch(setAddressList(listAddresses))
   };
 
   const handleDirection = () => {
     onSearchDirection();
-    dispatch(setSelect(false))
+    dispatch(setSelect(null))
     dispatch(setAddressList(null))
     dispatch(setAddress(null))
   };
@@ -76,10 +74,10 @@ export default function SearchBox({ onSearchDirection}: {
         </button>
       </div>
 
-      {select&&<LocationInfor/>}
+      {select==='infoBox'&&<LocationInfor/>}
 
       <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
-        {!select && <AddressList/>}
+        {select==='list' && <AddressList/>}
       </div>
     </motion.div>
   );

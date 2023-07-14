@@ -4,13 +4,13 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 type InitialState = {
     addressList: SearchResult[]|null,
     address: SearchResult|null,
-    select: boolean
+    select: string|null
 }
 
 const initialState : InitialState = {
     addressList: null,
     address: null,
-    select: false
+    select: null
 }
 
 export const searchSlice = createSlice({
@@ -23,7 +23,7 @@ export const searchSlice = createSlice({
         setAddress: (state, action: PayloadAction<SearchResult|null>) => {
             state.address = action.payload
         },
-        setSelect: (state, action: PayloadAction<boolean>) => {
+        setSelect: (state, action: PayloadAction<string|null>) => {
             state.select = action.payload
         },
     }
