@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents, Polyline } from "react-leaflet";
@@ -30,7 +30,7 @@ interface MapViewProps {
   setEndPoint:any
 }
 
-export default function MapView() {
+export default function MapView(props:MapViewProps) {
   const item = useAppSelector(state => state.search.address)
   const select = useAppSelector(state => state.search.select)
   const source = useAppSelector(state => state.routing.source)
