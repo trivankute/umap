@@ -60,6 +60,7 @@ st_distance (point.geometry,st_transform(st_centroid(roads.way),4326)) as toRoad
 
 from point, point_point, point_polygon, roads, wards, districts
     `, "SRID=4326;POINT(" + lng + " " + lat + ")")
+    await prisma.$disconnect()
     const {
         point_osm_id,
         point_housenumber,
