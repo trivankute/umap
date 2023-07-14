@@ -26,6 +26,7 @@ function FetchFilter(props: any) {
     let [{ data }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
     useEffect(() => {
         return () => {
+            console.log("unmount")
             controller.abort();
         }
     }, [])
