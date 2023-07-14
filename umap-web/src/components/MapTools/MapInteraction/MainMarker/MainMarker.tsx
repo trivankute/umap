@@ -14,7 +14,7 @@ const redIcon = new L.Icon({
   iconSize: [30, 50],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+  shadowSize: [58, 50],
 });
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
@@ -93,10 +93,10 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
   );
 }
 
-function PopUpForLoading({ markerRef }: { markerRef: any, setFetchingFilter: any }) {
+function PopUpForLoading({ markerRef, markerPos }: { markerPos:any, markerRef: any }) {
   useEffect(() => {
     markerRef?.current?.openPopup()
-  }, [])
+  }, [markerRef && markerRef.current, markerPos[0], markerPos[1]])
 
   return (<>
     <motion.div
@@ -178,7 +178,7 @@ function MainMarker(props: any) {
             {
               props.interactMode === 'filter' && props.fetchingFilter &&
               <>
-                <PopUpForLoading markerRef={markerRef} setFetchingFilter={props.setFetchingFilter} />
+                <PopUpForLoading markerRef={markerRef} markerPos={props.position} />
               </>
             }
             {props.interactMode === 'filter' &&
