@@ -24,6 +24,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             return
         }
         const result = await nearestAddress(prisma, lng, lat)
+        await prisma.$disconnect()
         res.status(200).json({
             state:"success",
             message:"Your request is accepted",
