@@ -23,7 +23,6 @@ export default function SearchBox({ onSearchDirection}: {
       dispatch(setSelect(null))
       dispatch(setAddressList(null))
       dispatch(setAddress(null))
-
     }
   };
 
