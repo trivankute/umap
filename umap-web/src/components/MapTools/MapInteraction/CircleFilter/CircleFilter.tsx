@@ -18,8 +18,8 @@ export default function CircleFilter(props:CircleFilterProps){
             pathOptions={{ color: 'red' }}
             radius={props.fetchingFilter} />
             :
-            props.addressList.map((address:any) =>
-                <InformationMarker position={[address.lat,address.lng]}
+            props.addressList.map((address:any, index:number) =>
+                <InformationMarker key={index} position={[address.lat,address.lng]}
                     text={address.address}
                     type={address.type}
                     mainMarkerPos={{ lat: props.mainMarker[0], lng: props.mainMarker[1] }}

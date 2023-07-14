@@ -143,8 +143,8 @@ function FilterMenu(props: FilterMenuProps) {
                         </div>
                         <div className="w-full max-h-64 p-2 flex flex-col overflow-auto space-y-2">
                             {
-                                AmentitiesList.map((amenity) =>
-                                    <FilterMenuItem amenity={amenity}
+                                AmentitiesList.map((amenity:any, index:number) =>
+                                    <FilterMenuItem key={index} amenity={amenity}
                                         setType={setType}
                                         type={type}
                                     />
