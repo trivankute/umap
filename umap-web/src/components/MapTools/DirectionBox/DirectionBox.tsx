@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, memo, useRef, useEffect } from 'react'
+import React, { useState, memo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
@@ -10,7 +10,8 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import getAddresses from '@/services/getAddresses';
 import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlice';
 import LocationInfor from '../LocationInfor/LocationInfor';
-import { setState } from '@/redux/slices/routingSlice';
+import { setDestination, setDirection, setSource, setState } from '@/redux/slices/routingSlice';
+import getDirection from '@/services/getDirection';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -18,59 +19,86 @@ interface DirectionBoxProps {
 
 const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const select = useAppSelector(state => state.search.select)
+        const source = useAppSelector(state => state.routing.source)
+        const destination = useAppSelector(state => state.routing.destination)
+        
         const dispatch = useAppDispatch()
 
-        const [sourceValue, setSourceValue] = useState('');
-        const [destinationValue, setDestinationValue] = useState('');
+        const [sourceValue, setSourceValue] = useState<string>('');
+        const [destinationValue, setDestinationValue] = useState<string>('');
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
-            if(sourceValue===''){
-                dispatch(setSelect(false))
+            if(event.target.value===''){
+                setSourceValue('')
+                dispatch(setSelect(null))
                 dispatch(setAddressList(null))
                 dispatch(setAddress(null))
+                dispatch(setSource(null))
+                dispatch(setDirection(null))
             }
         };
 
         const handleSearchSource = async () => {
             const listAddresses = await getAddresses(sourceValue);
         
-            dispatch(setSelect(false))
+            dispatch(setSelect('list'))
             dispatch(setAddressList(listAddresses))
             dispatch(setState('source'))
+            dispatch(setDirection(null))
         };
 
         const handleInputChangeDestination = (event: React.ChangeEvent<HTMLInputElement>) => {
             setDestinationValue(event.target.value);
-            if(destinationValue===''){
-                dispatch(setSelect(false))
+            if(event.target.value===''){
+                setDestinationValue('')
+                dispatch(setSelect(null))
                 dispatch(setAddressList(null))
                 dispatch(setAddress(null))
+                dispatch(setDestination(null))
+                dispatch(setDirection(null))
             }
         };
 
         const handleSearchDestination = async () => {
             const listAddresses = await getAddresses(destinationValue);
         
-            dispatch(setSelect(false))
+            dispatch(setSelect('list'))
             dispatch(setAddressList(listAddresses))
             dispatch(setState('destination'))
+            dispatch(setDirection(null))
         };
+
+        const handleDirection = async () => {
+            if(source!==null && destination!==null){
+                const directions = await getDirection(source, destination, 'foot')
+                if(source?.address)
+                    setDestinationValue(source?.address)
+                else setDestinationValue('')
+                if(destination?.address)
+                    setSourceValue(destination?.address)
+                else setSourceValue('')
+                dispatch(setDirection(directions))
+                dispatch(setSelect(null))
+            }
+        }
+        
+        const handleSwap = () => {
+            const oldDestination = destination
+            dispatch(setDestination(source))
+            if(source?.address)
+                setDestinationValue(source?.address)
+            else 
+                setDestinationValue('')
+            dispatch(setSource(oldDestination))
+            if(oldDestination?.address)
+                setSourceValue(oldDestination?.address)
+            else setSourceValue('')
+        }
 
         const handleCancel = () => {
             props.onDirectionCancel()
         }
-
-        // useEffect(() => {
-        //     console.log(source, destination)
-        //     if(srcSearchRef.current != null && source?.address != null) {
-        //         srcSearchRef.current.value = source.address
-        //     }
-        //     if(destSearchRef.current != null && destination?.address != null) {
-        //         destSearchRef.current.value = destination.address
-        //     }
-        // }, [source?.address, destination?.address])
-
 
   return (
     <motion.div 
@@ -81,7 +109,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         key="direction-box"
         className="bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]">
         <div className="direction-tool flex items-center justify-between p-2 border-b-2">
-            <button className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100">
+            <button 
+                className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100"
+                onClick={handleDirection}
+            >
                 <FontAwesomeIcon icon={faDirections} className="group-hover:text-green-400"/>
             </button>
             <button 
@@ -113,7 +144,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             </div>
 
             <div className='border border-red-500 rounded-full w-fit hover:bg-red-300 cursor-pointer ml-auto mr-2'
-                    // onClick={swapOrder}
+                    onClick={handleSwap}
                 >
                     <SwapHorizIcon className='text-red-500'/>
             </div>
@@ -137,10 +168,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 </button>
             </div>
         </div>
-        {select&&<LocationInfor/>}
+        {select==='infoBox' && <LocationInfor/>}
 
       <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
-        {!select && <AddressList/>}
+        {select==='list' && <AddressList/>}
       </div>
     </motion.div>
   )

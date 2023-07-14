@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
-import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents } from "react-leaflet";
+import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents, Polyline } from "react-leaflet";
 import './Map.css';
 import MarkerElement from "../MapTools/MapInteraction/MarkerElement/MarkerElement";
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
@@ -10,6 +10,10 @@ import StartPoint from "../MapTools/Routing/StartPoint/StartPoint";
 import EndPoint from "../MapTools/Routing/EndPoint/EndPoint";
 import { useAppSelector } from "@/redux/hooks";
 const { BaseLayer } = LayersControl;
+
+const redOptions = { 
+  color: 'green' 
+}
 
 interface MapViewProps {
   interactMode: 'mainMarkerOff' | 'mainMarkerOn'|'filter',
@@ -31,6 +35,7 @@ export default function MapView(props:MapViewProps) {
   const select = useAppSelector(state => state.search.select)
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
+  const direction = useAppSelector(state => state.routing.direction)
   
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
