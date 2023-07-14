@@ -1,0 +1,8 @@
+.marker{
+    cursor: all-scroll !important;
+    z-index: 100000000;
+    background-color: black !important;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+}
