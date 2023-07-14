@@ -2,13 +2,14 @@ import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { getParentDirectory } from "./updateMapData/getDates";
 import checkWardExist from "./utils/findWard";
+import findStreet from "./utils/findStreet";
+import { Result } from "postcss";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // prisma call
     // const parentDirectory = getParentDirectory()
-    let result = await checkWardExist(prisma, 'Phường 14', 'Quận 10')
-    
-    res.status(200).json(result)
+    // res.status(200).json(result)
+
 
     // const polygons = await prisma.$queryRawUnsafe(`
     // WITH
@@ -23,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // select osm_id::text,"addr:housenumber", "addr:street",name,st_x(st_transform(st_centroid(way),4326)),st_y(st_transform(st_centroid(way),4326))
     // from planet_osm_polygon, specific_ward
     // where (name notnull or "addr:housenumber" notnull or "addr:street" notnull) and st_contains(specific_ward.ward_geometry, planet_osm_polygon.way)`, "Quận 10", 'Phường 14')
-    
+
     // const points = await prisma.$queryRawUnsafe(`
     // WITH
     //     specific_district as (
