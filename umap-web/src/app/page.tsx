@@ -11,6 +11,8 @@ import { LatLngExpression } from "leaflet";
 // Bootstrap Stuffs
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+import { SearchResult } from "@/types/Types";
+import { StoreProvider } from "@/redux/provider"
 
 //-------------------------------------------------------------------------------------------------------------------
 
@@ -119,19 +121,7 @@ export default function Home() {
 
 
   return (
-    <div className="relative">
-      <div className="absolute" style={{ zIndex: 10000 }}>
-        <AnimatePresence mode='wait'>
-          {showDirectionBox &&
-            <DirectionBox onDirectionCancel={handleSearchCancel} />
-          }
-        </AnimatePresence>
-        <AnimatePresence mode='wait'>
-          {!showDirectionBox &&
-            <SearchBox onSearchDirection={handleSearchDirection} />
-          }
-        </AnimatePresence>
-      </div>
+    <StoreProvider>
       <div className="relative">
         <MapView {...MapviewProps} />
         {
@@ -142,7 +132,22 @@ export default function Home() {
           showFilterMenu && 
           <FilterMenu {...FilterMenuProps} />
         }
+        <div className="absolute" style={{ zIndex: 10000 }}>
+          <AnimatePresence mode='wait'>
+            {showDirectionBox &&
+              <DirectionBox onDirectionCancel={handleSearchCancel} />
+            }
+          </AnimatePresence>
+          <AnimatePresence mode='wait'>
+            {!showDirectionBox &&
+              <SearchBox onSearchDirection={handleSearchDirection}/>
+            }
+          </AnimatePresence>
+        </div>
+        <div className="relative">
+          <MapView/>
+        </div>
       </div>
-    </div>
+    </StoreProvider>
   )
 }
