@@ -10,8 +10,6 @@ import { StoreProvider } from "@/redux/provider"
 
 export default function Home({views}:{views:number}) {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
-  const [itemMarker, setItemMarker] = useState<SearchResult|null>(null)
-
 
   const handleSearchDirection = () => {
     setShowDirectionBox(true);
@@ -32,12 +30,12 @@ export default function Home({views}:{views:number}) {
           </AnimatePresence>
           <AnimatePresence mode='wait'>
             {!showDirectionBox &&
-              <SearchBox onSearchDirection={handleSearchDirection} setItemMarker={setItemMarker} />
+              <SearchBox onSearchDirection={handleSearchDirection}/>
             }
           </AnimatePresence>
         </div>
         <div className="relative">
-          <MapView itemMarker = {itemMarker}/>
+          <MapView/>
         </div>
       </div>
     </StoreProvider>

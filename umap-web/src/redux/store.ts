@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import  routingReducer from "./slices/routingSlice";
+import  searchReducer from "./slices/searchSlice";
 
 export const store = configureStore({
     reducer: {
-        routing: routingReducer
+        routing: routingReducer,
+        search: searchReducer
     }
 })
 
