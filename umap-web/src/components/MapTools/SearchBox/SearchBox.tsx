@@ -1,38 +1,46 @@
-import React, { useState, memo } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch } from '@fortawesome/free-solid-svg-icons';
 import AddressList from '../AddressList/AddressList';
 import { motion } from 'framer-motion';
 import getAddresses from '@/services/getAddresses';
-import { SearchBoxProps, SearchResult } from '@/types/Types';
+import { SearchResult } from '@/types/Types';
 import LocationInfor from '../LocationInfor/LocationInfor';
+import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setState } from '@/redux/slices/routingSlice';
 
-export default function SearchBox({ onSearchDirection, setItemMarker }: {
-  onSearchDirection: () => void,
-  setItemMarker: (item: SearchResult) => void
+export default function SearchBox({ onSearchDirection}: {
+  onSearchDirection: () => void
 }) {
+  
   const [searchValue, setSearchValue] = useState('');
-  const [listPlace, setListPlace] = useState<SearchResult[]>([]);
-  const [list, setList] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const select = useAppSelector(state => state.search.select)
+  
+  const dispatch = useAppDispatch()
+        
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(event.target.value);
+    if(searchValue===''){
+      dispatch(setSelect(false))
+      dispatch(setAddressList(null))
+      dispatch(setAddress(null))
+    }
   };
 
   const handleSearch = async () => {
-    setIsLoading(true); // Set isLoading to true when starting the search
     const listAddresses = await getAddresses(searchValue);
-    console.log(listAddresses);
-    setList(true);
-    setListPlace(listAddresses);
-    setSelectedItem(null);
-    setIsLoading(false); // Set isLoading to false after the search is complete
+
+    dispatch(setSelect(false))
+    dispatch(setAddressList(listAddresses))
   };
 
   const handleDirection = () => {
     onSearchDirection();
+    dispatch(setSelect(false))
+    dispatch(setAddressList(null))
+    dispatch(setAddress(null))
   };
 
   return (
@@ -68,15 +76,11 @@ export default function SearchBox({ onSearchDirection, setItemMarker }: {
         </button>
       </div>
 
-      {isLoading ? (
-        <div className="text-center mt-2 bg-white">Loading...</div> 
-      ) : selectedItem ? (
-        <LocationInfor item={selectedItem} />
-      ) : (
-        <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
-          {list && <AddressList listPlace={listPlace} setSelectedItem={setSelectedItem} setItemMarker={setItemMarker} />}
-        </div>
-      )}
+      {select&&<LocationInfor/>}
+
+      <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
+        {!select && <AddressList/>}
+      </div>
     </motion.div>
   );
 }

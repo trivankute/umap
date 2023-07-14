@@ -1,11 +1,10 @@
-import { SearchAreaResult, SearchResult } from "@/types/Types";
-import { useState, useCallback, memo, RefObject } from "react";
-import { MapContainerProps, Marker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
-import { PopupInfor } from "@/types/Types";
+import { SearchResult } from "@/types/Types";
+import { memo } from "react";
+import { Marker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
-function PopUpData({ data }: { data: PopupInfor }) {
+function PopUpData({ data }: { data: SearchResult }) {
   return (
     <div className="space-y-2">
       <div className="flex flex-col space-y-1">
@@ -17,13 +16,13 @@ function PopUpData({ data }: { data: PopupInfor }) {
       <div className="flex space-x-1">
         <div className="font-semibold w-15">Vĩ độ:</div>
         <div>
-          {data.lat}
+          {data.center[0]}
         </div>
       </div>
       <div className="flex space-x-1">
         <div className="font-semibold w-15">Kinh độ:</div>
         <div>
-          {data.lng}
+          {data.center[1]}
         </div>
       </div>
     </div>
@@ -32,15 +31,7 @@ function PopUpData({ data }: { data: PopupInfor }) {
 
 function MarkerElement({ mapRef, item }: { mapRef: any, item: SearchResult }) {
     const map =useMap()
-
-    const data = {
-      address: item.address,
-      lng: String(item.center[0]),
-      lat: String(item.center[1]),
-      type: item.type,
-      typeOfShape: item.typeOfShape
-    }
-
+    
     map.panTo(item.center)
   
     return (
@@ -52,7 +43,7 @@ function MarkerElement({ mapRef, item }: { mapRef: any, item: SearchResult }) {
             position={item.center}
           >
             <Popup className="drop-shadow-md">
-              <PopUpData data={data}/>
+              <PopUpData data={item}/>
             </Popup>
           </Marker>
         }

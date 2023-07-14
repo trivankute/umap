@@ -4,13 +4,17 @@ import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
 import { MapContainer,ZoomControl,WMSTileLayer, LayersControl} from "react-leaflet";
 import './Map.css';
-import { motion } from "framer-motion";
 import MarkerElement from "../MapTools/MapInteraction/MarkerElement/MarkerElement";
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
-import { SearchResult } from "@/types/Types";
+import { useAppSelector } from "@/redux/hooks";
 
 const { BaseLayer } = LayersControl;
-export default function MapView({itemMarker}:{itemMarker: SearchResult}) {
+export default function MapView() {
+  const item = useAppSelector(state => state.search.address)
+  const select = useAppSelector(state => state.search.select)
+  const source = useAppSelector(state => state.routing.source)
+  const destination = useAppSelector(state => state.routing.destination)
+  
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
 
@@ -64,7 +68,10 @@ export default function MapView({itemMarker}:{itemMarker: SearchResult}) {
         <ZoomControl position="topright" />
         {/* marker for  */}
         <MainMarker mapRef={mapRef}/>
-        {itemMarker && <MarkerElement mapRef={mapRef} item={itemMarker}/>}
+        {select && item && <MarkerElement mapRef={mapRef} item={item}/>}
+        {source && <MarkerElement mapRef={mapRef} item={source}/>}
+        {destination && <MarkerElement mapRef={mapRef} item={destination}/>}
+
         <Event />
         </MapContainer>
       }
