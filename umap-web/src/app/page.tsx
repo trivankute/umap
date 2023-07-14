@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback, useRef} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import SearchBox from "@/components/MapTools/SearchBox/SearchBox"
 import DirectionBox from "@/components/MapTools/DirectionBox/DirectionBox"
 import dynamic from "next/dynamic";
@@ -24,11 +24,11 @@ export default function Home() {
   const [interactMode, setInteractMode] = useState<'mainMarkerOff' | 'filter' | 'mainMarkerOn'>('mainMarkerOff');
   const [mainMarkerPosition, setMainMarkerPosition] = useState<any>([]);
   const [addressList, setAddressList] = useState<any>([]);
-  const [fetchingFilter, setFetchingFilter] = useState<false|number>(false);
+  const [fetchingFilter, setFetchingFilter] = useState<false | number>(false);
   const mapRef = useRef<any>(null)
   // for startPoint
-  const [startPoint, setStartPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
-  const [endPoint, setEndPoint] = useState<"readyToSet"|LatLngExpression|null>(null);
+  const [startPoint, setStartPoint] = useState<"readyToSet" | LatLngExpression | null>(null);
+  const [endPoint, setEndPoint] = useState<"readyToSet" | LatLngExpression | null>(null);
 
   const MapviewProps = {
     interactMode,
@@ -76,11 +76,11 @@ export default function Home() {
 
   const handleSearchDirection = useCallback(() => {
     setShowDirectionBox(true);
-  },[]);
+  }, []);
 
   const handleSearchCancel = useCallback(() => {
     setShowDirectionBox(false);
-  },[]);
+  }, []);
 
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function Home() {
       setShowContextMenu(true);
       setShowFilterMenu(false);
       setAddressList([]);
-      if(interactMode!=='mainMarkerOff')
+      if (interactMode !== 'mainMarkerOff')
         setInteractMode('mainMarkerOn');
     }
     window.addEventListener("contextmenu", handleContextMenu);
@@ -100,7 +100,7 @@ export default function Home() {
     }
   }, [interactMode])
 
-  useEffect(()=>{
+  useEffect(() => {
     function dispatch() {
       // fake click event
       const event = new MouseEvent('click', {
@@ -113,25 +113,15 @@ export default function Home() {
       // leaflet-container dispatch
       document.getElementsByClassName('leaflet-container')[0].dispatchEvent(event);
     }
-    if(startPoint==="readyToSet"||endPoint==="readyToSet")
-    {
+    if (startPoint === "readyToSet" || endPoint === "readyToSet") {
       dispatch();
     }
-  },[startPoint, endPoint])
+  }, [startPoint, endPoint])
 
 
   return (
     <StoreProvider>
       <div className="relative">
-        <MapView {...MapviewProps} />
-        {
-          showContextMenu &&
-          <ContextMenu {...ContextMenuProps} />
-        }
-        {
-          showFilterMenu && 
-          <FilterMenu {...FilterMenuProps} />
-        }
         <div className="absolute" style={{ zIndex: 10000 }}>
           <AnimatePresence mode='wait'>
             {showDirectionBox &&
@@ -140,13 +130,19 @@ export default function Home() {
           </AnimatePresence>
           <AnimatePresence mode='wait'>
             {!showDirectionBox &&
-              <SearchBox onSearchDirection={handleSearchDirection}/>
+              <SearchBox onSearchDirection={handleSearchDirection} />
             }
           </AnimatePresence>
         </div>
-        <div className="relative">
-          <MapView/>
-        </div>
+          <MapView {...MapviewProps} />
+          {
+            showContextMenu &&
+            <ContextMenu {...ContextMenuProps} />
+          }
+          {
+            showFilterMenu &&
+            <FilterMenu {...FilterMenuProps} />
+          }
       </div>
     </StoreProvider>
   )
