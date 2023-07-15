@@ -23,10 +23,9 @@ interface FilterMenuProps {
 
 function FetchFilter(props: any) {
     props.mapRef.current.flyTo(props.mainMarker, 18);
-    let [{ data }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
+    let [{ data, error, isLoading }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
     useEffect(() => {
         return () => {
-            console.log("unmount")
             controller.abort();
         }
     }, [])

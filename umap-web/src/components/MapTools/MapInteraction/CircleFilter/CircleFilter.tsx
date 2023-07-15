@@ -99,6 +99,8 @@ export function returnRightIconByType(type: string) {
             return "fa-mail-bulk";
         case "roof":
             return "fa-gas-pump";
+        case "industrial":
+            return "fa-industry";
 
         default:
             return "fa-home";

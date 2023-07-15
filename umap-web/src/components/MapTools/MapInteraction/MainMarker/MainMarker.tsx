@@ -1,8 +1,7 @@
 'use client'
-import { useState, memo, useRef, useEffect, useCallback } from "react";
+import { useState, memo, useRef, useEffect } from "react";
 import { useMapEvents, Marker, Popup, Circle } from "react-leaflet";
 import { PopupInfor } from "@/types/Types";
-import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
 import CircleFilter, { returnRightIconByType } from "../CircleFilter/CircleFilter";
@@ -11,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setDestination, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
 import InformationMarker from "../InformationMarker/InformationMarker";
+import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -70,10 +70,7 @@ function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: a
 
 function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, position: number[], markerRef: any, setCirclePos: any }) {
 
-  const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
-
-  const { data, error, isLoading }
-    = useSWR(`/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, fetcher)
+  let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
 
   useEffect(() => {
     if (markerRef && markerRef.current) {
@@ -81,6 +78,12 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
       mapRef.current.flyTo([position[0], position[1]], mapRef.current.getZoom())
     }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
+
+  useEffect(()=>{
+    return () => {
+      controller.abort();
+    }
+  },[position[0], position[1]])
 
   useEffect(() => {
     if (data) {
