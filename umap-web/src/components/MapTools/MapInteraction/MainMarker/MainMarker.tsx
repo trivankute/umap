@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import './MainMarker.css'
 import CircleFilter from "../CircleFilter/CircleFilter";
 import L from 'leaflet'
+import "node_modules/leaflet.awesome-markers";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -16,6 +17,16 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [58, 50],
 });
+
+// @ts-ignore
+// https://www.npmjs.com/package/leaflet.awesome-markers
+var Icon = L.AwesomeMarkers.icon({
+  icon: "fa-map",
+  prefix: "fa",
+  markerColor: "red",
+  iconColor: "white",
+});
+
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
@@ -93,7 +104,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
   );
 }
 
-function PopUpForLoading({ markerRef, markerPos }: { markerPos:any, markerRef: any }) {
+function PopUpForLoading({ markerRef, markerPos }: { markerPos: any, markerRef: any }) {
   useEffect(() => {
     markerRef?.current?.openPopup()
   }, [markerRef && markerRef.current, markerPos[0], markerPos[1]])
@@ -150,7 +161,7 @@ function MainMarker(props: any) {
             draggable={true}
             ref={markerRef}
             position={props.position}
-            icon={redIcon}
+            icon={Icon}
             eventHandlers={
               {
                 dblclick() {

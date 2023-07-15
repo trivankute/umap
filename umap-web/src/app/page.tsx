@@ -9,8 +9,10 @@ import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/Contex
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
 import { LatLngExpression } from "leaflet";
 // Bootstrap Stuffs
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+// @ts-ignore
+dynamic(()=> import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
+// @ts-ignore
+dynamic(()=> import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
 import { SearchResult } from "@/types/Types";
 import { StoreProvider } from "@/redux/provider"
 
