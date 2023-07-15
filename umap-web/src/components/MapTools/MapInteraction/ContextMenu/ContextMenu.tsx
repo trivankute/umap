@@ -1,7 +1,9 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import ContextMenuItem from "../ContextMenuItem/ContextMenuItem";
 import { motion, AnimatePresence } from 'framer-motion'
 import Draggable from "react-draggable";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setDestination, setSource } from "@/redux/slices/routingSlice";
 
 interface ContextMenuProps {
   show: boolean,
@@ -11,16 +13,26 @@ interface ContextMenuProps {
   interactMode: 'mainMarkerOn' | 'mainMarkerOff' | 'filter',
   position: { top: number, left: number },
   setPosition: any,
-  startPoint: any,
-  setStartPoint: any,
-  endPoint: any,
-  setEndPoint: any,
 }
 
 function ContextMenu(props: ContextMenuProps) {
   const closeHandler = () => {
     props.setShow(false);
   }
+  const { source, destination } = useAppSelector(state => state.routing)
+  const dispatch = useAppDispatch()
+  const handleStartpointSignal = useCallback(()=>{
+    dispatch(setSource("readyToSet"))
+  }, [])
+  const handleEndpointSignal = useCallback(()=>{
+    dispatch(setDestination("readyToSet"))
+  }, [])
+  const handleRemoveStartpoint = useCallback(()=>{
+    dispatch(setSource(null))
+  }, [])
+  const handleRemoveEndpoint = useCallback(()=>{
+    dispatch(setDestination(null))
+  }, [])
 
   return (<>
     {
@@ -45,15 +57,15 @@ function ContextMenu(props: ContextMenuProps) {
               </button>
             </div>
           </Draggable>
-          <ContextMenuItem setStartPoint={props.setStartPoint} text="Chỉ đường từ đây" />
+          <ContextMenuItem setStartPoint={handleStartpointSignal} text="Chỉ đường từ đây" />
           {
-            props.startPoint !== null &&
-            <ContextMenuItem setStartPoint={props.setStartPoint} remove text="Remove start point" />
+            source !== null &&
+            <ContextMenuItem setStartPoint={handleRemoveStartpoint} remove text="Remove start point" />
           }
-          <ContextMenuItem setEndPoint={props.setEndPoint} text="Chỉ đường tới đây" />
+          <ContextMenuItem setEndPoint={handleEndpointSignal} text="Chỉ đường tới đây" />
           {
-            props.endPoint !== null &&
-            <ContextMenuItem setEndPoint={props.setEndPoint} remove text="Remove end point" />
+            destination !== null &&
+            <ContextMenuItem setEndPoint={handleRemoveEndpoint} remove text="Remove end point" />
           }
           {
             props.interactMode !== 'mainMarkerOff' &&

@@ -7,6 +7,8 @@ import { motion } from 'framer-motion'
 import './MainMarker.css'
 import CircleFilter from "../CircleFilter/CircleFilter";
 import L from 'leaflet'
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setDestination, setSource } from "@/redux/slices/routingSlice";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -115,14 +117,17 @@ function PopUpForLoading({ markerRef, markerPos }: { markerPos:any, markerRef: a
 function MainMarker(props: any) {
   const [circlePos, setCirclePos] = useState<any>([]);
   const markerRef = useRef<any>(null)
+  const dispatch = useAppDispatch()
+  const { source, destination } = useAppSelector(state => state.routing)
+
   useMapEvents({
     click(e) {
-      if (props.startPoint === "readyToSet") {
-        props.setStartPoint([e.latlng.lat, e.latlng.lng])
+      if (source === "readyToSet") {
+        dispatch(setSource({center: [e.latlng.lat, e.latlng.lng]}))
         return;
       }
-      else if (props.endPoint === "readyToSet") {
-        props.setEndPoint([e.latlng.lat, e.latlng.lng])
+      else if (destination === "readyToSet") {
+        dispatch(setDestination({center: [e.latlng.lat, e.latlng.lng]}))
         return;
       }
       else if (props.interactMode !== 'filter') {

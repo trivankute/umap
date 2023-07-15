@@ -6,8 +6,6 @@ import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents, P
 import './Map.css';
 import MarkerElement from "../MapTools/MapInteraction/MarkerElement/MarkerElement";
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
-import StartPoint from "../MapTools/Routing/StartPoint/StartPoint";
-import EndPoint from "../MapTools/Routing/EndPoint/EndPoint";
 import { useAppSelector } from "@/redux/hooks";
 const { BaseLayer } = LayersControl;
 
@@ -23,11 +21,6 @@ interface MapViewProps {
   addressList:any,
   mapRef: any,
   fetchingFilter:any,
-
-  startPoint:any,
-  setStartPoint:any,
-  endPoint:any,
-  setEndPoint:any
 }
 
 export default function MapView(props:MapViewProps) {
@@ -60,7 +53,7 @@ export default function MapView(props:MapViewProps) {
     fetchData()
   }, [])
 
-
+  
   return (
     <>
       {
@@ -88,22 +81,13 @@ export default function MapView(props:MapViewProps) {
             </LayersControl>
 
             <ZoomControl position="topright" />
-            <MainMarker startPoint={props.startPoint} endPoint={props.endPoint}
-            setStartPoint={props.setStartPoint} setEndPoint={props.setEndPoint}
+            <MainMarker
             mapRef={props.mapRef} interactMode={props.interactMode} 
             setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
             position={props.mainMarkerPosition} fetchingFilter={props.fetchingFilter} addressList={props.addressList}/>
-            {
-              props.startPoint && Array.isArray(props.startPoint) &&
-              <StartPoint position={props.startPoint} setPosition={props.setStartPoint}/>
-            }
-            {
-              props.endPoint && Array.isArray(props.endPoint) &&
-              <EndPoint position={props.endPoint} setPosition={props.setEndPoint}/>
-            }
-            {select && item && <MarkerElement mapRef={mapRef} item={item}/>}
-            {source && <MarkerElement mapRef={mapRef} item={source}/>}
-            {destination && <MarkerElement mapRef={mapRef} item={destination}/>}
+            {select && item && <MarkerElement mapRef={mapRef} item={item} type="select"/>}
+            {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
+            {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
             <Event/>
           </MapContainer>
       }

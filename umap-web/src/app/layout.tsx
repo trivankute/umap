@@ -1,3 +1,4 @@
+import { StoreProvider } from '@/redux/provider'
 import './globals.css'
 import { Inter } from 'next/font/google'
 
@@ -15,7 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <StoreProvider>
+        <body className={inter.className}>{children}</body>
+      </StoreProvider>
     </html>
   )
 }
