@@ -4,34 +4,59 @@ import { Marker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
 import L from "leaflet";
 import { useAppDispatch } from "@/redux/hooks";
 import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import "node_modules/leaflet.awesome-markers";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [22, 40],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+// const redIcon = new L.Icon({
+//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+//   iconSize: [22, 40],
+//   iconAnchor: [12, 41],
+//   popupAnchor: [1, -34],
+//   shadowSize: [41, 41],
+// });
+
+// const blueIcon = new L.Icon({
+//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+//   iconSize: [22, 40],
+//   iconAnchor: [12, 41],
+//   popupAnchor: [1, -34],
+//   shadowSize: [41, 41],
+// });
+
+// const greenIcon = new L.Icon({
+//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+//   iconSize: [22, 40],
+//   iconAnchor: [12, 41],
+//   popupAnchor: [1, -34],
+//   shadowSize: [41, 41],
+// });
+
+// @ts-ignore
+var redIcon = L.AwesomeMarkers.icon({
+  icon: "fa-map-pin",
+  prefix: "fa",
+  markerColor: "red",
+  iconColor: "white",
 });
 
-const blueIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [22, 40],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+// @ts-ignore
+var greenIcon = L.AwesomeMarkers.icon({
+  icon: "fa-map-pin",
+  prefix: "fa",
+  markerColor: "green",
+  iconColor: "white",
 });
 
-const greenIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [22, 40],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+// @ts-ignore
+var blueIcon = L.AwesomeMarkers.icon({
+  icon: "fa-map-pin",
+  prefix: "fa",
+  markerColor: "blue",
+  iconColor: "white",
 });
 
 function PopUpData({ data }: { data: SearchResult }) {
