@@ -8,8 +8,10 @@ import { AnimatePresence } from "framer-motion";
 import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/ContextMenu";
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
 // Bootstrap Stuffs
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min";
+// @ts-ignore
+dynamic(()=> import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
+// @ts-ignore
+dynamic(()=> import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
 import { useAppSelector } from "@/redux/hooks";
 
 //-------------------------------------------------------------------------------------------------------------------
