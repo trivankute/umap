@@ -7,7 +7,6 @@ const MapView = dynamic(() => import("@/components/Map/Map"), { ssr: false });
 import { AnimatePresence } from "framer-motion";
 import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/ContextMenu";
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
-import { LatLngExpression } from "leaflet";
 // Bootstrap Stuffs
 // @ts-ignore
 dynamic(()=> import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
@@ -15,6 +14,7 @@ dynamic(()=> import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
 dynamic(()=> import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
 import { SearchResult } from "@/types/Types";
 import { StoreProvider } from "@/redux/provider"
+import { useAppSelector } from "@/redux/hooks";
 
 //-------------------------------------------------------------------------------------------------------------------
 
@@ -28,9 +28,8 @@ export default function Home() {
   const [addressList, setAddressList] = useState<any>([]);
   const [fetchingFilter, setFetchingFilter] = useState<false | number>(false);
   const mapRef = useRef<any>(null)
-  // for startPoint
-  const [startPoint, setStartPoint] = useState<"readyToSet" | LatLngExpression | null>(null);
-  const [endPoint, setEndPoint] = useState<"readyToSet" | LatLngExpression | null>(null);
+  // for sourcePoint and destinationPoint
+  const { source, destination } = useAppSelector(state => state.routing)
 
   const MapviewProps = {
     interactMode,
@@ -40,10 +39,6 @@ export default function Home() {
     addressList,
     mapRef,
     fetchingFilter,
-    startPoint,
-    setStartPoint,
-    endPoint,
-    setEndPoint
   };
 
   const ContextMenuProps = {
@@ -54,11 +49,6 @@ export default function Home() {
     interactMode,
     position: menuPosition,
     setPosition: setMenuPosition,
-
-    startPoint,
-    setStartPoint,
-    endPoint,
-    setEndPoint
   };
 
   const FilterMenuProps = {
@@ -115,37 +105,36 @@ export default function Home() {
       // leaflet-container dispatch
       document.getElementsByClassName('leaflet-container')[0].dispatchEvent(event);
     }
-    if (startPoint === "readyToSet" || endPoint === "readyToSet") {
+    if (source === "readyToSet" || destination === "readyToSet") {
       dispatch();
     }
-  }, [startPoint, endPoint])
+  }, [source, destination])
 
+  console.log("app rerender")
 
   return (
-    <StoreProvider>
-      <div className="relative">
-        <div className="absolute" style={{ zIndex: 10000 }}>
-          <AnimatePresence mode='wait'>
-            {showDirectionBox &&
-              <DirectionBox onDirectionCancel={handleSearchCancel} />
-            }
-          </AnimatePresence>
-          <AnimatePresence mode='wait'>
-            {!showDirectionBox &&
-              <SearchBox onSearchDirection={handleSearchDirection} />
-            }
-          </AnimatePresence>
-        </div>
-          <MapView {...MapviewProps} />
-          {
-            showContextMenu &&
-            <ContextMenu {...ContextMenuProps} />
+    <div className="relative">
+      <div className="absolute" style={{ zIndex: 10000 }}>
+        <AnimatePresence mode='wait'>
+          {showDirectionBox &&
+            <DirectionBox onDirectionCancel={handleSearchCancel} />
           }
-          {
-            showFilterMenu &&
-            <FilterMenu {...FilterMenuProps} />
+        </AnimatePresence>
+        <AnimatePresence mode='wait'>
+          {!showDirectionBox &&
+            <SearchBox onSearchDirection={handleSearchDirection} />
           }
+        </AnimatePresence>
       </div>
-    </StoreProvider>
+      <MapView {...MapviewProps} />
+      {
+        showContextMenu &&
+        <ContextMenu {...ContextMenuProps} />
+      }
+      {
+        showFilterMenu &&
+        <FilterMenu {...FilterMenuProps} />
+      }
+    </div>
   )
 }

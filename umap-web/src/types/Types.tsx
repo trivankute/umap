@@ -4,7 +4,7 @@ export interface SearchBoxProps {
 
 export interface SearchResult {
     osm_id?: string;
-    address: string|null;
+    address?: string;
     center: any
     totalDistance?: number
     type?: string 
