@@ -26,9 +26,10 @@ function FetchFilter(props: any) {
     let [{ data, error, isLoading }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
     useEffect(() => {
         return () => {
+            console.log("hi")
             controller.abort();
         }
-    }, [])
+    }, [props.mainMarker,props.radius,props.mainMarker[0],props.mainMarker[1]])
     if (data) {
         const addressList = data.data;
         let filteredAddressList = null;
@@ -108,13 +109,25 @@ function FilterMenu(props: FilterMenuProps) {
                         </Draggable>
 
                         <div className="w-full h-fit border-b border-gray-300 flex justify-around items-center space-x-2 p-2">
-                            <div onClick={() => { setRadius(50) }} className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden",
+                            <div onClick={() => { 
+                                setRadius(50) 
+                                if(props.fetchingFilter)
+                                {
+                                    props.setFetchingFilter(50);
+                                }
+                            }} className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden",
                                 {
                                     "bg-gray-200": radius === 50
                                 })}>
                                 50m
                             </div>
-                            <div onClick={() => { setRadius(100) }} className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden",
+                            <div onClick={() => { 
+                                setRadius(100)
+                                if(props.fetchingFilter)
+                                {
+                                    props.setFetchingFilter(100);
+                                }
+                             }} className={clsx("w-8 h-8 flex justify-center items-center rounded-md text-xs border-b cursor-pointer hover:bg-gray-200 overflow-hidden",
                                 {
                                     "bg-gray-200": radius === 100
                                 })}>
