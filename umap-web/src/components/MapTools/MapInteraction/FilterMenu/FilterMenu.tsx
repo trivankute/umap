@@ -23,10 +23,9 @@ interface FilterMenuProps {
 
 function FetchFilter(props: any) {
     props.mapRef.current.flyTo(props.mainMarker, 18);
-    let [{ data }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
+    let [{ data, error, isLoading }, controller]: any = useCancelableSWR(`http://localhost:3000/api/map/getAddresses/fromRadiusOfCoor?lat=${props.mainMarker[0]}&lng=${props.mainMarker[1]}&radius=${props.radius}`, {})
     useEffect(() => {
         return () => {
-            console.log("unmount")
             controller.abort();
         }
     }, [])
@@ -143,8 +142,8 @@ function FilterMenu(props: FilterMenuProps) {
                         </div>
                         <div className="w-full max-h-64 p-2 flex flex-col overflow-auto space-y-2">
                             {
-                                AmentitiesList.map((amenity) =>
-                                    <FilterMenuItem amenity={amenity}
+                                AmentitiesList.map((amenity:any, index:number) =>
+                                    <FilterMenuItem key={index} amenity={amenity}
                                         setType={setType}
                                         type={type}
                                     />

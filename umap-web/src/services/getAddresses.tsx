@@ -6,7 +6,7 @@ export default async function getAddresses(searchValue: string) {
     "text": searchValue
   });
 
-  const requestOptions = {
+  const requestOptions:any = {
     method: 'POST',
     headers: myHeaders,
     body: raw,

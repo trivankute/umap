@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo } from "react";
 import clsx from "clsx";
 
 interface ContextMenuItemProps {
@@ -13,6 +13,7 @@ interface ContextMenuItemProps {
     remove?:boolean,
 }
 function ContextMenuItem({ remove,setStartPoint, setEndPoint, setShowFilterMenu, text, setInteractMode, modeForMarker, setShowContextMenu, disabled }: ContextMenuItemProps) {
+
     const handleOnClick = ()=>{
         if(setInteractMode&&modeForMarker){
             setInteractMode(modeForMarker)
@@ -23,19 +24,11 @@ function ContextMenuItem({ remove,setStartPoint, setEndPoint, setShowFilterMenu,
         if(setShowFilterMenu){
             setShowFilterMenu(true)
         }
-        if(setStartPoint&&!remove){
-            setStartPoint("readyToSet")
+        if(setStartPoint){
+            setStartPoint()
         }
-        else if(setStartPoint&&remove)
-        {
-            setStartPoint(null)
-        }
-        if(setEndPoint&&!remove){
-            setEndPoint("readyToSet")
-        }
-        else if(setEndPoint&&remove)
-        {
-            setEndPoint(null)
+        if(setEndPoint){
+            setEndPoint()
         }
     }
     return ( <>

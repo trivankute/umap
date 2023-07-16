@@ -1,12 +1,16 @@
 'use client'
-import { useState, memo, useRef, useEffect, useCallback } from "react";
+import { useState, memo, useRef, useEffect } from "react";
 import { useMapEvents, Marker, Popup, Circle } from "react-leaflet";
 import { PopupInfor } from "@/types/Types";
-import useSWR from "swr"
 import { motion } from 'framer-motion'
 import './MainMarker.css'
-import CircleFilter from "../CircleFilter/CircleFilter";
+import CircleFilter, { returnRightIconByType } from "../CircleFilter/CircleFilter";
 import L from 'leaflet'
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import "node_modules/leaflet.awesome-markers";
+import InformationMarker from "../InformationMarker/InformationMarker";
+import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -16,6 +20,16 @@ const redIcon = new L.Icon({
   popupAnchor: [1, -34],
   shadowSize: [58, 50],
 });
+
+// @ts-ignore
+// https://www.npmjs.com/package/leaflet.awesome-markers
+var Icon = L.AwesomeMarkers.icon({
+  icon: "fa-map",
+  prefix: "fa",
+  markerColor: "red",
+  iconColor: "white",
+});
+
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
@@ -56,10 +70,7 @@ function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: a
 
 function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, position: number[], markerRef: any, setCirclePos: any }) {
 
-  const fetcher = (...args: [any]) => fetch(...args).then((res) => res.json());
-
-  const { data, error, isLoading }
-    = useSWR(`/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, fetcher)
+  let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
 
   useEffect(() => {
     if (markerRef && markerRef.current) {
@@ -68,10 +79,16 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
     }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
+  useEffect(()=>{
+    return () => {
+      controller.abort();
+    }
+  },[position[0], position[1]])
+
   useEffect(() => {
     if (data) {
       {
-        setCirclePos([data.data.lat, data.data.lng])
+        setCirclePos(data.data)
       }
     }
   }, [data])
@@ -93,7 +110,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
   );
 }
 
-function PopUpForLoading({ markerRef, markerPos }: { markerPos:any, markerRef: any }) {
+function PopUpForLoading({ markerRef, markerPos }: { markerPos: any, markerRef: any }) {
   useEffect(() => {
     markerRef?.current?.openPopup()
   }, [markerRef && markerRef.current, markerPos[0], markerPos[1]])
@@ -113,16 +130,18 @@ function PopUpForLoading({ markerRef, markerPos }: { markerPos:any, markerRef: a
 }
 
 function MainMarker(props: any) {
-  const [circlePos, setCirclePos] = useState<any>([]);
+  const [circlePos, setCirclePos] = useState<any>(null);
   const markerRef = useRef<any>(null)
+  const dispatch = useAppDispatch()
+  const { source, destination } = useAppSelector(state => state.routing)
   useMapEvents({
     click(e) {
-      if (props.startPoint === "readyToSet") {
-        props.setStartPoint([e.latlng.lat, e.latlng.lng])
+      if (source === "readyToSet") {
+        dispatch(setSource({ center: [e.latlng.lat, e.latlng.lng] }))
         return;
       }
-      else if (props.endPoint === "readyToSet") {
-        props.setEndPoint([e.latlng.lat, e.latlng.lng])
+      else if (destination === "readyToSet") {
+        dispatch(setDestination({ center: [e.latlng.lat, e.latlng.lng] }))
         return;
       }
       else if (props.interactMode !== 'filter') {
@@ -137,7 +156,7 @@ function MainMarker(props: any) {
 
   const removeMarker = () => {
     props.setPosition([]);
-    setCirclePos([]);
+    setCirclePos(null);
     props.setInteractMode('mainMarkerOff')
   };
 
@@ -150,7 +169,7 @@ function MainMarker(props: any) {
             draggable={true}
             ref={markerRef}
             position={props.position}
-            icon={redIcon}
+            icon={Icon}
             eventHandlers={
               {
                 dblclick() {
@@ -167,11 +186,20 @@ function MainMarker(props: any) {
               <>
                 <SetPopup mapRef={props.mapRef} position={props.position} markerRef={markerRef} setCirclePos={setCirclePos} />
                 {
-                  circlePos.length > 0 &&
-                  <Circle
-                    center={{ lat: circlePos[0], lng: circlePos[1] }}
-                    pathOptions={{ color: 'green' }}
-                    radius={10} />
+                  circlePos &&
+                  <>
+                    <Circle
+                      center={{ lat: circlePos.lat, lng: circlePos.lng }}
+                      pathOptions={{ color: 'green' }}
+                      radius={10} />
+                    <InformationMarker 
+                      position= {[circlePos.lat, circlePos.lng]}
+                      text= {circlePos.address}
+                      type= {circlePos.type}
+                      mainMarkerPos= {{ lat: props.position[0], lng: props.position[1] }}
+                      faForIcon= {returnRightIconByType(circlePos.type)}
+                    />
+                  </>
                 }
               </>
             }

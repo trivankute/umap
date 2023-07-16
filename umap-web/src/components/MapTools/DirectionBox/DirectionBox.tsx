@@ -12,6 +12,8 @@ import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlic
 import LocationInfor from '../LocationInfor/LocationInfor';
 import { setDestination, setDirection, setSource, setState } from '@/redux/slices/routingSlice';
 import getDirection from '@/services/getDirection';
+import { SearchResult } from '@/types/Types';
+import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -25,7 +27,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const dispatch = useAppDispatch()
 
         const [sourceValue, setSourceValue] = useState<string>('');
+        const [sourceSearchLoading, setSourceSearchLoading] = useState(false);
+
         const [destinationValue, setDestinationValue] = useState<string>('');
+        const [destinationSearchLoading, setDestinationSearchLoading] = useState(false);
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
@@ -40,12 +45,21 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         };
 
         const handleSearchSource = async () => {
-            const listAddresses = await getAddresses(sourceValue);
-        
-            dispatch(setSelect('list'))
-            dispatch(setAddressList(listAddresses))
-            dispatch(setState('source'))
-            dispatch(setDirection(null))
+            setSourceSearchLoading(true)
+            dispatch(setAddressList(null))
+            if(sourceValue !== '')
+            {
+                const listAddresses = await getAddresses(sourceValue);
+            
+                setSourceSearchLoading(false)
+                dispatch(setSelect('list'))
+                dispatch(setAddressList(listAddresses))
+                dispatch(setState('source'))
+                dispatch(setDirection(null))
+            }
+            else {
+                setSourceSearchLoading(false)
+            }
         };
 
         const handleInputChangeDestination = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,16 +75,27 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         };
 
         const handleSearchDestination = async () => {
-            const listAddresses = await getAddresses(destinationValue);
-        
-            dispatch(setSelect('list'))
-            dispatch(setAddressList(listAddresses))
-            dispatch(setState('destination'))
-            dispatch(setDirection(null))
+            setDestinationSearchLoading(true)
+            dispatch(setAddressList(null))
+            if(destinationValue !== '')
+            {
+                const listAddresses = await getAddresses(destinationValue);
+            
+                setDestinationSearchLoading(false)
+                dispatch(setSelect('list'))
+                dispatch(setAddressList(listAddresses))
+                dispatch(setState('destination'))
+                dispatch(setDirection(null))
+            }
+            else
+            {
+                setDestinationSearchLoading(false)
+            }
         };
 
         const handleDirection = async () => {
-            if(source!==null && destination!==null){
+            if(typeof source === 'string' || typeof destination === 'string') return
+            if(source && destination){
                 const directions = await getDirection(source, destination, 'foot')
                 if(source?.address)
                     setDestinationValue(source?.address)
@@ -84,6 +109,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         }
         
         const handleSwap = () => {
+            if(typeof source === 'string' || typeof destination === 'string') return
             const oldDestination = destination
             dispatch(setDestination(source))
             if(source?.address)
@@ -125,22 +151,27 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         <div className="direction-box p-2 w-full">
             <div className="direction-start">
                 <div className="icon-start w-[40px] flex justify-center items-center">
-                    <FontAwesomeIcon icon={faCircle} />
+                    <FontAwesomeIcon icon={faMapMarkerAlt} />
                 </div>
                 
                 <input 
                     type="text"
                     placeholder='Chọn điểm bắt đầu...'
-                    className='search-input w-full outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base' 
+                    className='search-input w-full mr-1 outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base' 
                     value={sourceValue}
                     onChange={handleInputChangeSource}
                 />
-                <button 
-                    className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
-                    onClick={handleSearchSource}
-                >
-                    <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
-                </button>
+                {
+                    !sourceSearchLoading ?
+                    <button 
+                        className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
+                        onClick={handleSearchSource}
+                    >
+                        <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
+                    </button>
+                    :
+                    <LoadingForSearchBox/>
+                }
             </div>
 
             <div className='border border-red-500 rounded-full w-fit hover:bg-red-300 cursor-pointer ml-auto mr-2'
@@ -156,16 +187,21 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 <input 
                     type="text"
                     placeholder='Chọn điểm đến...'
-                    className='search-input w-full outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base'
+                    className='search-input w-full mr-1 outline-none focus:ring-1 focus:ring-green-400 focus:border-transparent text-sm md:text-base'
                     value={destinationValue}
                     onChange={handleInputChangeDestination}
                 />
-                <button
-                    className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
-                    onClick={handleSearchDestination}
-                >
-                    <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
-                </button>
+                {
+                    !destinationSearchLoading ?
+                    <button
+                        className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
+                        onClick={handleSearchDestination}
+                    >
+                        <FontAwesomeIcon icon={faSearch} className="group-hover:text-white"/>
+                    </button>
+                    :
+                    <LoadingForSearchBox/>
+                }
             </div>
         </div>
         {select==='infoBox' && <LocationInfor/>}

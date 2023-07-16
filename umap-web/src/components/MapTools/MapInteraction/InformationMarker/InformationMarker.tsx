@@ -2,14 +2,16 @@ import { memo, useEffect, useRef } from "react";
 import { Marker, Popup } from "react-leaflet";
 import { motion } from "framer-motion";
 import L from 'leaflet';
+import "node_modules/leaflet.awesome-markers";
 
 function InformationMarker({
-    position, text, type, mainMarkerPos
+    position, text, type, mainMarkerPos, faForIcon
 }: {
     position: any,
     text: string,
     type: string,
-    mainMarkerPos: any
+    mainMarkerPos: any,
+    faForIcon: string
 }) {
     const markerRef = useRef<any>(null);
     useEffect(() => {
@@ -17,14 +19,22 @@ function InformationMarker({
     }, [
         markerRef && markerRef.current
     ])
-    const greenIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
-    });
+    // const greenIcon = new L.Icon({
+    //     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+    //     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    //     iconSize: [25, 41],
+    //     iconAnchor: [12, 41],
+    //     popupAnchor: [1, -34],
+    //     shadowSize: [41, 41],
+    // });
+    // @ts-ignore
+    var greenIcon = L.AwesomeMarkers.icon({
+        icon: faForIcon,
+        prefix: "fa",
+        markerColor: "green",
+        iconColor: "white",
+      });
+      
     return (<>
         <Marker
             position={position}
