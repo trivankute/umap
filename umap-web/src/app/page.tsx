@@ -9,9 +9,9 @@ import ContextMenu from "@/components/MapTools/MapInteraction/ContextMenu/Contex
 import FilterMenu from "@/components/MapTools/MapInteraction/FilterMenu/FilterMenu";
 // Bootstrap Stuffs
 // @ts-ignore
-dynamic(()=> import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
+dynamic(() => import("bootstrap/dist/css/bootstrap.min.css"), { ssr: false });
 // @ts-ignore
-dynamic(()=> import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
+dynamic(() => import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
 import { SearchResult } from "@/types/Types";
 import { StoreProvider } from "@/redux/provider"
 import { useAppSelector } from "@/redux/hooks";
@@ -127,14 +127,18 @@ export default function Home() {
         </AnimatePresence>
       </div>
       <MapView {...MapviewProps} />
-      {
-        showContextMenu &&
-        <ContextMenu {...ContextMenuProps} />
-      }
-      {
-        showFilterMenu &&
-        <FilterMenu {...FilterMenuProps} />
-      }
+      <AnimatePresence mode='wait'>
+        {
+          showContextMenu &&
+          <ContextMenu {...ContextMenuProps} />
+        }
+      </AnimatePresence>
+      <AnimatePresence mode='wait'>
+        {
+          showFilterMenu &&
+          <FilterMenu {...FilterMenuProps} />
+        }
+      </AnimatePresence>
     </div>
   )
 }
