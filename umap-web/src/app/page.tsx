@@ -8,7 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { SearchResult } from "@/types/Types";
 import { StoreProvider } from "@/redux/provider"
 
-export default function Home({views}:{views:number}) {
+export default function Home() {
   const [showDirectionBox, setShowDirectionBox] = useState(false);
 
   const handleSearchDirection = () => {

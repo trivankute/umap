@@ -9,12 +9,17 @@ import LocationInfor from '../LocationInfor/LocationInfor';
 import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setState } from '@/redux/slices/routingSlice';
+import SearchHistory from './SearchHistory'
+import { saveSearchRequest } from '@/services/SearchRequest';
+
+
 
 export default function SearchBox({ onSearchDirection}: {
   onSearchDirection: () => void
 }) {
   
   const [searchValue, setSearchValue] = useState('');
+  // const [historyShowed, setHistoryShowed] = useState<boolean>(false)
 
   const select = useAppSelector(state => state.search.select)
   
@@ -30,10 +35,14 @@ export default function SearchBox({ onSearchDirection}: {
   };
 
   const handleSearch = async () => {
-    const listAddresses = await getAddresses(searchValue);
+    // const listAddresses = await getAddresses(searchValue);
+
+    await saveSearchRequest({
+      content: searchValue
+    })
 
     dispatch(setSelect(false))
-    dispatch(setAddressList(listAddresses))
+    // dispatch(setAddressList(listAddresses))
   };
 
   const handleDirection = () => {
@@ -60,6 +69,8 @@ export default function SearchBox({ onSearchDirection}: {
           className="search-input w-full outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent text-sm md:text-base"
           value={searchValue}
           onChange={handleInputChange}
+          // onFocus={() => {setHistoryShowed(true)}}
+          // onBlur={() => {setTimeout(() => setHistoryShowed(false), 200)}}
         />
 
         <button
@@ -75,7 +86,7 @@ export default function SearchBox({ onSearchDirection}: {
           <FontAwesomeIcon icon={faDirections} className="faDirections group-hover:text-green-400" />
         </button>
       </div>
-
+      {/* {historyShowed && !searchValue && <SearchHistory updateSearch={(val) => setSearchValue(val)}/>} */}
       {select&&<LocationInfor/>}
 
       <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">

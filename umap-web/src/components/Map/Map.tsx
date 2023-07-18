@@ -23,7 +23,6 @@ export default function MapView() {
     const response = await fetch("http://localhost:3000/api/session/", {method: 'GET'})
     .then(response=>response.json())
     .then(result=>result)
-    console.log(response)
     if(response.zoom===null||response.center===null){
       setView({
         center: {lat:10.879961,lng:106.810877},
