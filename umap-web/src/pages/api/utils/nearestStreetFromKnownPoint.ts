@@ -7,25 +7,25 @@ export default async function handler(prisma: any, osm_id: string, signal: 'poin
         result = await prisma.$queryRawUnsafe(`
     with
     point as
-    (select way as geometry from planet_osm_point
+    (select planet_osm_point.way as geometry from planet_osm_point
     where osm_id = $1),
-    roads as (select name from planet_osm_line, point
-        where boundary isnull and name notnull
-        order by st_closestPoint(planet_osm_line.way, point.geometry) <-> point.geometry
-        limit 1)
-    select * from roads
+    near_street as (select * from streets_forsearch, point
+    where st_dwithin(ST_GeomFromText(ST_AsText(point.geometry),4326)::geography, st_transform(streets_forsearch.way, 4326),100))
+    select name from near_street, point
+    order by st_closestPoint(st_transform(near_street.way,4326), point.geometry::geometry) <-> point.geometry
+    limit 1
     `, id)
     else if (signal === 'polygon')
         result = await prisma.$queryRawUnsafe(`
     with
     point as
-    (select st_centroid(way) as geometry, way from planet_osm_polygon
+    (select st_centroid(planet_osm_polygon.way) as geometry from planet_osm_polygon
     where osm_id = $1),
-    roads as (select name from planet_osm_line, point
-        where boundary isnull and name notnull
-        order by st_closestPoint(planet_osm_line.way, point.way) <-> st_closestPoint(point.way, planet_osm_line.way)
-        limit 1)
-    select * from roads
+    near_street as (select * from streets_forsearch, point
+        where st_dwithin(ST_GeomFromText(ST_AsText(point.geometry),4326)::geography, st_transform(streets_forsearch.way, 4326),100))
+    select name from near_street, point
+    order by st_closestPoint(st_transform(near_street.way,4326), point.geometry::geometry) <-> point.geometry
+    limit 1
     `, id)
     await prisma.$disconnect()
     return result
