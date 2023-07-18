@@ -423,7 +423,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 resForStreetArray = resForStreetArray.map((item: any) => {
                     let geojson = JSON.parse(item.st_asgeojson)
                     geojson.coordinates = geojson.coordinates.map((item: any) => {
-                        return (item[1], item[0])
+                        return [item[1], item[0]]
                     })
                     return {
                         state: "success",
