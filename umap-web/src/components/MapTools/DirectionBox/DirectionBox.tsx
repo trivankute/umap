@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, memo } from 'react'
+import React, { useState, memo, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
@@ -10,10 +10,11 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import getAddresses from '@/services/getAddresses';
 import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlice';
 import LocationInfor from '../LocationInfor/LocationInfor';
-import { setDestination, setDirection, setSource, setState } from '@/redux/slices/routingSlice';
+import { setDestination, setDirectionInfor, setSource, setState } from '@/redux/slices/routingSlice';
 import getDirection from '@/services/getDirection';
 import { SearchResult } from '@/types/Types';
 import { LoadingForSearchBox } from '../SearchBox/SearchBox';
+import DirectionList from '../DirectionsList/DirectionList';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -23,6 +24,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const select = useAppSelector(state => state.search.select)
         const source = useAppSelector(state => state.routing.source)
         const destination = useAppSelector(state => state.routing.destination)
+        const directionInfor = useAppSelector(state => state.routing.directionInfor)
         
         const dispatch = useAppDispatch()
 
@@ -31,6 +33,8 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
 
         const [destinationValue, setDestinationValue] = useState<string>('');
         const [destinationSearchLoading, setDestinationSearchLoading] = useState(false);
+
+        const [directionLoading, setDirectionLoading] = useState(false);
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
@@ -40,7 +44,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setAddressList(null))
                 dispatch(setAddress(null))
                 dispatch(setSource(null))
-                dispatch(setDirection(null))
+                dispatch(setDirectionInfor(null))
             }
         };
 
@@ -55,7 +59,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setSelect('list'))
                 dispatch(setAddressList(listAddresses))
                 dispatch(setState('source'))
-                dispatch(setDirection(null))
+                dispatch(setDirectionInfor(null))
             }
             else {
                 setSourceSearchLoading(false)
@@ -70,7 +74,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setAddressList(null))
                 dispatch(setAddress(null))
                 dispatch(setDestination(null))
-                dispatch(setDirection(null))
+                dispatch(setDirectionInfor(null))
             }
         };
 
@@ -85,7 +89,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setSelect('list'))
                 dispatch(setAddressList(listAddresses))
                 dispatch(setState('destination'))
-                dispatch(setDirection(null))
+                dispatch(setDirectionInfor(null))
             }
             else
             {
@@ -94,17 +98,22 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         };
 
         const handleDirection = async () => {
+            
             if(typeof source === 'string' || typeof destination === 'string') return
             if(source && destination){
-                const directions = await getDirection(source, destination, 'foot')
+                setDirectionLoading(true)
+                const directionsDetail = await getDirection(source, destination, 'foot')
+
                 if(source?.address)
                     setDestinationValue(source?.address)
                 else setDestinationValue('')
                 if(destination?.address)
                     setSourceValue(destination?.address)
                 else setSourceValue('')
-                dispatch(setDirection(directions))
+                dispatch(setDirectionInfor(directionsDetail))
+                
                 dispatch(setSelect(null))
+                if(directionsDetail) setDirectionLoading(false)
             }
         }
         
@@ -123,9 +132,20 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         }
 
         const handleCancel = () => {
+            dispatch(setDestination(null))
+            dispatch(setSource(null))
+            dispatch(setDirectionInfor(null))
             props.onDirectionCancel()
         }
 
+        useEffect(()=>{
+            if(source!==null && source!=='readyToSet' && source.address)
+                setSourceValue(source.address)
+            if(destination!==null && destination!=='readyToSet' && destination.address)
+                setDestinationValue(destination.address)
+                
+        }, [source, destination])
+        
   return (
     <motion.div 
         initial={{opacity:0, x: -500}}
@@ -135,12 +155,17 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         key="direction-box"
         className="bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]">
         <div className="direction-tool flex items-center justify-between p-2 border-b-2">
-            <button 
-                className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100"
-                onClick={handleDirection}
-            >
-                <FontAwesomeIcon icon={faDirections} className="group-hover:text-green-400"/>
-            </button>
+            {
+                !directionLoading?
+                <button 
+                    className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100"
+                    onClick={handleDirection}
+                >
+                    <FontAwesomeIcon icon={faDirections} className="group-hover:text-green-400"/>
+                </button>
+                :
+                <LoadingForSearchBox/>
+            }
             <button 
                 className="cancel-button w-[40px] flex justify-center items-center rounded-md group hover:bg-gray-100" 
                 onClick={handleCancel}
@@ -208,6 +233,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
 
       <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
         {select==='list' && <AddressList/>}
+      </div>
+
+      <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
+        {directionInfor&&<DirectionList/>}
       </div>
     </motion.div>
   )

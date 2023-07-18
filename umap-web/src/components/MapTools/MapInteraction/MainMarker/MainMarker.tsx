@@ -11,6 +11,7 @@ import { setDestination, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
 import InformationMarker from "../InformationMarker/InformationMarker";
 import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
+import getAddress from "@/services/getAddress";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -28,8 +29,14 @@ var Icon = L.AwesomeMarkers.icon({
   prefix: "fa",
   markerColor: "red",
   iconColor: "white",
+  extraClasses:"animate-spin"
 });
 
+async function getSource(lng: any, lat: number){
+  const source =await getAddress(lng, lat)
+  console.log('source: ', source)
+  return source
+}
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
@@ -135,13 +142,22 @@ function MainMarker(props: any) {
   const dispatch = useAppDispatch()
   const { source, destination } = useAppSelector(state => state.routing)
   useMapEvents({
-    click(e) {
+     async click(e) {
       if (source === "readyToSet") {
-        dispatch(setSource({ center: [e.latlng.lat, e.latlng.lng] }))
+        const sourceMarker = await getSource(e.latlng.lng, e.latlng.lat)
+        console.log("Get source", sourceMarker)
+        dispatch(setSource({ 
+          address: sourceMarker.data.address,
+          center: [sourceMarker.data.lat, sourceMarker.data.lng] 
+        }))
         return;
       }
       else if (destination === "readyToSet") {
-        dispatch(setDestination({ center: [e.latlng.lat, e.latlng.lng] }))
+        const destinationMarker = await getSource(e.latlng.lng, e.latlng.lat)
+        dispatch(setDestination({ 
+          address: destinationMarker.data.address,
+          center: [destinationMarker.data.lat, destinationMarker.data.lng] 
+        }))
         return;
       }
       else if (props.interactMode !== 'filter') {

@@ -28,7 +28,10 @@ export default function MapView(props:MapViewProps) {
   const select = useAppSelector(state => state.search.select)
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
-  const direction = useAppSelector(state => state.routing.direction)
+  const directionsInfor = useAppSelector(state => state.routing.directionInfor)
+  const direction = directionsInfor?directionsInfor.map(
+    (item: any)=>[item.coors.map((position: any)=>[position[1], position[0]])]
+  ):null
   
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
@@ -88,6 +91,7 @@ export default function MapView(props:MapViewProps) {
             {select && item && <MarkerElement mapRef={mapRef} item={item} type="select"/>}
             {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
             {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
+            {direction && <Polyline pathOptions={redOptions} positions={direction} />}
             <Event/>
           </MapContainer>
       }
