@@ -29,6 +29,7 @@ var Icon = L.AwesomeMarkers.icon({
   prefix: "fa",
   markerColor: "red",
   iconColor: "white",
+  extraClasses:"animate-spin"
 });
 
 async function getSource(lng: any, lat: number){
