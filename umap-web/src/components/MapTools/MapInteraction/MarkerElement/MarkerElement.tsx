@@ -5,6 +5,7 @@ import L from "leaflet";
 import { useAppDispatch } from "@/redux/hooks";
 import { setDestination, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
+import getAddress from "@/services/getAddress";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
@@ -96,8 +97,9 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
       dispatch(setDestination(null))
   },[])
   const handleDrag = useCallback((e: any) => {
-    if(type==="source")
+    if(type==="source") {
       dispatch(setSource({center: [e.target._latlng.lat, e.target._latlng.lng]}))
+    }
     else if(type==="destination")
       dispatch(setDestination({center: [e.target._latlng.lat, e.target._latlng.lng]}))
   },[])

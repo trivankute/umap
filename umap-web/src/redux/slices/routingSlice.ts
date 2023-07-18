@@ -5,14 +5,14 @@ type RoutingState = {
     state: string,
     source: "readyToSet"|SearchResult | null,
     destination: "readyToSet"|SearchResult | null,
-    direction: number[][]|null
+    directionInfor: any
 }
 
 const initialState : RoutingState = {
     state: '',
     source: null,
     destination: null,
-    direction: null
+    directionInfor: null
 }
 
 export const routingSlice = createSlice({
@@ -28,11 +28,11 @@ export const routingSlice = createSlice({
         setDestination: (state, action: PayloadAction<SearchResult|null|"readyToSet">) => {
             state.destination = action.payload
         },
-        setDirection: (state, action: PayloadAction<number[][]|null>) => {
-            state.direction = action.payload
+        setDirectionInfor: (state, action: PayloadAction<any>) => {
+            state.directionInfor = action.payload
         }
     }
 })
 
-export const {setState, setSource, setDestination, setDirection} = routingSlice.actions
+export const {setState, setSource, setDestination, setDirectionInfor} = routingSlice.actions
 export default routingSlice.reducer;
