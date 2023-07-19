@@ -6,8 +6,8 @@ export default async function handler(prisma: any, lng: string, lat: string) {
     // where boundary isnull and name notnull and st_contains(wards.ward_geometry, way)),
     const a: any = await prisma.$queryRawUnsafe(`
     with 
-point as (select st_setsrid(st_geomfromtext('POINT(106.65516  10.744393345562086)')::geometry, 4326) as geometry),
-point_geography as (select st_setsrid(st_geomfromtext('POINT(106.65516  10.744393345562086)')::geography, 4326) as geometry),
+point as (select st_setsrid(st_geomfromtext($1)::geometry, 4326) as geometry),
+point_geography as (select st_setsrid(st_geomfromtext($1)::geography, 4326) as geometry),
 point_point as (select osm_id, "addr:housenumber","addr:street",name,way, amenity, shop, tourism, historic from planet_osm_point,point
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_transform(way,4326) <-> point.geometry
