@@ -2,12 +2,12 @@ import prisma from "@/lib/prisma";
 // @ts-ignore
 import levenshtein from "fast-levenshtein";
 import { NextApiRequest, NextApiResponse } from "next";
-import nearestStreetFromKnownPoint from "../../../../../utils/nearestStreetFromKnownPoint";
+import nearestStreetFromKnownPoint from "../../../utils/nearestStreetFromKnownPoint";
 import { getParentDirectory } from "../../../updateMapData/getDates";
 import addressParser from '@/pages/api/addressParser/'
-import findWard from "@/utils/findWard";
-import findDistrict from "@/utils/findDistrict";
-import findStreet from "@/utils/findStreet";
+import findWard from "@/pages/api/utils/findWard";
+import findDistrict from "@/pages/api/utils/findDistrict";
+import findStreet from "@/pages/api/utils/findStreet";
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
     // body

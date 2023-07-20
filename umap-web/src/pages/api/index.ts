@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 import { getParentDirectory } from "./updateMapData/getDates";
-import checkWardExist from "../../utils/findWard";
+import checkWardExist from "./utils/findWard";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // prisma call
