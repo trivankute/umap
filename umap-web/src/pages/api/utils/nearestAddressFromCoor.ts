@@ -16,8 +16,8 @@ point_polygon as (select osm_id, "addr:housenumber","addr:street",name,way, land
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_closestPoint(st_transform(way,4326), point.geometry) <-> point.geometry
 limit 1),
-best_road as (select streets_forsearch.highway, streets_forsearch.name, streets_forsearch.ward, streets_forsearch.district, streets_forsearch.way as way from streets_forsearch, point
-order by st_closestPoint(st_transform(streets_forsearch.way,4326), point.geometry) <-> point.geometry
+best_road as (select streets_forsearch.highway, streets_forsearch.street as name, streets_forsearch.ward, streets_forsearch.district, streets_forsearch.street_way as way from streets_forsearch, point
+order by st_closestPoint(st_transform(streets_forsearch.street_way,4326), point.geometry) <-> point.geometry
 limit 1)
 
 select 
