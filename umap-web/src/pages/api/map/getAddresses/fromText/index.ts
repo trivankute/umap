@@ -28,7 +28,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             return
         }
+        console.log(text)
         let resultOfParser = await addressParser(text)
+        console.log(resultOfParser)
         let {
             housenumber, housename, street, ward, district, city
         } = resultOfParser
