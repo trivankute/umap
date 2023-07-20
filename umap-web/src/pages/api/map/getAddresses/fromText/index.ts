@@ -32,6 +32,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         let {
             housenumber, housename, street, ward, district, city
         } = resultOfParser
+        console.log(housenumber, housename, street, ward, district, city)
         // console.log(resultOfParser)
         //////////////////////////////////////// true attribute return by addreeParser because of
         ///////////////////// obey the rule of address in vietname
@@ -51,7 +52,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         if (typeof district === 'boolean') {
             district = false
         }
-        // console.log(housenumber, housename, street, ward, district)
+        
         let searchMode = ''
         if (housenumber || housename) {
             if (street && ward && district)
@@ -86,6 +87,14 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         }
         else if (!ward && district) {
             searchMode = 'district'
+        }
+        // if searchMode is empty
+        if (searchMode === '') {
+            res.status(400).json({
+                state: "failed",
+                message: "Can't regconize your address"
+            })
+            return
         }
         ///////////////////////////////////////////////// start searching full
         if (searchMode === 'full') {
@@ -401,27 +410,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 street = 'Đường ' + street
             }
             // @ts-ignore
-            let resForStreet = await findStreet(prisma, street)
-            await prisma.$disconnect()
-            // connect all coors
-            let coorsArray: any = []
-            // we will intend to get the center of which have most coors
-            let maxLength = -999
-            let maxIndex = -999
-
-            for (let i = 0; i < resForStreet.length; i++) {
-                let geojson = JSON.parse(resForStreet[i].st_asgeojson)
-                // geojson.coors is array of coors
-                coorsArray = [...coorsArray, ...geojson.coordinates]
-                // get the center of which have most coors
-                if (geojson.coordinates.length > maxLength) {
-                    maxLength = geojson.coordinates.length
-                    maxIndex = i
-                }
-            }
+            let resForStreetArray = await findStreet(prisma, street)
             // return result
-            if (resForStreet.length === 0) {
-                await prisma.$disconnect()
+            if (resForStreetArray.length === 0) {
                 res.status(400).json({
                     state: "failed",
                     message: `Street ${street} is not exist`
@@ -429,18 +420,20 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
-                coorsArray = coorsArray.map((item: any) => {
-                    return [item[1], item[0]]
+                resForStreetArray = resForStreetArray.map((item: any) => {
+                    let geojson = JSON.parse(item.st_asgeojson)
+                    geojson.coordinates = geojson.coordinates.map((item: any) => {
+                        return [item[1], item[0]]
+                    })
+                    return {
+                        state: "success",
+                        searchMode: "street",
+                        address: street + " " + item.ward + " " + item.district + " " + "Thành phố Hồ Chí Minh",
+                        center: [item.st_y, item.st_x],
+                        borderLine: geojson.coordinates
+                    }
                 })
-                resForStreet = {
-                    state: "success",
-                    searchMode: "street",
-                    address: street + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForStreet[maxIndex].st_y, resForStreet[maxIndex].st_x],
-                    borderLine: coorsArray
-                }
-                await prisma.$disconnect()
-                res.status(200).json(resForStreet)
+                res.status(200).json(resForStreetArray)
             }
         }
         ///////////////////////////////////////////////// start searching ward

@@ -10,12 +10,12 @@ import { setDestination, setSource, setState } from "@/redux/slices/routingSlice
 function AddressList() {
     const listPlace = useAppSelector(state => state.search.addressList)
     const state = useAppSelector(state => state.routing.state)
-     
+    
     const dispatch = useAppDispatch()
 
     const handleLocation = (item: SearchResult) => {
         dispatch(setAddress(item))
-        dispatch(setSelect(true))
+        dispatch(setSelect('infoBox'))
 
         const location = {
             address: item.address,
@@ -35,20 +35,22 @@ function AddressList() {
     return ( <>
         {
             listPlace && listPlace.length > 0 &&
-            <List className='list-address bg-white' component="nav" aria-label="main mailbox folders">
+            <List className='list-address bg-white w-full' component="nav" aria-label="main mailbox folders">
                 {listPlace.map((item) => {
                 return (
                     <div key={item?.osm_id}>
                     <ListItem
                         onClick={()=>handleLocation(item)}
-                        className="hover:bg-gray-100 cursor-pointer"
+                        className="hover:bg-gray-100 cursor-pointer w-full h-full"
                     >
                         <ListItemIcon>
                         <FontAwesomeIcon icon={faMapMarkerAlt} />
                         </ListItemIcon>
                         <ListItemText primary={item?.address} />
                     </ListItem>
-                    <Divider />
+                    {
+                        listPlace.indexOf(item) !== listPlace.length - 1 && <Divider />
+                    }
                     </div>
                 );
                 })}
@@ -56,8 +58,8 @@ function AddressList() {
         }
         {
             listPlace && listPlace.length === 0 && 
-            <div className="bg-white ">
-                <p>NOT FOUND</p> 
+            <div className="bg-white w-full h-full flex justify-center items-center p-2">
+                <div>Không tìm thấy kết quả</div> 
             </div>
         }
         </> );

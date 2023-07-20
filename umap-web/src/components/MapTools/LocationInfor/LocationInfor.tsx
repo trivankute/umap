@@ -1,4 +1,3 @@
-import { SearchResult } from "@/types/Types";
 import { List, ListItem, ListItemText, ListItemIcon } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMapMarkedAlt} from "@fortawesome/free-solid-svg-icons";
