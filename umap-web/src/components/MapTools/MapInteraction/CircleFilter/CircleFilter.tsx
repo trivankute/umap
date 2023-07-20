@@ -41,7 +41,7 @@ export function returnRightIconByType(type: string) {
             return "fa-shopping-bag";
         case "airport":
             return "fa-plane";
-        case "bus_station":
+        case "bus_stop":
             return "fa-bus";
         case "train_station":
             return "fa-train";

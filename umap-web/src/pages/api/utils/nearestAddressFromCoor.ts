@@ -8,11 +8,11 @@ export default async function handler(prisma: any, lng: string, lat: string) {
     with 
 point as (select st_setsrid(st_geomfromtext($1)::geometry, 4326) as geometry),
 point_geography as (select st_setsrid(st_geomfromtext($1)::geography, 4326) as geometry),
-point_point as (select osm_id, "addr:housenumber","addr:street",name,way, amenity, shop, tourism, historic from planet_osm_point,point
+point_point as (select osm_id, "addr:housenumber","addr:street",name,way, amenity, shop, tourism, historic, highway from planet_osm_point,point
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_transform(way,4326) <-> point.geometry
 limit 1),
-point_polygon as (select osm_id, "addr:housenumber","addr:street",name,way, landuse, building, amenity, leisure, shop from planet_osm_polygon,point
+point_polygon as (select osm_id, "addr:housenumber","addr:street",name,way, landuse, building, amenity, leisure, shop, highway from planet_osm_polygon,point
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_closestPoint(st_transform(way,4326), point.geometry) <-> point.geometry
 limit 1),
@@ -29,6 +29,8 @@ point_point.amenity as point_amenity,
 point_point.shop as point_shop,
 point_point.tourism as point_tourism,
 point_point.historic as point_historic,
+point_point.highway as point_highway,
+
 point_polygon.osm_id::text as polygon_osm_id,
 point_polygon."addr:housenumber" as polygon_housenumber,
 point_polygon."addr:street" as polygon_street,
@@ -38,6 +40,8 @@ point_polygon.landuse as polygon_landuse,
 point_polygon.amenity as polygon_amenity,
 point_polygon.leisure as polygon_leisure,
 point_polygon.shop as polygon_shop,
+point_polygon.highway as polygon_highway,
+
 best_road.name as road_name,
 best_road.highway as road_highway,
 best_road.ward, best_road.district, best_road.city, 
@@ -63,6 +67,7 @@ from point, point_point, point_polygon, best_road
         point_shop,
         point_tourism,
         point_historic,
+        point_highway,
 
         polygon_osm_id,
         polygon_housenumber,
@@ -73,6 +78,7 @@ from point, point_point, point_polygon, best_road
         polygon_amenity,
         polygon_leisure,
         polygon_shop,
+        polygon_highway,
 
         road_name,
         road_highway,
@@ -138,6 +144,9 @@ from point, point_point, point_polygon, best_road
         else if (polygon_shop) {
             type = polygon_shop
         }
+        else if (polygon_highway) {
+            type = polygon_highway
+        }
         else if (type === "") {
             type = "unknown"
         }
@@ -191,6 +200,9 @@ from point, point_point, point_polygon, best_road
         }
         else if (point_historic) {
             type = point_historic
+        }
+        else if (point_highway) {
+            type = point_highway
         }
         else if (type === "" && point_housenumber) {
             type = "house"
