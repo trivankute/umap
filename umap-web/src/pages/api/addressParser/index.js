@@ -1,5 +1,6 @@
-const importUrl = "./data/processed/"
+const importUrl = "../data/processed/"
 
+const cities = require(`${importUrl}city.json`)
 const districts = require(`${importUrl}district.json`)
 const wards = require(`${importUrl}ward.json`)
 const streets = require(`${importUrl}street.json`)
@@ -8,6 +9,10 @@ const housenumbers = require(`${importUrl}housenumber.json`)
 
 const Fuse = require('fuse.js')
 
+const fuseForCities = new Fuse(cities, {
+    includeScore: true,
+    threshold: 0.5
+})
 const fuseForDistricts = new Fuse(districts, {
     includeScore: true,
     threshold: 0.5
@@ -29,7 +34,7 @@ const fuseForHousenumbers = new Fuse(housenumbers, {
     threshold: 0.3
 })
 
-async function usingFuses(string, signal) {
+async function useFuses(string, signal) {
     let res = []
     // must be in order like this so that when regconize equal 0 will correct the type
     if (signal.housename === false) {
@@ -52,6 +57,10 @@ async function usingFuses(string, signal) {
         res.push({ type: 'ward', data: await fuseForWards.search(string, { limit: 1 }) })
     }
 
+    if (signal.city === false) {
+        res.push({ type: 'city', data: await fuseForCities.search(string, { limit: 1 }) })
+    }
+
     return res
 }
 
@@ -62,7 +71,7 @@ export default async function addressParser(fullAddress) {
         street: false,
         ward: false,
         district: false,
-        city: 'Thành phố Hồ Chí Minh'
+        city: false
     }
     if (fullAddress === '') return {
         housenumber: "",
@@ -86,9 +95,9 @@ export default async function addressParser(fullAddress) {
     for (let i = 0; i < addressTokens.length; i++) {
         curString = addressTokens.slice(indexStart, i + 1).join(' ')
         // console.log(curString)
-        let res = await usingFuses(curString, result)
+        let res = await useFuses(curString, result)
         let curScore = 1
-        // count number of not [] in res
+        // count number != [] or score not big in res
         let countCompatible = 0
         for (let j = 0; j < res.length; j++) {
             if (res[j].data.length > 0&&res[j].data[0].score < 0.2) {
@@ -124,7 +133,7 @@ export default async function addressParser(fullAddress) {
                 curScore = tempScore
                 rightString = tempString
             }
-            // console.log(curString, tempType, tempScore, tempString, typeChange)
+            // console.log(curString, tempType, tempScore, tempString)
         }
         //////////////////////////////////////old version
         // else 
@@ -136,6 +145,7 @@ export default async function addressParser(fullAddress) {
             // for autocomplete
             if(curType!==false)
                 result[curType] = rightString
+            ////////////////////////////////////////// test for rules check
             if (curType === 'street') {
                 if (result['housename'] === false)
                     result['housename'] = true
@@ -160,6 +170,42 @@ export default async function addressParser(fullAddress) {
                 if (result['ward'] === false)
                     result['ward'] = true
             }
+            if (curType === 'city') {
+                if (result['housename'] === false)
+                    result['housename'] = true
+                if (result['housenumber'] === false)
+                    result['housenumber'] = true
+                if (result['street'] === false)
+                    result['street'] = true
+                if (result['ward'] === false)
+                    result['ward'] = true
+                if (result['district'] === false)
+                    result['district'] = true
+            }
+            // /////////////////////////////////////////////// test for every where search
+            // if (curType === 'housenumber') {
+            //     if (result['housename'] === false)
+            //         result['housename'] = true
+            // }
+            // if (curType === 'housename') {
+            //     if (result['housenumber'] === false)
+            //         result['housenumber'] = true
+            // }
+            // if (curType === 'street') {
+            //     if (result['street'] === false)
+            //         result['street'] = true
+            // }
+            // if (curType === 'ward') {
+            //     if (result['ward'] === false)
+            //         result['ward'] = true
+            // }
+            // if (curType === 'district') {
+            //     if (result['district'] === false)
+            //         result['district'] = true
+            // }
+
+
+
             indexStart = i
             if (countCompatible === 0 && onlyBackwardOneTime === false) {
                 i--
@@ -203,6 +249,18 @@ export default async function addressParser(fullAddress) {
                 result['street'] = true
             if (result['ward'] === false)
                 result['ward'] = true
+        }
+        if (curType === 'city') {
+            if (result['housename'] === false)
+                result['housename'] = true
+            if (result['housenumber'] === false)
+                result['housenumber'] = true
+            if (result['street'] === false)
+                result['street'] = true
+            if (result['ward'] === false)
+                result['ward'] = true
+            if (result['district'] === false)
+                result['district'] = true
         }
     }
     // console.log(curType, rightString)
