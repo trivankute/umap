@@ -149,7 +149,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             </button>
         </div>
         <div className="direction-box p-2 w-full">
-            <div className="direction-start">
+            <form onSubmit={(e)=>{
+                e.preventDefault()
+                handleSearchSource()
+            }} className="direction-start">
                 <div className="icon-start w-[40px] flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                 </div>
@@ -172,7 +175,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     :
                     <LoadingForSearchBox/>
                 }
-            </div>
+            </form>
 
             <div className='border border-red-500 rounded-full w-fit hover:bg-red-300 cursor-pointer ml-auto mr-2'
                     onClick={handleSwap}
@@ -180,7 +183,10 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     <SwapHorizIcon className='text-red-500'/>
             </div>
 
-            <div className="direction-des">
+            <form onSubmit={(e)=>{
+                e.preventDefault()
+                handleSearchDestination()
+            }} className="direction-des">
                 <div className="icon-direction w-[40px] flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                 </div>
@@ -202,7 +208,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     :
                     <LoadingForSearchBox/>
                 }
-            </div>
+            </form>
         </div>
         {select==='infoBox' && <LocationInfor/>}
 
