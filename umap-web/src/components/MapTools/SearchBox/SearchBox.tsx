@@ -50,6 +50,7 @@ export default function SearchBox({ onSearchDirection }: {
       content: searchValue
     })
 
+    dispatch(setSelect(null))
     // dispatch(setSelect(false))
     // dispatch(setAddressList(listAddresses))
     setSearchLoading(true)
@@ -81,7 +82,10 @@ export default function SearchBox({ onSearchDirection }: {
       key="search-box"
       className="fixed flex flex-col m-2 max-w-[300px] md:max-w-[400px]"
     >
-      <div className="inline-flex bg-white items-center border border-white shadow-xl p-2 rounded-lg overflow-hidden gap-x-2 max-w-[100%]">
+      <form onSubmit={(e)=>{
+        e.preventDefault()
+        handleSearch()
+      }} className="inline-flex bg-white items-center border border-white shadow-xl p-2 rounded-lg overflow-hidden gap-x-2 max-w-[100%]">
         <label htmlFor="search-input"></label>
         <input
           type="text"
@@ -110,9 +114,8 @@ export default function SearchBox({ onSearchDirection }: {
         >
           <FontAwesomeIcon icon={faDirections} className="faDirections group-hover:text-green-400" />
         </button>
-      </div>
-
-      {select === 'infoBox' && <LocationInfor />}
+      </form>
+      {/* {historyShowed && !searchValue && <SearchHistory updateSearch={(val) => setSearchValue(val)}/>} */}
 
       <div className="inline-flex border-0 mt-2 shadow-xl rounded-xl overflow-hidden">
         {select === 'list' && <AddressList />}
