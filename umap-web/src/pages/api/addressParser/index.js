@@ -1,4 +1,4 @@
-const importUrl = "../data/processed/"
+const importUrl = "./data/processed/"
 
 const cities = require(`${importUrl}city.json`)
 const districts = require(`${importUrl}district.json`)
@@ -34,7 +34,7 @@ const fuseForHousenumbers = new Fuse(housenumbers, {
     threshold: 0.3
 })
 
-async function useFuses(string, signal) {
+async function usingFuses(string, signal) {
     let res = []
     // must be in order like this so that when regconize equal 0 will correct the type
     if (signal.housename === false) {
@@ -63,7 +63,6 @@ async function useFuses(string, signal) {
 
     return res
 }
-
 export default async function addressParser(fullAddress) {
     let result = {
         housenumber: false,
@@ -95,7 +94,7 @@ export default async function addressParser(fullAddress) {
     for (let i = 0; i < addressTokens.length; i++) {
         curString = addressTokens.slice(indexStart, i + 1).join(' ')
         // console.log(curString)
-        let res = await useFuses(curString, result)
+        let res = await usingFuses(curString, result)
         let curScore = 1
         // count number != [] or score not big in res
         let countCompatible = 0
