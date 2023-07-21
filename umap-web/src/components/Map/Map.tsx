@@ -32,6 +32,7 @@ export default function MapView(props:MapViewProps) {
   const direction = directionsInfor?directionsInfor.map(
     (item: any)=>[item.coors.map((position: any)=>[position[1], position[0]])]
   ):null
+  const [directionLine, setDirectionLine] = useState(direction)
   
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
@@ -56,7 +57,11 @@ export default function MapView(props:MapViewProps) {
     fetchData()
   }, [])
 
-  
+  useEffect(()=>{
+    console.log('direction changed')
+    setDirectionLine(direction)
+  },[directionsInfor])
+
   return (
     <>
       {
@@ -91,7 +96,7 @@ export default function MapView(props:MapViewProps) {
             {select && item && <MarkerElement mapRef={mapRef} item={item} type="select"/>}
             {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
             {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
-            {direction && <Polyline pathOptions={redOptions} positions={direction} />}
+            {directionLine && <Polyline pathOptions={redOptions} positions={directionLine} />}
             <Event/>
           </MapContainer>
       }

@@ -14,7 +14,6 @@ export default async function getDirection(source: SearchResult, destination: Se
     .then(response => response.json())
     .then(result => result)
     .catch(error => console.log('error', error));
-    console.log("response",response)
     
     return response
 }

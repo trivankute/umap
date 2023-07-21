@@ -1,9 +1,11 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import ContextMenuItem from "../ContextMenuItem/ContextMenuItem";
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Draggable from "react-draggable";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
+import { LoadingForSearchBox } from "../../SearchBox/SearchBox";
+import { setStateMenu } from "@/redux/slices/loadingSlice";
 
 interface ContextMenuProps {
   show: boolean,
@@ -16,11 +18,19 @@ interface ContextMenuProps {
 }
 
 function ContextMenu(props: ContextMenuProps) {
+  
+  const [loading, setLoading] = useState<null|'start'|'end'>(null)
+  const { source, destination } = useAppSelector(state => state.routing)
+  const stateMenu = useAppSelector(state => state.loading.stateMenu)
+  
+  const dispatch = useAppDispatch()
   const closeHandler = () => {
     props.setShow(false);
+    // if(loading!=null){
+    //   dispatch(setStateMenu(null))
+    // }
   }
-  const { source, destination } = useAppSelector(state => state.routing)
-  const dispatch = useAppDispatch()
+  
   const handleStartpointSignal = useCallback(() => {
     dispatch(setSource("readyToSet"))
   }, [])
@@ -29,10 +39,16 @@ function ContextMenu(props: ContextMenuProps) {
   }, [])
   const handleRemoveStartpoint = useCallback(() => {
     dispatch(setSource(null))
+    dispatch(setDirectionInfor(null))
   }, [])
   const handleRemoveEndpoint = useCallback(() => {
     dispatch(setDestination(null))
+    dispatch(setDirectionInfor(null))
   }, [])
+
+  useEffect(()=>{
+    setLoading(stateMenu)
+  }, [stateMenu])
 
   return (<>
     <motion.div
@@ -55,12 +71,24 @@ function ContextMenu(props: ContextMenuProps) {
           </button>
         </div>
       </Draggable>
-      <ContextMenuItem setStartPoint={handleStartpointSignal} text="Chỉ đường từ đây" />
+      {
+        loading!=='start'
+        ?
+        <ContextMenuItem setStartPoint={handleStartpointSignal} text="Chỉ đường từ đây" />
+        :
+        <LoadingForSearchBox/>
+      }
       {
         source !== null &&
         <ContextMenuItem setStartPoint={handleRemoveStartpoint} remove text="Remove start point" />
       }
-      <ContextMenuItem setEndPoint={handleEndpointSignal} text="Chỉ đường tới đây" />
+      {
+        loading!=='end'
+        ?
+        <ContextMenuItem setEndPoint={handleEndpointSignal} text="Chỉ đường tới đây" />
+        :
+        <LoadingForSearchBox/>
+      }
       {
         destination !== null &&
         <ContextMenuItem setEndPoint={handleRemoveEndpoint} remove text="Remove end point" />

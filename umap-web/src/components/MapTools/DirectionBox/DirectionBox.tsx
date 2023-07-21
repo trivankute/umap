@@ -15,6 +15,7 @@ import getDirection from '@/services/getDirection';
 import { SearchResult } from '@/types/Types';
 import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 import DirectionList from '../DirectionsList/DirectionList';
+import { setDirectionState } from '@/redux/slices/loadingSlice';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -25,6 +26,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const source = useAppSelector(state => state.routing.source)
         const destination = useAppSelector(state => state.routing.destination)
         const directionInfor = useAppSelector(state => state.routing.directionInfor)
+        const directionState = useAppSelector(state => state.loading.directionState)
         
         const dispatch = useAppDispatch()
 
@@ -101,7 +103,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             
             if(typeof source === 'string' || typeof destination === 'string') return
             if(source && destination){
-                setDirectionLoading(true)
+                dispatch(setDirectionState(true))
                 const directionsDetail = await getDirection(source, destination, 'foot')
 
                 if(source?.address)
@@ -113,7 +115,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setDirectionInfor(directionsDetail))
                 
                 dispatch(setSelect(null))
-                if(directionsDetail) setDirectionLoading(false)
+                if(directionsDetail) dispatch(setDirectionState(false))
             }
         }
         
@@ -141,9 +143,12 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         useEffect(()=>{
             if(source!==null && source!=='readyToSet' && source.address)
                 setSourceValue(source.address)
+            else if(source===null)
+                setSourceValue('')
             if(destination!==null && destination!=='readyToSet' && destination.address)
                 setDestinationValue(destination.address)
-                
+            else if(destination===null)
+                setDestinationValue('')
         }, [source, destination])
         
   return (
@@ -156,7 +161,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         className="bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]">
         <div className="direction-tool flex items-center justify-between p-2 border-b-2">
             {
-                !directionLoading?
+                !directionState?
                 <button 
                     className="direction-button w-[40px] d-flex justify-center items-center rounded-md group hover:bg-gray-100"
                     onClick={handleDirection}

@@ -8,7 +8,6 @@ function DirectionList() {
     const listItems = useAppSelector(state => state.routing.directionInfor)
     const number = [1,2,3,4,5,6,7,8,9]
     const distance = number.reduce((prev: any, curr: any)=>prev+curr, 0)
-    console.log("Distance", distance)
 
     return (
       <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>

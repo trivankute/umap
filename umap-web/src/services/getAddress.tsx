@@ -9,7 +9,6 @@ export default async function getAddress(lng: any, lat: any){
     .then(response => response.json())
     .then(result => result)
     .catch(error => console.log('error', error));
-    console.log("response",response)
 
     return response
 }
