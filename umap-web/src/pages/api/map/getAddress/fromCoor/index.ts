@@ -11,17 +11,6 @@ interface CustomNextApiRequest extends NextApiRequest {
 }
 
 export default async function handler(req: CustomNextApiRequest, res: NextApiResponse) {
-    let a = setInterval(()=>{
-        console.log(res.destroyed)
-    },200)
-    res.on('close', ()=>{
-        console.log("res closed")
-        clearInterval(a)
-    })
-    res.on('end', ()=>{
-        console.log("res ended")
-        clearInterval(a)
-    })
     // only get request
     if (req.method === 'GET') {
         // get lng and lat from req.query
@@ -41,7 +30,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             message: "Your request is accepted",
             data: result
         })
-        console.log(result)
+        return
     }
     else {
         res.status(400).json({
