@@ -77,9 +77,10 @@ function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: a
 }
 
 function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, position: number[], markerRef: any, setCirclePos: any }) {
-
-  let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
-
+  // let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
+  const [data, setData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  
   useEffect(() => {
     if (markerRef && markerRef.current) {
       markerRef?.current?.openPopup()
@@ -87,11 +88,40 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
     }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
-  useEffect(()=>{
+  // useEffect(()=>{
+  //   return () => {
+  //     controller.abort();
+  //   }
+  // },[position[0], position[1]])
+
+  useEffect(() => {
+    let isMounted = true;
+    let controller = new AbortController();
+    let signal = controller.signal;
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`
+          , { signal: signal }).catch(err=>console.log(err));
+        const jsonData = await response?.json();
+        if (isMounted) {
+          setData(jsonData);
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData(null)
+      }
+    };
+
+    fetchData();
+
     return () => {
+      isMounted = false;
+      setData(null)
       controller.abort();
-    }
-  },[position[0], position[1]])
+    };
+  }, [position[0], position[1]]);
 
   useEffect(() => {
     if (data) {
@@ -110,7 +140,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
       transition={{ duration: 1 }}
     >
       <Popup className="drop-shadow-md">
-        {error && "There is some error"}
+        {/* {error && "There is some error"} */}
         {isLoading && "Loading..."}
         {data && <PopUpData data={data.data} mainMarkerPos={position} />}
       </Popup>

@@ -6,7 +6,8 @@ export default async function handler(prisma: any, lng: string, lat: string) {
     // where boundary isnull and name notnull and st_contains(wards.ward_geometry, way)),
     const a: any = await prisma.$queryRawUnsafe(`
     with 
-point as (select $1::geometry),
+point as (select st_setsrid(st_geomfromtext($1)::geometry, 4326) as geometry),
+point_geography as (select st_setsrid(st_geomfromtext($1)::geography, 4326) as geometry),
 point_point as (select osm_id, "addr:housenumber","addr:street",name,way, amenity, shop, tourism, historic from planet_osm_point,point
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_transform(way,4326) <-> point.geometry
@@ -15,19 +16,12 @@ point_polygon as (select osm_id, "addr:housenumber","addr:street",name,way, land
 where boundary isnull and ("addr:housenumber" notnull or name notnull or "addr:street" notnull)
 order by st_closestPoint(st_transform(way,4326), point.geometry) <-> point.geometry
 limit 1),
-wards as (select ward,ward_geometry from wards_forsearch,point
-where st_contains(st_transform(ward_geometry,4326), point.geometry)
-limit 1),
-districts as (select district from districts_forsearch,point
-where st_contains(st_transform(district_geometry,4326), point.geometry)
-limit 1),
-roads as (select name, way, highway from planet_osm_line, point
-where boundary isnull and name notnull
-order by st_closestPoint(st_transform(way,4326), point.geometry) <-> point.geometry
+best_road as (select streets_forsearch.highway, streets_forsearch.name, streets_forsearch.ward, streets_forsearch.district, streets_forsearch.way as way from streets_forsearch, point
+order by st_closestPoint(st_transform(streets_forsearch.way,4326), point.geometry) <-> point.geometry
 limit 1)
 
 select 
-point_point.osm_id as point_osm_id,
+point_point.osm_id::text as point_osm_id,
 point_point."addr:housenumber" as point_housenumber,
 point_point."addr:street" as point_street,
 point_point.name as point_location_name,
@@ -35,7 +29,7 @@ point_point.amenity as point_amenity,
 point_point.shop as point_shop,
 point_point.tourism as point_tourism,
 point_point.historic as point_historic,
-point_polygon.osm_id as polygon_osm_id,
+point_polygon.osm_id::text as polygon_osm_id,
 point_polygon."addr:housenumber" as polygon_housenumber,
 point_polygon."addr:street" as polygon_street,
 point_polygon.name as polygon_location_name,
@@ -44,22 +38,21 @@ point_polygon.landuse as polygon_landuse,
 point_polygon.amenity as polygon_amenity,
 point_polygon.leisure as polygon_leisure,
 point_polygon.shop as polygon_shop,
-roads.name as road_name,
-roads.highway as road_highway,
-wards.ward, districts.district, 
+best_road.name as road_name,
+best_road.highway as road_highway,
+best_road.ward, best_road.district, 
 st_x(st_transform(st_centroid(point_point.way),4326)) as point_lng,
 st_y(st_transform(st_centroid(point_point.way),4326)) as point_lat, 
 st_x(st_transform(st_centroid(point_polygon.way),4326)) as polygon_lng,
 st_y(st_transform(st_centroid(point_polygon.way),4326)) as polygon_lat,
-st_x(st_transform(st_centroid(roads.way),4326)) as road_lng,
-st_y(st_transform(st_centroid(roads.way),4326)) as road_lat,
-st_distance (point.geometry,st_transform(st_centroid(point_polygon.way),4326)) as toPolygon,
-st_distance (point.geometry,st_transform(st_centroid(point_point.way),4326)) as toPoint,
-st_distance (point.geometry,st_transform(st_centroid(roads.way),4326)) as toRoad
+st_x(st_transform(st_centroid(best_road.way),4326)) as road_lng,
+st_y(st_transform(st_centroid(best_road.way),4326)) as road_lat,
+st_distance (st_transform(point.geometry, 4326),st_transform(st_centroid(point_polygon.way),4326)) as toPolygon,
+st_distance (st_transform(point.geometry, 4326),st_transform(point_point.way,4326)) as toPoint,
+st_distance (st_transform(point.geometry, 4326),st_transform(st_centroid(best_road.way),4326)) as toRoad
 
-
-from point, point_point, point_polygon, roads, wards, districts
-    `, "SRID=4326;POINT(" + lng + " " + lat + ")")
+from point, point_point, point_polygon, best_road
+    `, "POINT(" + lng + " " + lat + ")")
     await prisma.$disconnect()
     const {
         point_osm_id,
