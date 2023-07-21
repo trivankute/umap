@@ -1,17 +1,28 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Event from "../MapTools/Event/Event";
 import MainMarker from "../MapTools/MapInteraction/MainMarker/MainMarker";
-import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents, Polyline } from "react-leaflet";
+import { MapContainer, ZoomControl, WMSTileLayer, LayersControl, useMapEvents, Polyline, Popup } from "react-leaflet";
 import './Map.css';
 import MarkerElement from "../MapTools/MapInteraction/MarkerElement/MarkerElement";
 import PageLoading from "../ForLoading/PageLoading/PageLoading";
 import { useAppSelector } from "@/redux/hooks";
 const { BaseLayer } = LayersControl;
+import DirectionPopup from '@/components/Map/DirectionPopup';
+import RouteList from './RouteList'
 
-const redOptions = { 
-  color: 'green' 
+const pathStyle = {
+  normal: {
+    color: 'green',
+    opacity: 0.8,
+    weight: 5
+  },
+  hover: {
+    color: 'yellow',
+    weight: 5
+  }
 }
+
 
 interface MapViewProps {
   interactMode: 'mainMarkerOff' | 'mainMarkerOn'|'filter',
@@ -29,13 +40,18 @@ export default function MapView(props:MapViewProps) {
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
   const directionsInfor = useAppSelector(state => state.routing.directionInfor)
-  const direction = directionsInfor?directionsInfor.map(
-    (item: any)=>[item.coors.map((position: any)=>[position[1], position[0]])]
+  const direction = directionsInfor ? directionsInfor.map(
+    (item: any)=> {
+      const invertLatLng = ([lng, lat]: [number, number]) => [lat, lng]
+      const pathPositions = [item.coors.map((position: any)=> invertLatLng(position))]
+      return <Polyline key={item.osm_id} pathOptions={item.hovered ? pathStyle.hover : pathStyle.normal} positions={pathPositions} />
+    }
   ):null
-  const [directionLine, setDirectionLine] = useState(direction)
   
+  const [directionLine, setDirectionLine] = useState(direction)
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +97,7 @@ export default function MapView(props:MapViewProps) {
 
             <LayersControl>
               <BaseLayer checked name="U-MAP">
-                <WMSTileLayer url="https://umap.dientoan.vn/geoserver/ows?" layers='TVtesting:planet_osm_line' />
+                <WMSTileLayer url="https://umap.dientoan.vn/geoserver/ows?" layers='umap:hochiminh-basemap' />
               </BaseLayer>
               <BaseLayer checked name="OSM">
                 <WMSTileLayer url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png" />
@@ -96,7 +112,9 @@ export default function MapView(props:MapViewProps) {
             {select && item && <MarkerElement mapRef={mapRef} item={item} type="select"/>}
             {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
             {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
-            {directionLine && <Polyline pathOptions={redOptions} positions={directionLine} />}
+            {/* {direction && <Polyline pathOptions={redOptions} positions={direction} />} */}
+            {direction}
+            {directionLine&&<DirectionPopup />}
             <Event/>
           </MapContainer>
       }
