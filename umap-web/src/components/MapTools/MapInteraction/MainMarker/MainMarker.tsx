@@ -7,10 +7,13 @@ import './MainMarker.css'
 import CircleFilter, { returnRightIconByType } from "../CircleFilter/CircleFilter";
 import L from 'leaflet'
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
 import InformationMarker from "../InformationMarker/InformationMarker";
 import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
+import getAddress from "@/services/getAddress";
+import { setDirectionState, setStateMenu } from "@/redux/slices/loadingSlice";
+import getDirection from "@/services/getDirection";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -28,8 +31,13 @@ var Icon = L.AwesomeMarkers.icon({
   prefix: "fa",
   markerColor: "red",
   iconColor: "white",
+  extraClasses:"animate-spin"
 });
 
+async function getSource(lng: any, lat: any){
+  const source =await getAddress(lng, lat)
+  return source
+}
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
@@ -69,9 +77,10 @@ function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: a
 }
 
 function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, position: number[], markerRef: any, setCirclePos: any }) {
-
-  let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
-
+  // let [{ data, error, isLoading }, controller]:any = useCancelableSWR(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`, {})
+  const [data, setData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  
   useEffect(() => {
     if (markerRef && markerRef.current) {
       markerRef?.current?.openPopup()
@@ -79,11 +88,40 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
     }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
-  useEffect(()=>{
+  // useEffect(()=>{
+  //   return () => {
+  //     controller.abort();
+  //   }
+  // },[position[0], position[1]])
+
+  useEffect(() => {
+    let isMounted = true;
+    let controller = new AbortController();
+    let signal = controller.signal;
+    const fetchData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch(`http://localhost:3000/api/map/getAddress/fromCoor?lat=${position[0]}&lng=${position[1]}`
+          , { signal: signal }).catch(err=>console.log(err));
+        const jsonData = await response?.json();
+        if (isMounted) {
+          setData(jsonData);
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData(null)
+      }
+    };
+
+    fetchData();
+
     return () => {
+      isMounted = false;
+      setData(null)
       controller.abort();
-    }
-  },[position[0], position[1]])
+    };
+  }, [position[0], position[1]]);
 
   useEffect(() => {
     if (data) {
@@ -102,7 +140,7 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
       transition={{ duration: 1 }}
     >
       <Popup className="drop-shadow-md">
-        {error && "There is some error"}
+        {/* {error && "There is some error"} */}
         {isLoading && "Loading..."}
         {data && <PopUpData data={data.data} mainMarkerPos={position} />}
       </Popup>
@@ -133,18 +171,84 @@ function MainMarker(props: any) {
   const [circlePos, setCirclePos] = useState<any>(null);
   const markerRef = useRef<any>(null)
   const dispatch = useAppDispatch()
-  const { source, destination } = useAppSelector(state => state.routing)
+  
+  const source = useAppSelector(state=>state.routing.source)
+  const destination = useAppSelector(state=>state.routing.destination)
+
+  const [sourceMarker, setSourceMarker] = useState(source)
+  const [destinationMarker, setDestinationMarker] = useState(destination)
+
+  useEffect(()=>{
+    // console.log('source: ', source)
+    // console.log('destination: ', destination)
+
+    setSourceMarker(source)
+    setDestinationMarker(destination)
+  }, [source, destination])
+
   useMapEvents({
-    click(e) {
+     async click(e) {
       if (source === "readyToSet") {
-        dispatch(setSource({ center: [e.latlng.lat, e.latlng.lng] }))
-        return;
+        dispatch(setStateMenu('start'))
+        const data = await getSource(e.latlng.lng, e.latlng.lat)
+
+        dispatch(setSource({ 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        }))
+
+        console.log('source marker')
+        console.log('destination: ', destination)
+        console.log('source: ', { 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        })
+
+        if(destinationMarker&&destinationMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          const directionsDetail = await getDirection({ 
+            address: data.data.address,
+            center: [e.latlng.lat, e.latlng.lng] 
+          }, destinationMarker, 'foot')
+
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+        return ;
       }
-      else if (destination === "readyToSet") {
-        dispatch(setDestination({ center: [e.latlng.lat, e.latlng.lng] }))
-        return;
+      if (destination === "readyToSet") {
+        dispatch(setStateMenu('end'))
+        const data = await getSource(e.latlng.lng, e.latlng.lat)
+        
+        dispatch(setDestination({ 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        }))
+
+        console.log('source marker')
+        console.log('destination: ', { 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        })
+        console.log('source: ', source)
+        
+        if(sourceMarker&&sourceMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          const directionsDetail = await getDirection(sourceMarker, { 
+            address: data.data.address,
+            center: [e.latlng.lat, e.latlng.lng] 
+          }, 'foot')
+
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+        return ;
       }
-      else if (props.interactMode !== 'filter') {
+      if (props.interactMode !== 'filter') {
         // @ts-ignore
         props.setPosition([e.latlng.lat, e.latlng.lng]);
         // fly but current zoom
@@ -173,9 +277,12 @@ function MainMarker(props: any) {
             eventHandlers={
               {
                 dblclick() {
+                  console.log('remove marker')
                   removeMarker();
+                  dispatch(setDirectionInfor(null))
                 },
                 dragend(e) {
+                  console.log('drag end')
                   props.setPosition([e.target._latlng.lat, e.target._latlng.lng])
                 }
               }
