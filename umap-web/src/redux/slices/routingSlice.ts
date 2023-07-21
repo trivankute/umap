@@ -6,10 +6,6 @@ type RoutingState = {
     source: "readyToSet"|SearchResult | null,
     destination: "readyToSet"|SearchResult | null,
     directionInfor: any,
-    popupCoors: {
-        position: [number, number],
-        content: string
-    } | null
 }
 
 const initialState : RoutingState = {
@@ -17,7 +13,6 @@ const initialState : RoutingState = {
     source: null,
     destination: null,
     directionInfor: null,
-    popupCoors: null
 }
 
 export const routingSlice = createSlice({
@@ -36,7 +31,7 @@ export const routingSlice = createSlice({
         setDirectionInfor: (state, action: PayloadAction<any>) => {
             state.directionInfor = action.payload
         },
-        routeItemHovered: (state, action: PayloadAction<number>) => {
+        routeItemHovered: (state, action: PayloadAction<any>) => {
             const itemId = action.payload
             state.directionInfor = state.directionInfor.map((item : any, index : number) => {
                 return (
@@ -45,15 +40,11 @@ export const routingSlice = createSlice({
                     {...item, hovered: false}
                 )
             })
+            
         },
         routeItemBlurred: (state) => {
             state.directionInfor = state.directionInfor.map((item : any) => ({...item, hovered: false}))
         },
-        routeClicked: (state, action: PayloadAction<{position: [number, number], content: string}>) => {
-
-            state.popupCoors = {...action.payload}
-            console.log("popup: ", state.popupCoors)
-        }
     }
 })
 
@@ -64,7 +55,6 @@ export const {
     setDirectionInfor, 
     routeItemHovered, 
     routeItemBlurred,
-    routeClicked
 } = routingSlice.actions
 
 export default routingSlice.reducer;

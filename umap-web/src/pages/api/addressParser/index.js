@@ -208,3 +208,7 @@ export default async function addressParser(fullAddress) {
     // console.log(curType, rightString)
     return result
 }
+
+
+
+// console.log(fuseForDistricts.search('quận 1'))

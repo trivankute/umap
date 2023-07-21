@@ -3,7 +3,8 @@ import { Box, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { instruction } from '@/utils/getDirectionInstruction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { routeItemBlurred, routeItemHovered, routeClicked } from '@/redux/slices/routingSlice';
+import { routeItemBlurred, routeItemHovered } from '@/redux/slices/routingSlice';
+import { popupShowed } from '@/redux/slices/popupSlice';
 import { faArrowAltCircleLeft, faArrowAltCircleRight, faArrowAltCircleUp, faArrowCircleUp, faArrowTurnRight, faTentArrowTurnLeft } from '@fortawesome/free-solid-svg-icons';
 
 function DirectionList() {
@@ -14,16 +15,15 @@ function DirectionList() {
 
     const invertLatLng = ([lng, lat]: [number, number]) : [number, number] => [lat, lng]
 
-    const hoverItem = (id: number) => {
+    const hoverAndShowPopup = (id: number, popup: any) => {
+      popup.position = invertLatLng(popup.position)
       dispatch(routeItemHovered(id))
+      dispatch(popupShowed(popup))
     }
     const blurItem = () => {
       dispatch(routeItemBlurred())
     }
 
-    const showPopup = (coors: [number, number], content: string) => {
-      dispatch((routeClicked({position: invertLatLng(coors), content})))
-    }
 
     return (
       <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
@@ -34,9 +34,8 @@ function DirectionList() {
             if (item.direction === 'start') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >
                   <ListItemIcon>
@@ -57,9 +56,8 @@ function DirectionList() {
             } else if (item.direction === 'straight') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >                 
                   <ListItemIcon>
@@ -80,9 +78,8 @@ function DirectionList() {
             }else if (item.direction === 'left') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >                  
                   <ListItemIcon>
@@ -103,9 +100,8 @@ function DirectionList() {
             } else if (item.direction === 'right') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >                
                   <ListItemIcon>
@@ -126,9 +122,8 @@ function DirectionList() {
             }else if (item.direction === 'u turn left') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >                 
                   <ListItemIcon>
@@ -149,9 +144,8 @@ function DirectionList() {
             }else if (item.direction === 'u turn right') {
               return (
                 <ListItem 
-                  key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  key={index} 
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >            
                   <ListItemIcon>
@@ -173,8 +167,7 @@ function DirectionList() {
               return (
                 <ListItem 
                   key={item} 
-                  onClick={() => showPopup(item.coors[0], item.osm_name)}
-                  onMouseEnter={() => hoverItem(index)}
+                  onMouseEnter={() => hoverAndShowPopup(index, {position: item.coors[0], content: `${instruction(item.direction, item.osm_name)}`})}
                   onMouseLeave={() => blurItem()}
                 >                
                   <ListItemText primary={`${index + 1}. ${instruction(item.direction, item.osm_name)}`} />
