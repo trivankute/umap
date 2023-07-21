@@ -39,18 +39,17 @@ export default function MapView(props:MapViewProps) {
   const select = useAppSelector(state => state.search.select)
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
-  const directionsInfor = useAppSelector(state => state.routing.directionInfor)
-  const direction = directionsInfor ? directionsInfor.map(
-    (item: any)=> {
-      const invertLatLng = ([lng, lat]: [number, number]) => [lat, lng]
-      const pathPositions = [item.coors.map((position: any)=> invertLatLng(position))]
-      return <Polyline key={item.osm_id} pathOptions={item.hovered ? pathStyle.hover : pathStyle.normal} positions={pathPositions} />
-    }
-  ):null
+  // const directionsInfor = useAppSelector(state => state.routing.directionInfor)
+  // const direction = directionsInfor ? directionsInfor.map(
+  //   (item: any)=> {
+  //     const invertLatLng = ([lng, lat]: [number, number]) => [lat, lng]
+  //     const pathPositions = [item.coors.map((position: any)=> invertLatLng(position))]
+  //     return <Polyline key={item.osm_id} pathOptions={item.hovered ? pathStyle.hover : pathStyle.normal} positions={pathPositions} />
+  //   }
+  // ):null
 
   const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,7 +107,8 @@ export default function MapView(props:MapViewProps) {
             {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
             {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
             {/* {direction && <Polyline pathOptions={redOptions} positions={direction} />} */}
-            {direction}
+            {/* {direction} */}
+            <RouteList />
             <DirectionPopup />
             <Event/>
           </MapContainer>
