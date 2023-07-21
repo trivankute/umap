@@ -5,7 +5,6 @@ import Draggable from "react-draggable";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
 import { LoadingForSearchBox } from "../../SearchBox/SearchBox";
-import { setStateMenu } from "@/redux/slices/loadingSlice";
 
 interface ContextMenuProps {
   show: boolean,
@@ -26,9 +25,6 @@ function ContextMenu(props: ContextMenuProps) {
   const dispatch = useAppDispatch()
   const closeHandler = () => {
     props.setShow(false);
-    // if(loading!=null){
-    //   dispatch(setStateMenu(null))
-    // }
   }
   
   const handleStartpointSignal = useCallback(() => {

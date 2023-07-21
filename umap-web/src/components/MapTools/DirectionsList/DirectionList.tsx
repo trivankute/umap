@@ -2,12 +2,10 @@ import React from 'react'
 import { Box, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
 import { useAppSelector } from '@/redux/hooks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleLeft, faArrowAltCircleRight, faArrowAltCircleUp, faArrowCircleUp, faArrowTurnRight, faTentArrowTurnLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleLeft, faArrowAltCircleRight, faArrowAltCircleUp, faArrowCircleUp, faArrowTurnRight } from '@fortawesome/free-solid-svg-icons';
 
 function DirectionList() {
     const listItems = useAppSelector(state => state.routing.directionInfor)
-    const number = [1,2,3,4,5,6,7,8,9]
-    const distance = number.reduce((prev: any, curr: any)=>prev+curr, 0)
 
     return (
       <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, memo, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faDirections, faSearch, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddressList from '../AddressList/AddressList';
@@ -12,7 +12,6 @@ import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlic
 import LocationInfor from '../LocationInfor/LocationInfor';
 import { setDestination, setDirectionInfor, setSource, setState } from '@/redux/slices/routingSlice';
 import getDirection from '@/services/getDirection';
-import { SearchResult } from '@/types/Types';
 import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 import DirectionList from '../DirectionsList/DirectionList';
 import { setDirectionState, setEndPointState, setStartPointState } from '@/redux/slices/loadingSlice';
@@ -35,8 +34,6 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const [sourceValue, setSourceValue] = useState<string>('');
 
         const [destinationValue, setDestinationValue] = useState<string>('');
-
-        const [directionLoading, setDirectionLoading] = useState(false);
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
