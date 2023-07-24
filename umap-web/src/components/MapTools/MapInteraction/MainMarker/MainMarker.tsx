@@ -7,10 +7,13 @@ import './MainMarker.css'
 import CircleFilter, { returnRightIconByType } from "../CircleFilter/CircleFilter";
 import L from 'leaflet'
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
 import InformationMarker from "../InformationMarker/InformationMarker";
 import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
+import getAddress from "@/services/getAddress";
+import { setDirectionState, setStateMenu } from "@/redux/slices/loadingSlice";
+import getDirection from "@/services/getDirection";
 
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
@@ -28,8 +31,13 @@ var Icon = L.AwesomeMarkers.icon({
   prefix: "fa",
   markerColor: "red",
   iconColor: "white",
+  extraClasses:"animate-spin"
 });
 
+async function getSource(lng: any, lat: any){
+  const source =await getAddress(lng, lat)
+  return source
+}
 
 function PopUpData({ data, mainMarkerPos }: { data: PopupInfor, mainMarkerPos: any }) {
   return (
@@ -163,18 +171,84 @@ function MainMarker(props: any) {
   const [circlePos, setCirclePos] = useState<any>(null);
   const markerRef = useRef<any>(null)
   const dispatch = useAppDispatch()
-  const { source, destination } = useAppSelector(state => state.routing)
+  
+  const source = useAppSelector(state=>state.routing.source)
+  const destination = useAppSelector(state=>state.routing.destination)
+
+  const [sourceMarker, setSourceMarker] = useState(source)
+  const [destinationMarker, setDestinationMarker] = useState(destination)
+
+  useEffect(()=>{
+    // console.log('source: ', source)
+    // console.log('destination: ', destination)
+
+    setSourceMarker(source)
+    setDestinationMarker(destination)
+  }, [source, destination])
+
   useMapEvents({
-    click(e) {
+     async click(e) {
       if (source === "readyToSet") {
-        dispatch(setSource({ center: [e.latlng.lat, e.latlng.lng] }))
-        return;
+        dispatch(setStateMenu('start'))
+        const data = await getSource(e.latlng.lng, e.latlng.lat)
+
+        dispatch(setSource({ 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        }))
+
+        console.log('source marker')
+        console.log('destination: ', destination)
+        console.log('source: ', { 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        })
+
+        if(destinationMarker&&destinationMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          const directionsDetail = await getDirection({ 
+            address: data.data.address,
+            center: [e.latlng.lat, e.latlng.lng] 
+          }, destinationMarker, 'foot')
+
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+        return ;
       }
-      else if (destination === "readyToSet") {
-        dispatch(setDestination({ center: [e.latlng.lat, e.latlng.lng] }))
-        return;
+      if (destination === "readyToSet") {
+        dispatch(setStateMenu('end'))
+        const data = await getSource(e.latlng.lng, e.latlng.lat)
+        
+        dispatch(setDestination({ 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        }))
+
+        console.log('source marker')
+        console.log('destination: ', { 
+          address: data.data.address,
+          center: [e.latlng.lat, e.latlng.lng] 
+        })
+        console.log('source: ', source)
+        
+        if(sourceMarker&&sourceMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          const directionsDetail = await getDirection(sourceMarker, { 
+            address: data.data.address,
+            center: [e.latlng.lat, e.latlng.lng] 
+          }, 'foot')
+
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+        return ;
       }
-      else if (props.interactMode !== 'filter') {
+      if (props.interactMode !== 'filter') {
         // @ts-ignore
         props.setPosition([e.latlng.lat, e.latlng.lng]);
         // fly but current zoom
@@ -203,9 +277,12 @@ function MainMarker(props: any) {
             eventHandlers={
               {
                 dblclick() {
+                  console.log('remove marker')
                   removeMarker();
+                  dispatch(setDirectionInfor(null))
                 },
                 dragend(e) {
+                  console.log('drag end')
                   props.setPosition([e.target._latlng.lat, e.target._latlng.lng])
                 }
               }
