@@ -77,6 +77,7 @@ export default async function addressParser(fullAddress) {
 
         // filter smallest score
         let min = 999
+        let minIndex = 0
         for (let i = 0; i < probsArray.length; i++) {
             if (probsArray[i].score < min) {
                 min = probsArray[i].score
