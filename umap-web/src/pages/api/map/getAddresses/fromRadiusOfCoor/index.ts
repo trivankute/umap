@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import nearestAddress from "../../../utils/nearestAddressFromCoor";
+import forRadius from "../../../utils/forRadius/forRadius";
 
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
@@ -70,16 +70,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         `, "SRID=4326;POINT("+lng+" "+lat+")", radius)
         await prisma.$disconnect()
         
-        // use nearestAddress to convert these lng and lat of points and polygons to addresses
-        let results:any = []
-        for (const point of points) {
-            let result = await nearestAddress(prisma,point.lng,point.lat)
-            results.push(result)
-        }
-        for (const polygon of polygons) {
-            let result = await nearestAddress(prisma,polygon.lng,polygon.lat)
-            results.push(result)
-        }
+        // // use nearestAddress to convert these lng and lat of points and polygons to addresses
+        let results:any = await forRadius(points, polygons)
         // if typeBuilding is not all, filter results
         if (typeBuilding!=="all") {
             results = results.filter((result:any)=>result.type===typeBuilding)
@@ -91,6 +83,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             message:"Your request is accepted",
             data:results
         })
+        return
     }
     else 
     {
