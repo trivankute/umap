@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
-import nearestAddress from "../../../utils/nearestAddressFromCoor";
+const nearestAddress = require("../../../utils/nearestAddressFromCoor");
 
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
