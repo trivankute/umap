@@ -1,68 +1,18 @@
-const importUrl = "./data/processed/"
-
-const districts = require(`${importUrl}district.json`)
-const wards = require(`${importUrl}ward.json`)
-const streets = require(`${importUrl}street.json`)
-const names = require(`${importUrl}name.json`)
-const housenumbers = require(`${importUrl}housenumber.json`)
-
-const Fuse = require('fuse.js')
-
-const fuseForDistricts = new Fuse(districts, {
-    includeScore: true,
-    threshold: 0.5
-})
-const fuseForWards = new Fuse(wards, {
-    includeScore: true,
-    threshold: 0.5
-})
-const fuseForStreets = new Fuse(streets, {
-    includeScore: true,
-    threshold: 0.3
-})
-const fuseForNames = new Fuse(names, {
-    includeScore: true,
-    threshold: 0.3
-})
-const fuseForHousenumbers = new Fuse(housenumbers, {
-    includeScore: true,
-    threshold: 0.3
-})
-
-async function usingFuses(string, signal) {
-    let res = []
-    // must be in order like this so that when regconize equal 0 will correct the type
-    if (signal.housename === false) {
-        res.push({ type: 'housename', data: await fuseForNames.search(string, { limit: 1 }) })
-    }
-
-    if (signal.housenumber === false) {
-        res.push({ type: 'housenumber', data: await fuseForHousenumbers.search(string, { limit: 1 }) })
-    }
-
-    if (signal.street === false) {
-        res.push({ type: 'street', data: await fuseForStreets.search(string, { limit: 1 }) })
-    }
-
-    if (signal.district === false) {
-        res.push({ type: 'district', data: await fuseForDistricts.search(string, { limit: 1 }) })
-    }
-
-    if (signal.ward === false) {
-        res.push({ type: 'ward', data: await fuseForWards.search(string, { limit: 1 }) })
-    }
-
-    return res
-}
+const { StaticPool } = require('node-worker-threads-pool');
 
 export default async function addressParser(fullAddress) {
+    const pool = new StaticPool({
+        size: 3,
+        task: './src/pages/api/addressParser/worker.js'
+    });
     let result = {
         housenumber: false,
         housename: false,
         street: false,
         ward: false,
         district: false,
-        city: 'Thành phố Hồ Chí Minh'
+        city: false,
+        // province: false
     }
     if (fullAddress === '') return {
         housenumber: "",
@@ -70,141 +20,135 @@ export default async function addressParser(fullAddress) {
         street: "",
         ward: "",
         district: "",
-        city: ""
+        city: "",
+        // province: ""
     }
     // delete all ','; '.';
     fullAddress = fullAddress.replace(/,/g, '')
-    // split fullAddress into array of tokens
-    let addressTokens = fullAddress.split(' ')
-    let curString = ""
-    let indexStart = 0
-    let curType = false
-    let onlyBackwardOneTime = false
-    /////////////////////////////////////// old version nothing here
-    let typeChange = false
-    let rightString = ''
-    for (let i = 0; i < addressTokens.length; i++) {
-        curString = addressTokens.slice(indexStart, i + 1).join(' ')
-        // console.log(curString)
-        let res = await usingFuses(curString, result)
-        let curScore = 1
-        // count number of not [] in res
-        let countCompatible = 0
-        for (let j = 0; j < res.length; j++) {
-            if (res[j].data.length > 0&&res[j].data[0].score < 0.2) {
-                countCompatible++
+    let stop = false
+    while (!stop) {
+        // split fullAddress into array of tokens
+        let testTokens = fullAddress.split(' ')
+        let stringArrays = []
+        for (let i = 1; i <= testTokens.length; i++) {
+            stringArrays.push(testTokens.slice(0, i).join(' '))
+        }
+        let order = ['city', 'district', 'ward', 'street', 'housenumber', 'housename'];
+        let promises = [];
+        for (let i = 0; i < order.length; i++) {
+            if (result.housename === false && order[i] === 'housename') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
+            }
+            if (result.housenumber === false && order[i] === 'housenumber') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
+            }
+            if (result.street === false && order[i] === 'street') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
+            }
+            if (result.ward === false && order[i] === 'ward') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
+            }
+            if (result.district === false && order[i] === 'district') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
+            }
+            if (result.city === false && order[i] === 'city') {
+                promises.push(pool.exec({ stringArrays, type: order[i] }));
             }
         }
-        // console.log(countCompatible)
-        if (countCompatible > 0) {
-            //////////////////////////////////////// old version nothing here
-            // find the smallest score in res
-            let tempType = curType
-            let tempScore = curScore
-            let tempString = rightString
-            for (let j = 0; j < res.length; j++) {
-                //////////////////////////////////////////////// old version
-                // if (res[j].data.length > 0 && res[j].data[0].score < curScore) {
-                if (res[j].data.length > 0 && res[j].data[0].score < tempScore) {
-                    tempType = res[j].type
-                    tempScore = res[j].data[0].score
-                    tempString = res[j].data[0].item
+        let probsArray = await Promise.all(promises)
 
-                    ///////////////////////////////////// old version
-                    // curType = res[j].type
-                    // curScore = res[j].data[0].score
-                    // rightString = res[j].data[0].item
-                }
+        // filter lowest distance
+        let minDistance = 999
+        for (let i = 0; i < probsArray.length; i++) {
+            if (probsArray[i].distance < minDistance) {
+                minDistance = probsArray[i].distance
             }
-            if (curType !== false && tempType !== curType) {
-                typeChange = true
-            }
-            else {
-                curType = tempType
-                curScore = tempScore
-                rightString = tempString
-            }
-            // console.log(curString, tempType, tempScore, tempString, typeChange)
         }
-        //////////////////////////////////////old version
-        // else 
-        if (countCompatible === 0 || typeChange === true) {
-            // cut the last word of curString
-            // curString = addressTokens.slice(indexStart, i).join(' ')
-            // result[curType] = curString
+        probsArray = probsArray.filter(item => item.distance < minDistance + 2)
 
-            // for autocomplete
-            if(curType!==false)
-                result[curType] = rightString
-            if (curType === 'street') {
+        // filter longest itemsLength
+        let maxLength = 0
+        for (let i = 0; i < probsArray.length; i++) {
+            if (probsArray[i].itemsLength > maxLength) {
+                maxLength = probsArray[i].itemsLength
+            }
+        }
+        probsArray = probsArray.filter(item => item.itemsLength === maxLength)
+
+        // filter smallest score
+        let min = 999
+        let minIndex = 0
+        for (let i = 0; i < probsArray.length; i++) {
+            if (probsArray[i].score < min) {
+                min = probsArray[i].score
+                minIndex = i
+            }
+        }
+
+        if (probsArray.length > 0) {
+            let tempType = probsArray[minIndex].type
+            let tempRightString = probsArray[minIndex].rightString
+            let tempString = probsArray[minIndex].curString
+            result[tempType] = tempRightString
+            fullAddress = fullAddress.replace(tempString, '')
+            fullAddress = fullAddress.trim()
+            if (tempType === 'street') {
                 if (result['housename'] === false)
                     result['housename'] = true
-                if (result['housenumber'] === false)
+                else if (result['housenumber'] === false)
                     result['housenumber'] = true
             }
-            if (curType === 'ward') {
+            else if (tempType === 'ward') {
                 if (result['housename'] === false)
                     result['housename'] = true
-                if (result['housenumber'] === false)
+                else if (result['housenumber'] === false)
                     result['housenumber'] = true
-                if (result['street'] === false)
+                else if (result['street'] === false)
                     result['street'] = true
             }
-            if (curType === 'district') {
+            else if (tempType === 'district') {
                 if (result['housename'] === false)
                     result['housename'] = true
-                if (result['housenumber'] === false)
+                else if (result['housenumber'] === false)
                     result['housenumber'] = true
-                if (result['street'] === false)
+                else if (result['street'] === false)
                     result['street'] = true
-                if (result['ward'] === false)
+                else if (result['ward'] === false)
                     result['ward'] = true
             }
-            indexStart = i
-            if (countCompatible === 0 && onlyBackwardOneTime === false) {
-                i--
-                onlyBackwardOneTime = true
+            else if (tempType === 'city') {
+                if (result['housename'] === false)
+                    result['housename'] = true
+                else if (result['housenumber'] === false)
+                    result['housenumber'] = true
+                else if (result['street'] === false)
+                    result['street'] = true
+                else if (result['ward'] === false)
+                    result['ward'] = true
+                else if (result['district'] === false)
+                    result['district'] = true
             }
-            else if (countCompatible === 0 && onlyBackwardOneTime === true) {
-                onlyBackwardOneTime = false
-            }
-            curType = false
-            // /////////////////////////////// old version nothing
-            typeChange = false
-            rightString = ''
-            continue
+            // if (tempType === 'province') {
+            //     if (result['housename'] === false)
+            //         result['housename'] = true
+            //     if (result['housenumber'] === false)
+            //         result['housenumber'] = true
+            //     if (result['street'] === false)
+            //         result['street'] = true
+            //     if (result['ward'] === false)
+            //         result['ward'] = true
+            //     if (result['district'] === false)
+            //         result['district'] = true
+            //     if (result['city'] === false)
+            //         result['city'] = true
+            // }
         }
-
+        else {
+            stop = true
+        }
+        // console.log("loop")
     }
-
-    if (curType !== false) {
-        result[curType] = rightString
-        ////////////////////////////////////////// test for rules check
-        if (curType === 'street') {
-            if (result['housename'] === false)
-                result['housename'] = true
-            if (result['housenumber'] === false)
-                result['housenumber'] = true
-        }
-        if (curType === 'ward') {
-            if (result['housename'] === false)
-                result['housename'] = true
-            if (result['housenumber'] === false)
-                result['housenumber'] = true
-            if (result['street'] === false)
-                result['street'] = true
-        }
-        if (curType === 'district') {
-            if (result['housename'] === false)
-                result['housename'] = true
-            if (result['housenumber'] === false)
-                result['housenumber'] = true
-            if (result['street'] === false)
-                result['street'] = true
-            if (result['ward'] === false)
-                result['ward'] = true
-        }
-    }
-    // console.log(curType, rightString)
+    // console.log("done")
+    await pool.destroy()
     return result
 }
