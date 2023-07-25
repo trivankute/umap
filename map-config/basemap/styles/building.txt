@@ -1,0 +1,39 @@
+* {
+  font-family: "SansSerif.bold";
+  halo-color: #ffffff;
+  halo-radius: 1;
+  font-weight: normal;
+  font-fill: #999;
+  z-index: 1;
+  font-style: normal; 
+  fill: #f2f2f2;
+  fill-opacity: 1, 1;
+  label-anchor: 0.5 0;
+  label-offset: 0 5;
+}
+
+[@scale > 10k] {
+  fill-opacity: 0;
+}
+
+[@scale < 10k] [@scale > 5k] {
+  fill-geometry: [offset(way, 1, -1)];
+  fill: #dfe2e4;
+  z-index: 0;
+}
+
+[@scale < 5k] [@scale > 2.5k] {
+  fill-geometry: [offset(way, 1, -1)];
+  fill: #dfe2e4;
+  font-size: 13;
+  label: [name];
+  z-index: 0;
+}
+
+[@scale < 2.5k] {
+  fill-geometry: [offset(way, 1.5, -1.5)];
+  fill: #dfe2e4;
+  font-size: 13;
+  label: [name];
+  z-index: 0;
+}

@@ -1,0 +1,125 @@
+*{
+  z-index: 1;
+  mark-size: 16;
+  mark-mime: "image/svg";
+}
+
+[amenity='marketplace' or shop='supermarket'] {
+  mark: symbol('file://symbols2/store-solid.svg');
+  :mark { fill: #c71c56; };
+  z-index: 9;
+}
+
+
+[@scale < 10k] [shop='convenience'] {
+  mark: symbol('file://symbols2/basket-shopping-solid.svg');
+  :mark { fill: #DE3163; };
+  z-index: 10;
+}
+
+[@scale < 10k] [amenity='cafe'] {
+  mark: symbol('file://symbols2/mug-hot-solid.svg');
+  :mark { fill: #6F4E37; };
+}
+
+
+[@scale < 10k] [amenity='fuel'] {
+  mark: symbol('file://symbols2/gas-pump-solid.svg');
+  :mark { fill: #005F6A; }
+}
+
+
+[@scale < 10k] [amenity='ferry_terminal'] {
+  mark: symbol('file://symbols2/ferry-solid.svg');
+  :mark { fill: #1D4168; };
+}
+
+[@scale < 10k] [amenity='fast_food'] {
+  mark: symbol('file://symbols2/burger-solid.svg');
+  :mark { fill: #a36850; };
+}
+
+
+[@scale < 10k] [amenity='food_court' or amenity='restaurant']{
+  mark: symbol('file://symbols2/utensils-solid.svg');
+  :mark { fill: #e2e8f0; };
+}
+
+
+[@scale < 10k] [amenity='college' or amenity='university' or amenity='school']{
+  mark: symbol('file://symbols2/school-solid.svg');
+  :mark { fill: #0284c7; };
+}
+
+[@scale < 10k] [amenity='bank'] {
+  mark: symbol('file://symbols2/money-bill-transfer-solid.svg');
+  :mark { fill: #10b981; };
+}
+
+
+[@scale < 10k] [amenity='pharmacy'] {
+  mark: symbol('file://symbols2/prescription-bottle-medical-solid.svg');
+  :mark { fill: #4ade80; };
+}
+
+
+
+[@scale < 10k] [amenity='hospital'] {
+  mark: symbol('file://symbols2/house-medical-solid.svg');
+  :mark { fill: #fda4af; };
+}
+
+
+[@scale < 10k] [amenity='library'] {
+  mark: symbol('file://symbols2/book-open-reader-solid.svg');
+  :mark { fill: #fde68a; };
+}
+
+
+[@scale < 10k] [amenity='kindergarten'] {
+  mark: symbol('file://symbols2/child-reaching-solid.svg');
+  :mark { fill: #fecdd3; };
+}
+
+
+
+[@scale < 10k] [amenity='post_office'] {
+  mark: symbol('file://symbols2/envelope-regular.svg');
+  :mark { fill: #fde68a; };
+}
+
+
+[@scale < 10k] [leisure='park'] {
+  mark: symbol('file://symbols2/landmark-solid.svg');
+  :mark { fill: #4ade80; };
+}
+
+
+[@scale < 10k] [highway='bus_stop'] {
+  mark: symbol('file://symbols2/bus-simple-solid.svg');
+  :mark { fill: #0284c7; };
+}
+
+
+[@scale < 10k] [amenity='atm'] {
+  mark: symbol('file://symbols2/money-check-dollar-solid.svg');
+  :mark { fill: #10b981; };
+}
+
+
+
+[@scale < 10k] [tourism='museum'] {
+  mark: symbol('file://symbols2/landmark-solid.svg');
+  :mark { fill: #f87171; };
+}
+
+
+[@scale < 10k] [tourism='attraction'] {
+  mark: symbol('file://symbols2/map-location-dot-solid.svg');
+  :mark { fill: #fca5a5; };
+}
+
+[@scale < 10k] [tourism='zoo'] {
+  mark: symbol('file://symbols2/paw-solid.svg');
+  :mark { fill: #4ade80; };
+}
