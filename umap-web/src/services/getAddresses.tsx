@@ -33,6 +33,12 @@ export default async function getAddresses(searchValue: string) {
     else if(response.searchMode === 'district'){
       return [response]
     }
+    else if(response.searchMode === 'city'){
+      return [response]
+    }
+    else if(response.searchMode === 'province'){
+      return [response]
+    }
   }
   else if(response.length>0){
     return response

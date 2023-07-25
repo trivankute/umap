@@ -5,13 +5,15 @@ type loadingState = {
     directionState: boolean,
     startPointState: boolean,
     endPointState: boolean,
+    menuState: boolean
 }
 
 const initialState : loadingState = {
     stateMenu: null,
     directionState: false,
     startPointState: false,
-    endPointState: false
+    endPointState: false,
+    menuState: false
 }
 
 export const loadingSlice = createSlice({
@@ -29,6 +31,9 @@ export const loadingSlice = createSlice({
         },
         setEndPointState: (state, action: PayloadAction<boolean>) => {
             state.endPointState = action.payload
+        },
+        setMenuState: (state, action: PayloadAction<boolean>) => {
+            state.menuState = action.payload
         }
     }
 })
@@ -37,6 +42,7 @@ export const {
     setStateMenu, 
     setDirectionState, 
     setStartPointState, 
-    setEndPointState
+    setEndPointState,
+    setMenuState
 } = loadingSlice.actions
 export default loadingSlice.reducer;

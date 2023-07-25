@@ -15,6 +15,8 @@ dynamic(() => import("bootstrap/dist/js/bootstrap.bundle.min"), { ssr: false });
 import { SearchResult } from "@/types/Types";
 import { StoreProvider } from "@/redux/provider"
 import { useAppSelector } from "@/redux/hooks";
+import { useDispatch } from "react-redux";
+import { setMenuState } from "@/redux/slices/loadingSlice";
 
 //-------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +31,8 @@ export default function Home() {
   const [fetchingFilter, setFetchingFilter] = useState<false | number>(false);
   const mapRef = useRef<any>(null)
   // for sourcePoint and destinationPoint
+  const menuState = useAppSelector(state=>state.loading.menuState)
+  const dispatch = useDispatch()
   const { source, destination } = useAppSelector(state => state.routing)
 
   const MapviewProps = {
@@ -83,6 +87,7 @@ export default function Home() {
       setShowContextMenu(true);
       setShowFilterMenu(false);
       setAddressList([]);
+      dispatch(setMenuState(true))
       if (interactMode !== 'mainMarkerOff')
         setInteractMode('mainMarkerOn');
     }
@@ -129,6 +134,7 @@ export default function Home() {
       <MapView {...MapviewProps} />
       <AnimatePresence mode='wait'>
         {
+          menuState &&
           showContextMenu &&
           <ContextMenu {...ContextMenuProps} />
         }

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, memo, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faDirections, faSearch, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddressList from '../AddressList/AddressList';
@@ -12,10 +12,10 @@ import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlic
 import LocationInfor from '../LocationInfor/LocationInfor';
 import { setDestination, setDirectionInfor, setSource, setState } from '@/redux/slices/routingSlice';
 import getDirection from '@/services/getDirection';
-import { SearchResult } from '@/types/Types';
 import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 import DirectionList from '../DirectionsList/DirectionList';
 import { setDirectionState, setEndPointState, setStartPointState } from '@/redux/slices/loadingSlice';
+import { setPopUp } from '@/redux/slices/popupSlice';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -34,9 +34,9 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
 
         const [sourceValue, setSourceValue] = useState<string>('');
 
-        const [destinationValue, setDestinationValue] = useState<string>('');
-
-        const [directionLoading, setDirectionLoading] = useState(false);
+        const [destinationValue, setDestinationValue] = useState<any>(
+            destination&&destination!=='readyToSet'?destination.address:''
+            );
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
@@ -47,6 +47,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setAddress(null))
                 dispatch(setSource(null))
                 dispatch(setDirectionInfor(null))
+                dispatch(setPopUp(null))
             }
         };
 
@@ -119,7 +120,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             }
         }
         
-        const handleSwap = () => {
+        const handleSwap = async () => {
             if(typeof source === 'string' || typeof destination === 'string') return
             const oldDestination = destination
             dispatch(setDestination(source))
@@ -131,6 +132,12 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             if(oldDestination?.address)
                 setSourceValue(oldDestination?.address)
             else setSourceValue('')
+            if(source&&oldDestination){
+                dispatch(setDirectionState(true))
+                const changedDirection = await getDirection(oldDestination, source, 'foot')
+                dispatch(setDirectionInfor(changedDirection))
+                dispatch(setDirectionState(false))
+            }
         }
 
         const handleCancel = () => {

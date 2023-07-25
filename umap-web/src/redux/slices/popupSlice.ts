@@ -19,21 +19,15 @@ export const popupSlice = createSlice({
         popupShowed: (state, action: PayloadAction<Popup>) => {
             state.popup = {...action.payload}
         },
-        routeItemBlurred: (state) => {
-            // state.directionInfor = state.directionInfor.map((item : any) => ({...item, hovered: false}))
-            // state.popupCoors = null
-        },
-        // routeClicked: (state, action: PayloadAction<{position: [number, number], content: string}>) => {
-
-        //     state.popupCoors = {...action.payload}
-        // }
+        setPopUp: (state, action: PayloadAction<any>) => {
+            state.popup = action.payload
+        }
     }
 })
 
 export const {
-    popupShowed, 
-    routeItemBlurred,
-    // routeClicked
+    popupShowed,
+    setPopUp
 } = popupSlice.actions
 
 export default popupSlice.reducer;

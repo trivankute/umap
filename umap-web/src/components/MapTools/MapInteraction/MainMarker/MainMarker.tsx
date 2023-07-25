@@ -10,23 +10,14 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
 import InformationMarker from "../InformationMarker/InformationMarker";
-import useCancelableSWR from "@/pages/api/utils/useCancelableSWR";
 import getAddress from "@/services/getAddress";
-import { setDirectionState, setStateMenu } from "@/redux/slices/loadingSlice";
+import { setDirectionState, setEndPointState, setMenuState, setStartPointState, setStateMenu } from "@/redux/slices/loadingSlice";
 import getDirection from "@/services/getDirection";
-
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-  iconSize: [30, 50],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [58, 50],
-});
+import { setPopUp } from "@/redux/slices/popupSlice";
 
 // @ts-ignore
 // https://www.npmjs.com/package/leaflet.awesome-markers
-var Icon = L.AwesomeMarkers.icon({
+const Icon = L.AwesomeMarkers.icon({
   icon: "fa-map",
   prefix: "fa",
   markerColor: "red",
@@ -88,12 +79,6 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
     }
   }, [position[0], position[1], markerRef && markerRef.current, isLoading])
 
-  // useEffect(()=>{
-  //   return () => {
-  //     controller.abort();
-  //   }
-  // },[position[0], position[1]])
-
   useEffect(() => {
     let isMounted = true;
     let controller = new AbortController();
@@ -140,7 +125,6 @@ function SetPopup({ position, markerRef, setCirclePos, mapRef }: { mapRef: any, 
       transition={{ duration: 1 }}
     >
       <Popup className="drop-shadow-md">
-        {/* {error && "There is some error"} */}
         {isLoading && "Loading..."}
         {data && <PopUpData data={data.data} mainMarkerPos={position} />}
       </Popup>
@@ -189,20 +173,20 @@ function MainMarker(props: any) {
   useMapEvents({
      async click(e) {
       if (source === "readyToSet") {
+        dispatch(setStartPointState(true))
+        dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
         dispatch(setStateMenu('start'))
         const data = await getSource(e.latlng.lng, e.latlng.lat)
 
         dispatch(setSource({ 
           address: data.data.address,
-          center: [e.latlng.lat, e.latlng.lng] 
+          center: [e.latlng.lat, e.latlng.lng]
         }))
 
-        console.log('source marker')
-        console.log('destination: ', destination)
-        console.log('source: ', { 
-          address: data.data.address,
-          center: [e.latlng.lat, e.latlng.lng] 
-        })
+        dispatch(setStartPointState(false))
+        dispatch(setStateMenu(null))
+        dispatch(setMenuState(false))
 
         if(destinationMarker&&destinationMarker!=='readyToSet'){
           dispatch(setDirectionState(true))
@@ -214,12 +198,14 @@ function MainMarker(props: any) {
           dispatch(setDirectionInfor(directionsDetail))
           dispatch(setDirectionState(false))
         }
-
-        dispatch(setStateMenu(null))
         return ;
       }
       if (destination === "readyToSet") {
+        dispatch(setEndPointState(true))
+        dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
         dispatch(setStateMenu('end'))
+
         const data = await getSource(e.latlng.lng, e.latlng.lat)
         
         dispatch(setDestination({ 
@@ -227,13 +213,10 @@ function MainMarker(props: any) {
           center: [e.latlng.lat, e.latlng.lng] 
         }))
 
-        console.log('source marker')
-        console.log('destination: ', { 
-          address: data.data.address,
-          center: [e.latlng.lat, e.latlng.lng] 
-        })
-        console.log('source: ', source)
-        
+        dispatch(setEndPointState(false))
+        dispatch(setStateMenu(null))
+        dispatch(setMenuState(false))
+
         if(sourceMarker&&sourceMarker!=='readyToSet'){
           dispatch(setDirectionState(true))
           const directionsDetail = await getDirection(sourceMarker, { 
@@ -244,8 +227,6 @@ function MainMarker(props: any) {
           dispatch(setDirectionInfor(directionsDetail))
           dispatch(setDirectionState(false))
         }
-
-        dispatch(setStateMenu(null))
         return ;
       }
       if (props.interactMode !== 'filter') {
@@ -261,6 +242,7 @@ function MainMarker(props: any) {
   const removeMarker = () => {
     props.setPosition([]);
     setCirclePos(null);
+    dispatch(setPopUp(null))
     props.setInteractMode('mainMarkerOff')
   };
 

@@ -10,8 +10,6 @@ import { faArrowAltCircleLeft, faArrowAltCircleRight, faArrowAltCircleUp, faArro
 function DirectionList() {
     const dispatch = useAppDispatch()
     const listItems = useAppSelector(state => state.routing.directionInfor)
-    const number = [1,2,3,4,5,6,7,8,9]
-    const distance = number.reduce((prev: any, curr: any)=>prev+curr, 0)
 
     const invertLatLng = ([lng, lat]: [number, number]) : [number, number] => [lat, lng]
 

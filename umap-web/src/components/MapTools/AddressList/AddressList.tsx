@@ -26,7 +26,7 @@ function AddressList() {
             dispatch(setSource(location))
             dispatch(setState(''))
         }
-        else if(state === 'destination') {
+        else {
             dispatch(setDestination(location))
             dispatch(setState(''))
         }

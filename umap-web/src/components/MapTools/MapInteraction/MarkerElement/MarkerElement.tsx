@@ -8,6 +8,7 @@ import "node_modules/leaflet.awesome-markers";
 import getAddress from "@/services/getAddress";
 import getDirection from "@/services/getDirection";
 import { setDirectionState, setEndPointState, setStartPointState, setStateMenu } from "@/redux/slices/loadingSlice";
+import { setPopUp } from "@/redux/slices/popupSlice";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
@@ -93,11 +94,14 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
       dispatch(setDestination(null))
       dispatch(setDirectionInfor(null))
     }
+    dispatch(setPopUp(null))
   },[])
   const handleDrag = useCallback(async (e: any) => {
     if(type==="source") {
         dispatch(setStartPointState(true))
         dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
+
         const data = await getAddress(
           e.target._latlng.lng, e.target._latlng.lat
         )
@@ -124,6 +128,8 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
     if(type==="destination"){
         dispatch(setEndPointState(true))
         dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
+
         const data = await getAddress(
           e.target._latlng.lng, e.target._latlng.lat
         )
