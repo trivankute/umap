@@ -1,39 +1,17 @@
 import { SearchResult } from "@/types/Types";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Marker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
 import L from "leaflet";
-import { useAppDispatch } from "@/redux/hooks";
-import { setDestination, setSource } from "@/redux/slices/routingSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/routingSlice";
 import "node_modules/leaflet.awesome-markers";
+import getAddress from "@/services/getAddress";
+import getDirection from "@/services/getDirection";
+import { setDirectionState, setStateMenu } from "@/redux/slices/loadingSlice";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
-// const redIcon = new L.Icon({
-//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-//   iconSize: [22, 40],
-//   iconAnchor: [12, 41],
-//   popupAnchor: [1, -34],
-//   shadowSize: [41, 41],
-// });
 
-// const blueIcon = new L.Icon({
-//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-//   iconSize: [22, 40],
-//   iconAnchor: [12, 41],
-//   popupAnchor: [1, -34],
-//   shadowSize: [41, 41],
-// });
-
-// const greenIcon = new L.Icon({
-//   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-//   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-//   iconSize: [22, 40],
-//   iconAnchor: [12, 41],
-//   popupAnchor: [1, -34],
-//   shadowSize: [41, 41],
-// });
 
 // @ts-ignore
 var redIcon = L.AwesomeMarkers.icon({
@@ -85,22 +63,100 @@ function PopUpData({ data }: { data: SearchResult }) {
 }
 
 function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult, type: "source" | "destination" | "select" }) {
+  const destination = useAppSelector(state => state.routing.destination)
+  const source = useAppSelector(state => state.routing.source)
+
+
+  const [sourceMarker, setSourceMarker] = useState(source)
+  const [destinationMarker, setDestinationMarker] = useState(destination)
+
+  useEffect(()=>{
+    console.log('Changed')
+    console.log('source: ', source)
+    console.log('destination: ', destination)
+    if(source)
+      setSourceMarker(source)
+    if(destination)
+      setDestinationMarker(destination)
+  }, [source, destination])
+
   const map = useMap()
-  console.log("Border line: ", item.borderLine)
   map.panTo(item.center)
   const dispatch = useAppDispatch()
   const removeMarker = useCallback(() => {
-    if (type === "source")
+    if (type === "source"){
+      console.log('delete source')
       dispatch(setSource(null))
-    else if (type === "destination")
+      dispatch(setDirectionInfor(null))
+    }
+    else if (type === "destination"){
       dispatch(setDestination(null))
+      dispatch(setDirectionInfor(null))
+    }
   },[])
-  const handleDrag = useCallback((e: any) => {
-    if(type==="source")
-      dispatch(setSource({center: [e.target._latlng.lat, e.target._latlng.lng]}))
-    else if(type==="destination")
-      dispatch(setDestination({center: [e.target._latlng.lat, e.target._latlng.lng]}))
-  },[])
+  const handleDrag = useCallback(async (e: any) => {
+    if(type==="source") {
+        const data = await getAddress(
+          e.target._latlng.lng, e.target._latlng.lat
+        )
+        
+        dispatch(setSource({
+          address: data.data.address,
+          center: [e.target._latlng.lat, e.target._latlng.lng]
+        }))
+
+        console.log('source marker')
+        console.log('destination: ', destinationMarker)
+        console.log('source: ', {
+          address: data.data.address,
+          center: [e.target._latlng.lat, e.target._latlng.lng]
+        })
+
+        if(destinationMarker&&destinationMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          dispatch(setDirectionInfor(null))
+          const directionsDetail = await getDirection({
+            address: data.data.address,
+            center: [e.target._latlng.lat, e.target._latlng.lng]
+          }, destinationMarker, 'foot')
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+
+    }
+    if(type==="destination"){
+        const data = await getAddress(
+          e.target._latlng.lng, e.target._latlng.lat
+        )
+        
+        dispatch(setDestination({
+          address: data.data.address,
+          center: [e.target._latlng.lat, e.target._latlng.lng]
+        }))
+
+        console.log('destination marker')
+        console.log('source: ', source)
+        console.log('destination: ', {
+          address: data.data.address,
+          center: [e.target._latlng.lat, e.target._latlng.lng]
+        })
+
+        if(sourceMarker&&sourceMarker!=='readyToSet'){
+          dispatch(setDirectionState(true))
+          dispatch(setDirectionInfor(null))
+          const directionsDetail = await getDirection(sourceMarker, {
+          address: data.data.address,
+          center: [e.target._latlng.lat, e.target._latlng.lng]
+          }, 'foot')
+          dispatch(setDirectionInfor(directionsDetail))
+          dispatch(setDirectionState(false))
+        }
+
+        dispatch(setStateMenu(null))
+    }
+  },[sourceMarker, destinationMarker])
 
   return (
     <>

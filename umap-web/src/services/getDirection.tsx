@@ -14,11 +14,6 @@ export default async function getDirection(source: SearchResult, destination: Se
     .then(response => response.json())
     .then(result => result)
     .catch(error => console.log('error', error));
-    console.log("response",response)
-
-    const data = response.map(
-        (item: any)=>[item.coors.map((position: any)=>[position[1], position[0]])]
-    )
     
-    return data
+    return response
 }
