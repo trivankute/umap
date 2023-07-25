@@ -50,8 +50,7 @@ export default function SearchBox({ onSearchDirection }: {
       content: searchValue
     })
 
-    dispatch(setSelect(null))
-    // dispatch(setSelect(false))
+    dispatch(setSelect(false))
     // dispatch(setAddressList(listAddresses))
     setSearchLoading(true)
     dispatch(setAddressList(null))

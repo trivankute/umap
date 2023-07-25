@@ -8,6 +8,7 @@ import addressParser from '@/pages/api/addressParser/'
 import findWard from "@/pages/api/utils/findWard";
 import findDistrict from "@/pages/api/utils/findDistrict";
 import findStreet from "@/pages/api/utils/findStreet";
+import findHousename from "@/pages/api/utils/findHousename";
 // custom req
 interface CustomNextApiRequest extends NextApiRequest {
     // body
@@ -34,7 +35,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         let {
             housenumber, housename, street, ward, district, city
         } = resultOfParser
-        console.log(housenumber, housename, street, ward, district, city)
+        console.log(housename, housenumber, street, ward, district, city)
         // console.log(resultOfParser)
         //////////////////////////////////////// true attribute return by addreeParser because of
         ///////////////////// obey the rule of address in vietname
@@ -54,41 +55,35 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         if (typeof district === 'boolean') {
             district = false
         }
-        
+        if (typeof city === 'boolean') {
+            city = false
+        }
+
         let searchMode = ''
-        if (housenumber || housename) {
-            if (street && ward && district)
+        if (housename && housenumber) {
+            if (street && ward && district && city) {
                 searchMode = 'full'
-            else if (!street || !district || !ward) {
-                res.status(400).json({
-                    state: "failed",
-                    message: "Can't regconize your address by lacking of ward or district or street"
-                })
+            }
+            else if (!street || !district || !ward || !city) {
+                searchMode = 'housename'
+                // there would be more features on full mode even lack of ward or district or street or city
+                // .....
             }
         }
+        if (housename) {
+            searchMode = 'housename'
+        }
         else if (!housenumber && !housename && street) {
-            // if (ward && district)
-            //     searchMode = 'street'
-            // else if (!ward || !district) {
-            //     res.status(400).json({
-            //         state: "failed",
-            //         message: "Can't regconize what part of your street by lacking of ward or district"
-            //     })
-            // }
             searchMode = 'street'
         }
         else if (!street && ward) {
-            if (district)
-                searchMode = 'ward'
-            else if (!district) {
-                res.status(400).json({
-                    state: "failed",
-                    message: "Can't regconize which ward by lacking of district"
-                })
-            }
+            searchMode = 'ward'
         }
         else if (!ward && district) {
             searchMode = 'district'
+        }
+        else if (!district && city) {
+            searchMode = 'city'
         }
         // if searchMode is empty
         if (searchMode === '') {
@@ -98,8 +93,31 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             return
         }
+        ///////////////////////////////////////////////// start searching housename
+        if (searchMode === 'housename') {
+            // search for only housename
+            console.log(housename, street, ward, district, city)
+            // @ts-ignore
+            let resForHousenameArray = await findHousename(prisma, housename, street, ward, district, city)
+            // return result
+            if (resForHousenameArray!.length === 0) {
+                res.status(400).json({
+                    state: "failed",
+                    message: `${housename} is not exist`
+                })
+                return
+            }
+            else {
+                res.status(200).json({
+                    state: "success",
+                    searchMode: "full",
+                    message: "Your request is successful",
+                    data: resForHousenameArray
+                })
+            }
+        }
         ///////////////////////////////////////////////// start searching full
-        if (searchMode === 'full') {
+        else if (searchMode === 'full') {
             // process data before fetching from database
             let location_name: null | string = null
             if (housename) {
@@ -122,38 +140,28 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // // console.log
             console.log("ward = " + ward)
             console.log("district = " + district)
+            console.log("city = " + city)
             console.log("address = " + address)
             console.log("location_name = " + location_name)
 
             ////////////////////// check if district contain ward or not
             // @ts-ignore
-            let resultCheckWard = await findWard(prisma, ward, district)
+            let resultCheckWard = await findWard(prisma, ward, district, city)
             if (resultCheckWard.length === 0) {
                 await prisma.$disconnect()
                 res.status(400).json({
                     state: "failed",
-                    message: `Ward ${ward} in district ${district} is not exist`
+                    message: `Ward ${ward} with district ${district} and city ${city} is not exist`
                 })
                 return
             }
             // prisma call
             ////////////////////////////////// old version
-            let points = await prisma.$queryRawUnsafe(`WITH
-                specific_district as (
-                select district, district_geometry from districts_forsearch
-                order by levenshtein(unaccent(lower(district)), unaccent(lower($1)))
-                limit 1),
-                specific_ward as (select ward, ward_geometry from wards_forsearch, specific_district
-                where st_contains(specific_district.district_geometry, ward_geometry)
-                order by levenshtein(unaccent(lower(ward)), unaccent(lower($2)))
-                limit 1),
-                specific_roads as (select * from planet_osm_line,specific_ward
-                where boundary isnull and name notnull and st_contains(specific_ward.ward_geometry, way)),
-                specific_points as (select * from planet_osm_point,specific_ward
-                where boundary isnull and (name notnull or "addr:street" notnull or "addr:housenumber" notnull) and st_contains(specific_ward.ward_geometry, way))
-
-                select osm_id::text, "addr:housenumber", "addr:street", name from specific_points
-                `, district, ward)
+            let points = await prisma.$queryRawUnsafe(`
+            select osm_id::text, "addr:housenumber", "addr:street", name from planet_osm_point
+            where place isnull and admin_level isnull and (name notnull or "addr:street" notnull or "addr:housenumber" notnull) 
+            and st_contains(st_setsrid($1::geometry, 3857), way)
+                `, resultCheckWard[0].ward_way)
             await prisma.$disconnect()
             // loop points and find the nearest street also fulfil null street by nearest street
             points = points.map(async (point: any) => {
@@ -191,21 +199,10 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             /////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////////////// old version
-            let polygons = await prisma.$queryRawUnsafe(`WITH
-                specific_district as (
-                select district, district_geometry from districts_forsearch
-                order by levenshtein(unaccent(lower(district)), unaccent(lower($1)))
-                limit 1),
-                specific_ward as (select ward, ward_geometry from wards_forsearch, specific_district
-                where st_contains(specific_district.district_geometry, ward_geometry)
-                order by levenshtein(unaccent(lower(ward)), unaccent(lower($2)))
-                limit 1),
-                specific_roads as (select * from planet_osm_line,specific_ward
-                where boundary isnull and name notnull and st_contains(specific_ward.ward_geometry, way)),
-                specific_polygons as (select * from planet_osm_polygon,specific_ward
-                where boundary isnull and (name notnull or "addr:street" notnull or "addr:housenumber" notnull) and st_contains(specific_ward.ward_geometry, way))
-
-                select osm_id::text, "addr:housenumber", "addr:street", name from specific_polygons
+            let polygons = await prisma.$queryRawUnsafe(`
+            select osm_id::text, "addr:housenumber", "addr:street", name from planet_osm_polygon
+            where place isnull and admin_level isnull and (name notnull or "addr:street" notnull or "addr:housenumber" notnull) 
+            and st_contains(st_setsrid($1::geometry, 3857), way)
                 `, district, ward)
             await prisma.$disconnect()
             // // loop polygons and find the nearest street also fulfil null street by nearest street
@@ -302,7 +299,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     // turn osm_id to bigInit
                     let id = BigInt(element.osm_id)
                     forResult = await prisma.$queryRawUnsafe(`select 
-                        amenity, shop, tourism, historic,
+                        amenity, shop, tourism, historic, highway,
                         st_y(st_transform(way,4326)) as lat, 
                         st_x(st_transform(way,4326)) as lng from planet_osm_point where osm_id = $1`, id)
                     await prisma.$disconnect()
@@ -320,6 +317,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     else if (forResult[0].historic) {
                         type = forResult[0].historic
                     }
+                    else if (forResult[0].highway) {
+                        type = forResult[0].highway
+                    }
                     else if (type === "" && element["addr:housenumber"]) {
                         type = "house"
                     }
@@ -332,7 +332,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     // turn osm_id to bigInit
                     let id = BigInt(element.osm_id)
                     forResult = await prisma.$queryRawUnsafe(`select 
-                        landuse, building, amenity, leisure, shop,
+                        landuse, building, amenity, leisure, shop, highway,
                         st_y(st_transform(st_centroid(way),4326)) as lat, 
                         st_x(st_transform(st_centroid(way),4326)) as lng from planet_osm_polygon where osm_id = $1`, id)
                     await prisma.$disconnect()
@@ -352,6 +352,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     }
                     else if (forResult[0].shop) {
                         type = forResult[0].shop
+                    }
+                    else if (forResult[0].highway) {
+                        type = forResult[0].highway
                     }
                     else if (type === "") {
                         type = "unknown"
@@ -378,7 +381,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     fullAddress += ', ' + district
                 }
                 // add city
-                fullAddress += ', ' + "Thành phố Hồ Chí Minh"
+                fullAddress += ', ' + city + '.'
                 element.fullAddress = fullAddress
 
                 return {
@@ -406,13 +409,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         else if (searchMode === 'street') {
             // search for only street
             console.log(street)
-            // check if street already include 'Đường'
-            if (typeof street === 'string' && !street.includes('Đường')) {
-                // add at first
-                street = 'Đường ' + street
-            }
             // @ts-ignore
-            let resForStreetArray = await findStreet(prisma, street)
+            let resForStreetArray = await findStreet(prisma, street, ward, district, city)
             // return result
             if (resForStreetArray.length === 0) {
                 res.status(400).json({
@@ -430,12 +428,13 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     return {
                         state: "success",
                         searchMode: "street",
-                        address: street + " " + item.ward + " " + item.district + " " + "Thành phố Hồ Chí Minh",
+                        address: street + " " + item.ward + " " + item.district + " " + item.city,
                         center: [item.st_y, item.st_x],
                         borderLine: geojson.coordinates
                     }
                 })
                 res.status(200).json(resForStreetArray)
+                return
             }
         }
         ///////////////////////////////////////////////// start searching ward
@@ -443,7 +442,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // search for only ward
             console.log(ward, district)
             // @ts-ignore
-            let resForWard = await findWard(prisma, ward, district)
+            let resForWard = await findWard(prisma, ward, district, city)
             await prisma.$disconnect()
             if (resForWard.length === 0) {
                 res.status(400).json({
@@ -453,18 +452,21 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
-                let geojson = JSON.parse(resForWard[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item: any) => {
-                    return [item[1], item[0]]
+                resForWard = resForWard.map((item: any) => {
+                    let geojson = JSON.parse(item.st_asgeojson)
+                    geojson.coordinates = geojson.coordinates.map((item: any) => {
+                        return [item[1], item[0]]
+                    })
+                    return {
+                        state: "success",
+                        searchMode: "ward",
+                        address: item.ward + " " + item.district + " " + item.city,
+                        center: [item.st_y, item.st_x],
+                        borderLine: geojson.coordinates
+                    }
                 })
-                resForWard = {
-                    state: "success",
-                    searchMode: "ward",
-                    address: ward + " " + district + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForWard[0].st_y, resForWard[0].st_x],
-                    borderLine: geojson.coordinates
-                }
                 res.status(200).json(resForWard)
+                return
             }
         }
         ///////////////////////////////////////////////// start searching district
@@ -472,7 +474,7 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // search for only district
             console.log(district)
             // @ts-ignore
-            let resForDistrict = await findDistrict(prisma, district)
+            let resForDistrict = await findDistrict(prisma, district, city)
             await prisma.$disconnect()
             if (resForDistrict.length === 0) {
                 res.status(400).json({
@@ -482,20 +484,54 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                 return
             }
             else {
-                let geojson = JSON.parse(resForDistrict[0].st_asgeojson)
-                geojson.coordinates = geojson.coordinates.map((item: any) => {
-                    return [item[1], item[0]]
+                resForDistrict = resForDistrict.map((item: any) => {
+                    let geojson = JSON.parse(item.st_asgeojson)
+                    geojson.coordinates = geojson.coordinates.map((item: any) => {
+                        return [item[1], item[0]]
+                    })
+                    return {
+                        state: "success",
+                        searchMode: "district",
+                        address: item.district + " " + item.city,
+                        center: [item.st_y, item.st_x],
+                        borderLine: geojson.coordinates
+                    }
                 })
-                resForDistrict = {
-                    state: "success",
-                    searchMode: "district",
-                    address: district + " " + "Thành phố Hồ Chí Minh",
-                    center: [resForDistrict[0].st_y, resForDistrict[0].st_x],
-                    borderLine: geojson.coordinates
-                }
                 res.status(200).json(resForDistrict)
+                return
             }
-
+        }
+        ///////////////////////////////////////////////// start searching city
+        else if (searchMode === 'city') {
+            // search for only city
+            console.log(city)
+            // @ts-ignore
+            let resForCity = await findCity(prisma, city)
+            await prisma.$disconnect()
+            if (resForCity.length === 0) {
+                res.status(400).json({
+                    state: "failed",
+                    message: `City ${city} is not exist`
+                })
+                return
+            }
+            else {
+                resForCity = resForCity.map((item: any) => {
+                    let geojson = JSON.parse(item.st_asgeojson)
+                    geojson.coordinates = geojson.coordinates.map((item: any) => {
+                        return [item[1], item[0]]
+                    })
+                    return {
+                        state: "success",
+                        searchMode: "city",
+                        address: item.city,
+                        center: [item.st_y, item.st_x],
+                        borderLine: geojson.coordinates
+                    }
+                })
+                res.status(200).json(resForCity)
+                return
+            }
         }
     }
     else {
