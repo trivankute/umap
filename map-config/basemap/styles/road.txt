@@ -1,0 +1,73 @@
+* { 
+  font-family: "SansSerif.bold";
+  font-fill: #62666b; 
+  font-weight: normal;
+  font-size: 13;
+  stroke: #dadce0, #ffffff;
+  stroke-linecap: round;
+  stroke-linejoin: miter;
+  z-index: 0, 1;
+  label-follow-line: true;
+  label-max-angle-delta: 90;
+  label-max-displacement: 8;
+  label-repeat: 600;
+  label-group: true;
+
+}
+
+[@scale > 500k] {
+  stroke-opacity: 0, 0;
+}
+
+[@scale < 500k] [@scale > 200k] {
+  stroke-width: 2.5, 1.5;
+  stroke-opacity: 1, 1;
+}
+
+
+[@scale < 200k] [@scale > 100k] {
+  stroke-width: 3, 2;
+  stroke-opacity: 1, 1;
+}
+
+[@scale < 100k] [@scale > 50k] {
+  stroke-width: 3.6, 3;
+  stroke-opacity: 1, 1;
+}
+
+[@scale < 50k] [@scale > 25k] {
+  stroke-width: 4, 3.2;
+  stroke-opacity: 1, 1;
+}
+
+[@scale < 25k] [@scale > 10k] {
+  stroke-width: 7, 6;
+  stroke-opacity: 1, 1;
+  z-index: 1;
+  label: [name];
+}
+
+[@scale < 10k] [@scale > 5k] {
+  stroke-width: 7, 6;
+  stroke-opacity: 1, 1;
+  label: [name];
+}
+
+[@scale < 5k] [@scale > 2k] {
+  stroke-width: 10, 9;
+  stroke-opacity: 1, 1;
+  label: [name];
+}
+
+[@scale < 2k] [@scale > 500]{
+  stroke-width: 30, 28;
+  stroke-opacity: 1, 1;
+  label: [name];
+  
+}
+
+[@scale < 500] {
+  stroke-width: 38, 36;
+  stroke-opacity: 1, 1;
+  label: [name];
+}

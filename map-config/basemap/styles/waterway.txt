@@ -1,0 +1,38 @@
+* { 
+  font-family: "SansSerif";
+  font-fill: #205fc0; 
+  font-weight: bold;
+  stroke: #9cc0f9;
+  stroke-linecap: round;
+  stroke-linejoin: miter;
+  label-follow-line: true;
+  label-max-angle-delta: 90;
+  label-max-displacement: 8;
+  label-repeat: 800;
+  label-padding: 12;
+  label-group: true;
+  label-offset: 7px;
+}
+
+[@scale > 150k] {
+  stroke-opacity: 0;
+}
+
+
+[@scale < 150k] [@scale > 100k] {
+  stroke-width: 1;
+} 
+
+[@scale < 100k] {
+  stroke-width: 1.5;
+}
+
+[@scale < 25k] {
+  stroke-width: 2;
+  label: [name];
+}
+
+[@scale < 5k] {
+  stroke-width: 5;
+  label: [name];
+}

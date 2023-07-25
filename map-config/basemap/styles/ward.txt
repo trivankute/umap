@@ -1,0 +1,39 @@
+[@scale < 550001] {
+  font-family: "SansSerif.bold";
+  font-fill: #202124; 
+  font-weight: normal;
+  font-size: 12;
+  halo-color: white;
+  halo-radius: 0.5;
+  fill: #e8eaed;
+  stroke: #c9b2a6;
+  stroke-width: 0.2;
+  stroke-dasharray: 10 2;
+  label-anchor: 0.5 0.5;
+  label-offset: 0 5;
+}
+
+[@scale > 200k] {
+  fill-opacity: 0;
+  stroke-opacity: 0
+}
+
+[@scale < 200k] [@scale > 150k]{
+  label: [name];
+  fill-opacity: 1;
+  stroke-opacity: 0.5;
+  font-size: 10;
+}
+
+[@scale < 150k] [@scale > 100k]{
+  label: [name];
+  fill-opacity: 1;
+  stroke-opacity: 0.5;
+  font-size: 10;
+}
+
+
+[@scale < 100k] {
+  fill-opacity: 1;
+  stroke-opacity: 0;
+}

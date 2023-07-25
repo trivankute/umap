@@ -1,0 +1,26 @@
+[@scale < 10k] { 
+  fill: #f7e6d4; 
+  z-index: 1;
+}
+
+[@scale < 10k] [@scale > 5k] {
+  fill-geometry: [offset(way, 1, -1)];
+  fill: #ece7d5;
+  z-index: 0;
+}
+
+[@scale < 5k] [@scale > 2.5k] {
+  fill-geometry: [offset(way, 1, -1)];
+  fill: #ece7d5;
+  font-size: 13;
+  label: [name];
+  z-index: 0;
+}
+
+[@scale < 2.5k] {
+  fill-geometry: [offset(way, 1.5, -1.5)], [way];
+  fill: #ece7d5;
+  font-size: 13;
+  label: [name];
+  z-index: 0;
+}

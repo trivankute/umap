@@ -1,0 +1,18 @@
+* { 
+  fill: #ceead6; 
+  halo-color: white;
+  halo-radius: 1;
+  font-family: "SansSerif.bold";
+  font-weight: normal;
+  font-fill: #33a753;
+  font-style: normal; 
+  label-anchor: 0.5 0;
+  label-offset: 0 5;
+}
+
+
+
+[@scale < 50k] {
+  font-size: 12;
+  label: [name];
+}

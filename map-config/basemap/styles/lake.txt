@@ -1,0 +1,38 @@
+* { 
+  font-weight: normal;
+  font-fill: #205fc0;
+  font-style: italic; 
+  fill: #9cc0f9;
+  label-anchor: 0.5 0;
+  label-offset: 0 5;
+  -gt-label-follow-line: true;
+  -gt-label-max-angle-delta: 90;
+  -gt-label-max-displacement: 800;
+  -gt-label-repeat: 500;
+}
+
+
+
+[@scale > 150k] {
+  fill-opacity: 0;
+}
+
+[@scale < 150k] [@scale > 100k] [way_area > 20000000]{
+  font-size: 8.5;
+  label: [name];
+}
+
+[@scale < 100k] [@scale > 50k] [way_area > 5000000]{
+  font-size: 8.5;
+  label: [name];
+}
+
+[@scale < 50k] [@scale > 20k] [way_area > 300000]{
+  font-size: 8.5;
+  label: [name];
+}
+
+[@scale < 20k] {
+  font-size: 8.5;
+  label: [name];
+}

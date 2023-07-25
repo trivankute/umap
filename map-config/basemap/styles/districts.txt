@@ -1,0 +1,43 @@
+* { 
+  font-family: "SansSerif.bold";
+  font-fill: #202124; 
+  font-weight: normal;
+  halo-color: white;
+  halo-radius: 1; 
+  fill: #e8eaed;
+  stroke: #c9b2a6;
+  stroke-width: 0.5;
+  stroke-dasharray: 10 2;
+  label-anchor: 0.5 0.5;
+  label-offset: 0 5;
+  label-repeat: 600;
+}
+
+[@scale > 300k] {
+  stroke-width: 0.3;
+  stroke-opacity: 0.3;
+}
+
+[@scale < 300k] [@scale > 200k] {
+  stroke-width: 0.5;
+  stroke-opacity: 0.3;
+  font-size: 12;
+  label: [uppername];
+}
+
+[@scale < 200k] [@scale > 150k] {
+  stroke-width: 0.5;
+  stroke-opacity: 0.3;
+  font-size: 12;
+  label: [uppername];
+}
+
+[@scale < 150k] [@scale > 20k] {
+  stroke-opacity: 0;
+  font-size: 12;
+}
+
+[@scale < 20k] {
+  stroke-opacity: 0;
+  font-size: 12;
+}
