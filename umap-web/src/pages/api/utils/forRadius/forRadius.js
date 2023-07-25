@@ -1,14 +1,9 @@
 const { StaticPool } = require('node-worker-threads-pool');
 
 export default async function forRadius(points, polygons) {
-    let size = (points.length + polygons.length)/3
-    if (size === 0)
-        size = 1
-    else if(size > 5)
-        size = 5
     // create pool
     const pool = new StaticPool({
-        size: size,
+        size: 10,
         task: './src/pages/api/utils/forRadius/worker.js'
     });
     // create promises for both points and polygons
