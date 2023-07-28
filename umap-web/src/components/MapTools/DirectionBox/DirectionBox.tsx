@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, memo, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDirections, faSearch, faMapMarkerAlt, faCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faDirections, faSearch, faMapMarkerAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './directionBoxStyle.component.css'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AddressList from '../AddressList/AddressList';
@@ -12,10 +12,10 @@ import { setAddressList, setAddress, setSelect } from '@/redux/slices/searchSlic
 import LocationInfor from '../LocationInfor/LocationInfor';
 import { setDestination, setDirectionInfor, setSource, setState } from '@/redux/slices/routingSlice';
 import getDirection from '@/services/getDirection';
-import { SearchResult } from '@/types/Types';
 import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 import DirectionList from '../DirectionsList/DirectionList';
-import { setDirectionState } from '@/redux/slices/loadingSlice';
+import { setDirectionState, setEndPointState, setStartPointState } from '@/redux/slices/loadingSlice';
+import { setPopUp } from '@/redux/slices/popupSlice';
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -27,16 +27,16 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const destination = useAppSelector(state => state.routing.destination)
         const directionInfor = useAppSelector(state => state.routing.directionInfor)
         const directionState = useAppSelector(state => state.loading.directionState)
+        const startPointState = useAppSelector(state => state.loading.startPointState)
+        const endPointState = useAppSelector(state => state.loading.endPointState)
         
         const dispatch = useAppDispatch()
 
         const [sourceValue, setSourceValue] = useState<string>('');
-        const [sourceSearchLoading, setSourceSearchLoading] = useState(false);
 
-        const [destinationValue, setDestinationValue] = useState<string>('');
-        const [destinationSearchLoading, setDestinationSearchLoading] = useState(false);
-
-        const [directionLoading, setDirectionLoading] = useState(false);
+        const [destinationValue, setDestinationValue] = useState<any>(
+            destination&&destination!=='readyToSet'?destination.address:''
+            );
         
         const handleInputChangeSource = (event: React.ChangeEvent<HTMLInputElement>) => {
             setSourceValue(event.target.value);
@@ -47,24 +47,25 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                 dispatch(setAddress(null))
                 dispatch(setSource(null))
                 dispatch(setDirectionInfor(null))
+                dispatch(setPopUp(null))
             }
         };
 
         const handleSearchSource = async () => {
-            setSourceSearchLoading(true)
+            dispatch(setStartPointState(true))
             dispatch(setAddressList(null))
             if(sourceValue !== '')
             {
                 const listAddresses = await getAddresses(sourceValue);
             
-                setSourceSearchLoading(false)
+                dispatch(setStartPointState(false))
                 dispatch(setSelect('list'))
                 dispatch(setAddressList(listAddresses))
                 dispatch(setState('source'))
                 dispatch(setDirectionInfor(null))
             }
             else {
-                setSourceSearchLoading(false)
+                dispatch(setStartPointState(false))
             }
         };
 
@@ -81,13 +82,13 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         };
 
         const handleSearchDestination = async () => {
-            setDestinationSearchLoading(true)
+            dispatch(setEndPointState(true))
             dispatch(setAddressList(null))
             if(destinationValue !== '')
             {
                 const listAddresses = await getAddresses(destinationValue);
             
-                setDestinationSearchLoading(false)
+                dispatch(setEndPointState(false))
                 dispatch(setSelect('list'))
                 dispatch(setAddressList(listAddresses))
                 dispatch(setState('destination'))
@@ -95,7 +96,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             }
             else
             {
-                setDestinationSearchLoading(false)
+                dispatch(setEndPointState(false))
             }
         };
 
@@ -119,7 +120,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             }
         }
         
-        const handleSwap = () => {
+        const handleSwap = async () => {
             if(typeof source === 'string' || typeof destination === 'string') return
             const oldDestination = destination
             dispatch(setDestination(source))
@@ -131,6 +132,12 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
             if(oldDestination?.address)
                 setSourceValue(oldDestination?.address)
             else setSourceValue('')
+            if(source&&oldDestination){
+                dispatch(setDirectionState(true))
+                const changedDirection = await getDirection(oldDestination, source, 'foot')
+                dispatch(setDirectionInfor(changedDirection))
+                dispatch(setDirectionState(false))
+            }
         }
 
         const handleCancel = () => {
@@ -195,7 +202,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     onChange={handleInputChangeSource}
                 />
                 {
-                    !sourceSearchLoading ?
+                    !startPointState ?
                     <button 
                         className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
                         onClick={handleSearchSource}
@@ -228,7 +235,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
                     onChange={handleInputChangeDestination}
                 />
                 {
-                    !destinationSearchLoading ?
+                    !endPointState ?
                     <button
                         className="group search-button w-[40px] flex justify-center items-center hover:bg-green-400 hover:border-transparent" 
                         onClick={handleSearchDestination}

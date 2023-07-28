@@ -5,14 +5,14 @@ type RoutingState = {
     state: string,
     source: "readyToSet"|SearchResult | null,
     destination: "readyToSet"|SearchResult | null,
-    directionInfor: any
+    directionInfor: any,
 }
 
 const initialState : RoutingState = {
     state: '',
     source: null,
     destination: null,
-    directionInfor: null
+    directionInfor: null,
 }
 
 export const routingSlice = createSlice({
@@ -30,9 +30,31 @@ export const routingSlice = createSlice({
         },
         setDirectionInfor: (state, action: PayloadAction<any>) => {
             state.directionInfor = action.payload
-        }
+        },
+        routeItemHovered: (state, action: PayloadAction<any>) => {
+            const itemId = action.payload
+            state.directionInfor = state.directionInfor.map((item : any, index : number) => {
+                return (
+                    index === itemId ? 
+                    {...item, hovered: true} :
+                    {...item, hovered: false}
+                )
+            })
+            
+        },
+        routeItemBlurred: (state) => {
+            state.directionInfor = state.directionInfor.map((item : any) => ({...item, hovered: false}))
+        },
     }
 })
 
-export const {setState, setSource, setDestination, setDirectionInfor} = routingSlice.actions
+export const {
+    setState, 
+    setSource, 
+    setDestination, 
+    setDirectionInfor, 
+    routeItemHovered, 
+    routeItemBlurred,
+} = routingSlice.actions
+
 export default routingSlice.reducer;

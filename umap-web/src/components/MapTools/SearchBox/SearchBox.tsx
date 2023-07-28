@@ -50,15 +50,17 @@ export default function SearchBox({ onSearchDirection }: {
       content: searchValue
     })
 
-    dispatch(setSelect(false))
+    dispatch(setSelect(null))
     // dispatch(setAddressList(listAddresses))
     setSearchLoading(true)
     dispatch(setAddressList(null))
     if(searchValue !== '') {
-    const listAddresses = await getAddresses(searchValue);
-    setSearchLoading(false)
-    dispatch(setSelect('list'))
-    dispatch(setAddressList(listAddresses))
+      const listAddresses = await getAddresses(searchValue);
+      console.log('searching...')
+      console.log(listAddresses)
+      setSearchLoading(false)
+      dispatch(setSelect('list'))
+      dispatch(setAddressList(listAddresses))
     }
     else {
       setSearchLoading(false)

@@ -152,3 +152,7 @@ export default async function addressParser(fullAddress) {
     await pool.destroy()
     return result
 }
+
+
+
+// console.log(fuseForDistricts.search('quận 1'))

@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-import  routingReducer from "./slices/routingSlice";
-import  searchReducer from "./slices/searchSlice";
-import loadingReducer from "./slices/loadingSlice";
+import routingReducer from "./slices/routingSlice";
+import searchReducer from "./slices/searchSlice";
+import popupReducer from "./slices/popupSlice"
+import loadingReducer from "./slices/loadingSlice"
 
 export const store = configureStore({
     reducer: {
         routing: routingReducer,
+        loading: loadingReducer,
         search: searchReducer,
-        loading: loadingReducer
+        popup: popupReducer
     }
 })
 

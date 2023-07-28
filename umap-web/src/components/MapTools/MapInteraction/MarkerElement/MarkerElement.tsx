@@ -7,7 +7,8 @@ import { setDestination, setDirectionInfor, setSource } from "@/redux/slices/rou
 import "node_modules/leaflet.awesome-markers";
 import getAddress from "@/services/getAddress";
 import getDirection from "@/services/getDirection";
-import { setDirectionState, setStateMenu } from "@/redux/slices/loadingSlice";
+import { setDirectionState, setEndPointState, setStartPointState, setStateMenu } from "@/redux/slices/loadingSlice";
+import { setPopUp } from "@/redux/slices/popupSlice";
 
 const redOptions = { color: 'red' }
 const limeOptions = { color: 'lime' }
@@ -93,9 +94,14 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
       dispatch(setDestination(null))
       dispatch(setDirectionInfor(null))
     }
+    dispatch(setPopUp(null))
   },[])
   const handleDrag = useCallback(async (e: any) => {
     if(type==="source") {
+        dispatch(setStartPointState(true))
+        dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
+
         const data = await getAddress(
           e.target._latlng.lng, e.target._latlng.lat
         )
@@ -104,14 +110,7 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
           address: data.data.address,
           center: [e.target._latlng.lat, e.target._latlng.lng]
         }))
-
-        console.log('source marker')
-        console.log('destination: ', destinationMarker)
-        console.log('source: ', {
-          address: data.data.address,
-          center: [e.target._latlng.lat, e.target._latlng.lng]
-        })
-
+        dispatch(setStartPointState(false))
         if(destinationMarker&&destinationMarker!=='readyToSet'){
           dispatch(setDirectionState(true))
           dispatch(setDirectionInfor(null))
@@ -127,6 +126,10 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
 
     }
     if(type==="destination"){
+        dispatch(setEndPointState(true))
+        dispatch(setDirectionInfor(null))
+        dispatch(setPopUp(null))
+
         const data = await getAddress(
           e.target._latlng.lng, e.target._latlng.lat
         )
@@ -135,13 +138,7 @@ function MarkerElement({ mapRef, item, type }: { mapRef: any, item: SearchResult
           address: data.data.address,
           center: [e.target._latlng.lat, e.target._latlng.lng]
         }))
-
-        console.log('destination marker')
-        console.log('source: ', source)
-        console.log('destination: ', {
-          address: data.data.address,
-          center: [e.target._latlng.lat, e.target._latlng.lng]
-        })
+        dispatch(setEndPointState(false))
 
         if(sourceMarker&&sourceMarker!=='readyToSet'){
           dispatch(setDirectionState(true))

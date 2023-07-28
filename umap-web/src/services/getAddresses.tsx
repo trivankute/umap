@@ -19,7 +19,7 @@ export default async function getAddresses(searchValue: string) {
   .catch(error => console.log('error', error));
 
   console.log("Response: ", response)
-  if(response.state === 'success'){
+  if(response&&response.state === 'success'){
     if(response.searchMode === 'full'){
       return response.data
     }
@@ -33,8 +33,14 @@ export default async function getAddresses(searchValue: string) {
     else if(response.searchMode === 'district'){
       return [response]
     }
+    else if(response.searchMode === 'city'){
+      return [response]
+    }
+    else if(response.searchMode === 'province'){
+      return [response]
+    }
   }
-  else if(response.length>0){
+  else if(response){
     return response
   }
 
