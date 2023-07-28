@@ -39,6 +39,8 @@ export default function MapView(props:MapViewProps) {
   const select = useAppSelector(state => state.search.select)
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
+  const directionInfor = useAppSelector(state => state.routing.directionInfor)
+
   // const directionsInfor = useAppSelector(state => state.routing.directionInfor)
   // const direction = directionsInfor ? directionsInfor.map(
   //   (item: any)=> {
@@ -113,7 +115,7 @@ export default function MapView(props:MapViewProps) {
             {/* {direction && <Polyline pathOptions={redOptions} positions={direction} />} */}
             {/* {direction} */}
             <RouteList />
-            <DirectionPopup />
+            {directionInfor&&<DirectionPopup />}
             <Event/>
           </MapContainer>
       }
