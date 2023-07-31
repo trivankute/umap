@@ -25,7 +25,7 @@ function BoxTeller() {
                             dispatch(turnOffTeller())
                             dispatch(turnOnEventBeginning())
                         }}>
-                            "End of intern"
+                            End of intern
                         </span>
                     }
                 </div>
