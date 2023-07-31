@@ -3,7 +3,6 @@ import prisma from "@/lib/prisma";
 import levenshtein from "fast-levenshtein";
 import { NextApiRequest, NextApiResponse } from "next";
 import nearestStreetFromKnownPoint from "../../../utils/nearestStreetFromKnownPoint";
-import { getParentDirectory } from "../../../updateMapData/getDates";
 import addressParser from '@/pages/api/addressParser/'
 import findWard from "@/pages/api/utils/findWard";
 import findDistrict from "@/pages/api/utils/findDistrict";
@@ -20,6 +19,10 @@ interface CustomNextApiRequest extends NextApiRequest {
 }
 
 export default async function handler(req: CustomNextApiRequest, res: NextApiResponse) {
+    res.on('close', () => {
+        prisma.$disconnect()
+        return res.end()
+    })
     // addressParser work best if it is unaccented
     if (req.method === 'POST') {
         // get text
@@ -34,6 +37,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         console.log(text)
         let resultOfParser = await addressParser(text)
         console.log(resultOfParser)
+        if (res.closed)
+            return
         let {
             housenumber, housename, street, ward, district, city
         } = resultOfParser
@@ -75,6 +80,9 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         if (housename) {
             searchMode = 'housename'
         }
+        else if (housenumber && street && ward && district) {
+            searchMode = 'full'
+        }
         else if (!housenumber && !housename && street) {
             searchMode = 'street'
         }
@@ -99,8 +107,12 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         if (searchMode === 'housename') {
             // search for only housename
             console.log(housename, street, ward, district, city)
+            let resForHousenameArray
+            if(!res.closed)
             // @ts-ignore
-            let resForHousenameArray = await findHousename(prisma, housename, street, ward, district, city)
+            resForHousenameArray = await findHousename(prisma, housename, street, ward, district, city)
+            if (res.closed)
+                return
             // return result
             if (resForHousenameArray!.length === 0) {
                 res.status(400).json({
@@ -149,6 +161,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             ////////////////////// check if district contain ward or not
             // @ts-ignore
             let resultCheckWard = await findWard(prisma, ward, district, city)
+            if (res.closed)
+                return
             if (resultCheckWard.length === 0) {
                 await prisma.$disconnect()
                 res.status(400).json({
@@ -165,6 +179,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             and st_contains(st_setsrid($1::geometry, 3857), way)
                 `, resultCheckWard[0].ward_way)
             await prisma.$disconnect()
+            if (res.closed)
+                return
             // loop points and find the nearest street also fulfil null street by nearest street
             points = points.map(async (point: any) => {
                 let nearestStreet
@@ -195,6 +211,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             // wait for all promises to resolve
             points = await Promise.all(points)
+            if (res.closed)
+                return
             // sort result from least distance
             points.sort((a: any, b: any) => {
                 return a.totalDistance - b.totalDistance
@@ -205,8 +223,10 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             select osm_id::text, "addr:housenumber", "addr:street", name from planet_osm_polygon
             where place isnull and admin_level isnull and (name notnull or "addr:street" notnull or "addr:housenumber" notnull) 
             and st_contains(st_setsrid($1::geometry, 3857), way)
-                `, district, ward)
+                `, resultCheckWard[0].ward_way)
             await prisma.$disconnect()
+            if (res.closed)
+                return
             // // loop polygons and find the nearest street also fulfil null street by nearest street
             polygons = polygons.map(async (polygon: any) => {
                 let nearestStreet
@@ -218,6 +238,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             // // wait for all promises to resolve
             polygons = await Promise.all(polygons)
+            if (res.closed)
+                return
 
             // distance variable inside everypoint
             polygons = polygons.map(async (element: any) => {
@@ -237,6 +259,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             })
             // wait for all promises to resolve
             polygons = await Promise.all(polygons)
+            if (res.closed)
+                return
             // sort result from least distance
             polygons.sort((a: any, b: any) => {
                 return a.totalDistance - b.totalDistance
@@ -383,7 +407,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
                     fullAddress += ', ' + district
                 }
                 // add city
-                fullAddress += ', ' + city + '.'
+                if(city)
+                    fullAddress += ', ' + city + '.'
                 element.fullAddress = fullAddress
 
                 return {
@@ -398,6 +423,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             )
             // wait for all promises to resolve
             result = await Promise.all(result)
+            if (res.closed)
+                return
             await prisma.$disconnect()
             res.status(200).json({
                 state: "success",
@@ -413,6 +440,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             console.log(street)
             // @ts-ignore
             let resForStreetArray = await findStreet(prisma, street, ward, district, city)
+            if (res.closed)
+                return
             // return result
             if (resForStreetArray.length === 0) {
                 res.status(400).json({
@@ -446,6 +475,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // @ts-ignore
             let resForWard = await findWard(prisma, ward, district, city)
             await prisma.$disconnect()
+            if (res.closed)
+                return
             if (resForWard.length === 0) {
                 res.status(400).json({
                     state: "failed",
@@ -478,6 +509,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // @ts-ignore
             let resForDistrict = await findDistrict(prisma, district, city)
             await prisma.$disconnect()
+            if (res.closed)
+                return
             if (resForDistrict.length === 0) {
                 res.status(400).json({
                     state: "failed",
@@ -510,6 +543,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
             // @ts-ignore
             let resForCity = await findCity(prisma, city)
             await prisma.$disconnect()
+            if (res.closed)
+                return
             if (resForCity.length === 0) {
                 res.status(400).json({
                     state: "failed",
