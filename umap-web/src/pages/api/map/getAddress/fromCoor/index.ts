@@ -11,6 +11,10 @@ interface CustomNextApiRequest extends NextApiRequest {
 }
 
 export default async function handler(req: CustomNextApiRequest, res: NextApiResponse) {
+    res.on('close', () => {
+        prisma.$disconnect()
+        return res.end()
+    })
     // only get request
     if (req.method === 'GET') {
         // get lng and lat from req.query
@@ -25,6 +29,8 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         }
         const result = await nearestAddress(prisma, lng, lat)
         await prisma.$disconnect()
+        if (res.closed)
+            return
         res.status(200).json({
             state: "success",
             message: "Your request is accepted",

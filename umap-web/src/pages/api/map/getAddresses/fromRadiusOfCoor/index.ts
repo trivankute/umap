@@ -13,31 +13,35 @@ interface CustomNextApiRequest extends NextApiRequest {
 }
 
 export default async function handler(req: CustomNextApiRequest, res: NextApiResponse) {
-    if(req.method === 'GET') {
+    res.on('close', () => {
+        prisma.$disconnect()
+        return res.end()
+    })
+    if (req.method === 'GET') {
         // get lng and lat and radius from req.query
-        const lng:string = req.query.lng
-        const lat:string = req.query.lat
-        const radius:number = parseInt(req.query.radius)
-        const typeBuilding:string = req.query.typeBuilding||"all"
-        
-        if(!lng||!lat||!radius) {
+        const lng: string = req.query.lng
+        const lat: string = req.query.lat
+        const radius: number = parseInt(req.query.radius)
+        const typeBuilding: string = req.query.typeBuilding || "all"
+
+        if (!lng || !lat || !radius) {
             res.status(400).json({
-                state:"failed",
-                message:"lng and lat and radius must be provided"
+                state: "failed",
+                message: "lng and lat and radius must be provided"
             })
             return
         }
         // limit radius to 100m
-        if (radius>100) {
+        if (radius > 100) {
             res.status(400).json({
-                state:"failed",
-                message:"radius must be less than 100m"
+                state: "failed",
+                message: "radius must be less than 100m"
             })
             return
         }
-    
+
         // find all points within 50m of this point
-        const points:any = await prisma.$queryRawUnsafe(`with 
+        const points: any = await prisma.$queryRawUnsafe(`with 
         point as (select $1::geography), 
         nearPoints as (
         select 
@@ -50,11 +54,13 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
         
         select st_x(st_transform(way,4326)) as lng, st_y(st_transform(way,4326)) as lat
          from nearPoints
-        `, "SRID=4326;POINT("+lng+" "+lat+")", radius)
+        `, "SRID=4326;POINT(" + lng + " " + lat + ")", radius)
         await prisma.$disconnect()
-    
+        if (res.closed)
+            return
+
         // find all polygons within 50m of this point
-        const polygons:any = await prisma.$queryRawUnsafe(`with
+        let polygons = await prisma.$queryRawUnsafe(`with
         point as (select $1::geography),
         nearPolygons as (
         select
@@ -67,29 +73,33 @@ export default async function handler(req: CustomNextApiRequest, res: NextApiRes
     
         select st_x(st_transform(st_centroid(way),4326)) as lng, st_y(st_transform(st_centroid(way),4326)) as lat
         from nearPolygons
-        `, "SRID=4326;POINT("+lng+" "+lat+")", radius)
+        `, "SRID=4326;POINT(" + lng + " " + lat + ")", radius)
         await prisma.$disconnect()
-        
+        if (res.closed)
+            return
+
         // // use nearestAddress to convert these lng and lat of points and polygons to addresses
-        let results:any = await forRadius(points, polygons)
-        // if typeBuilding is not all, filter results
-        if (typeBuilding!=="all") {
-            results = results.filter((result:any)=>result.type===typeBuilding)
-        }
+        let results = await forRadius(points, polygons)
         await prisma.$disconnect()
+        if (res.closed)
+            return
+        
+        // if typeBuilding is not all, filter results
+        if (typeBuilding !== "all") {
+            results = results.filter((result: any) => result.type === typeBuilding)
+        }
         // return these points and polygons
         res.status(200).json({
-            state:"success",
-            message:"Your request is accepted",
-            data:results
+            state: "success",
+            message: "Your request is accepted",
+            data: results
         })
         return
     }
-    else 
-    {
+    else {
         res.status(400).json({
-            state:"failed",
-            message:"Your request is rejected"
+            state: "failed",
+            message: "Your request is rejected"
         })
         return
     }
