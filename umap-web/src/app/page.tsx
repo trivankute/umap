@@ -17,6 +17,7 @@ import { StoreProvider } from "@/redux/provider"
 import { useAppSelector } from "@/redux/hooks";
 import { useDispatch } from "react-redux";
 import { setMenuState } from "@/redux/slices/loadingSlice";
+import TellerImage from "@/components/Special/TellerImage";
 
 //-------------------------------------------------------------------------------------------------------------------
 
@@ -31,9 +32,10 @@ export default function Home() {
   const [fetchingFilter, setFetchingFilter] = useState<false | number>(false);
   const mapRef = useRef<any>(null)
   // for sourcePoint and destinationPoint
-  const menuState = useAppSelector(state=>state.loading.menuState)
+  const menuState = useAppSelector(state => state.loading.menuState)
   const dispatch = useDispatch()
   const { source, destination } = useAppSelector(state => state.routing)
+  const teller = useAppSelector(state => state.special.teller)
 
   const MapviewProps = {
     interactMode,
@@ -77,7 +79,6 @@ export default function Home() {
   const handleSearchCancel = useCallback(() => {
     setShowDirectionBox(false);
   }, []);
-
 
   useEffect(() => {
     // right click
@@ -143,6 +144,12 @@ export default function Home() {
         {
           showFilterMenu &&
           <FilterMenu {...FilterMenuProps} />
+        }
+      </AnimatePresence>
+      <AnimatePresence>
+        {
+          teller &&
+          <TellerImage />
         }
       </AnimatePresence>
     </div>

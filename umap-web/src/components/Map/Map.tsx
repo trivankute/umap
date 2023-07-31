@@ -10,6 +10,8 @@ import { useAppSelector } from "@/redux/hooks";
 const { BaseLayer } = LayersControl;
 import DirectionPopup from '@/components/Map/DirectionPopup';
 import RouteList from './RouteList'
+import { useRouter } from "next/navigation";
+import Special from "../Special/Special/Special";
 
 const pathStyle = {
   normal: {
@@ -40,6 +42,7 @@ export default function MapView(props:MapViewProps) {
   const source = useAppSelector(state => state.routing.source)
   const destination = useAppSelector(state => state.routing.destination)
   const directionInfor = useAppSelector(state => state.routing.directionInfor)
+  const special = useAppSelector(state => state.special.special)
 
   // const directionsInfor = useAppSelector(state => state.routing.directionInfor)
   // const direction = directionsInfor ? directionsInfor.map(
@@ -50,7 +53,6 @@ export default function MapView(props:MapViewProps) {
   //   }
   // ):null
 
-  const mapRef = useRef<any>(null)
   const [view, setView] = useState<any>(false)
 
   useEffect(() => {
@@ -109,14 +111,15 @@ export default function MapView(props:MapViewProps) {
             mapRef={props.mapRef} interactMode={props.interactMode} 
             setInteractMode={props.setInteractMode} setPosition={props.setMainMarkerPosition}
             position={props.mainMarkerPosition} fetchingFilter={props.fetchingFilter} addressList={props.addressList}/>
-            {select && item && <MarkerElement mapRef={mapRef} item={item} type="select"/>}
-            {source && source!=="readyToSet" && <MarkerElement mapRef={mapRef} item={source} type="source"/>}
-            {destination && destination!=="readyToSet" && <MarkerElement mapRef={mapRef} item={destination} type="destination"/>}
+            {select && item && <MarkerElement mapRef={props.mapRef} item={item} type="select"/>}
+            {source && source!=="readyToSet" && <MarkerElement mapRef={props.mapRef} item={source} type="source"/>}
+            {destination && destination!=="readyToSet" && <MarkerElement mapRef={props.mapRef} item={destination} type="destination"/>}
             {/* {direction && <Polyline pathOptions={redOptions} positions={direction} />} */}
             {/* {direction} */}
             <RouteList />
             {directionInfor&&<DirectionPopup />}
             <Event/>
+            {special && <Special mapRef={props.mapRef}/>}
           </MapContainer>
       }
     </>
