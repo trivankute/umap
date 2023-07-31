@@ -16,6 +16,7 @@ import { LoadingForSearchBox } from '../SearchBox/SearchBox';
 import DirectionList from '../DirectionsList/DirectionList';
 import { setDirectionState, setEndPointState, setStartPointState } from '@/redux/slices/loadingSlice';
 import { setPopUp } from '@/redux/slices/popupSlice';
+import clsx from 'clsx'
 
 interface DirectionBoxProps {
     onDirectionCancel: () => void;
@@ -29,6 +30,7 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         const directionState = useAppSelector(state => state.loading.directionState)
         const startPointState = useAppSelector(state => state.loading.startPointState)
         const endPointState = useAppSelector(state => state.loading.endPointState)
+        const special = useAppSelector(state => state.special.special)
         
         const dispatch = useAppDispatch()
 
@@ -165,7 +167,9 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         exit={{opacity:0, x: -500}}
         transition={{duration: 0.5}}
         key="direction-box"
-        className="bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]">
+        className={clsx("bg-white fixed flex flex-col h-screen shadow-xl max-w-[300px] md:max-w-[400px]", {
+            "animate-bounce": special
+        })}>
         <div className="direction-tool flex items-center justify-between p-2 border-b-2">
             {
                 !directionState?
@@ -188,7 +192,6 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
         <div className="direction-box p-2 w-full">
             <form onSubmit={(e)=>{
                 e.preventDefault()
-                handleSearchSource()
             }} className="direction-start">
                 <div className="icon-start w-[40px] flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
@@ -222,7 +225,6 @@ const DirectionBox: React.FC<DirectionBoxProps> = (props) => {
 
             <form onSubmit={(e)=>{
                 e.preventDefault()
-                handleSearchDestination()
             }} className="direction-des">
                 <div className="icon-direction w-[40px] flex justify-center items-center">
                     <FontAwesomeIcon icon={faMapMarkerAlt} />

@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setState } from '@/redux/slices/routingSlice';
 import SearchHistory from './SearchHistory'
 import { saveSearchRequest } from '@/services/SearchRequest';
+import clsx from 'clsx';
 
 
 
@@ -31,6 +32,7 @@ export default function SearchBox({ onSearchDirection }: {
   const [searchLoading, setSearchLoading] = useState(false);
 
   const select = useAppSelector(state => state.search.select)
+  const special = useAppSelector(state => state.special.special)
 
   const dispatch = useAppDispatch()
 
@@ -81,11 +83,12 @@ export default function SearchBox({ onSearchDirection }: {
       exit={{ opacity: 0, y: -200 }}
       transition={{ duration: 0.5 }}
       key="search-box"
-      className="fixed flex flex-col m-2 max-w-[300px] md:max-w-[400px]"
+      className={clsx("fixed flex flex-col m-2 max-w-[300px] md:max-w-[400px]", {
+        "animate-bounce": special
+      })}
     >
       <form onSubmit={(e)=>{
         e.preventDefault()
-        handleSearch()
       }} className="inline-flex bg-white items-center border border-white shadow-xl p-2 rounded-lg overflow-hidden gap-x-2 max-w-[100%]">
         <label htmlFor="search-input"></label>
         <input
