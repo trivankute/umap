@@ -33,7 +33,7 @@ export default function RootLayout({
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className} style={{overflow: 'hidden'}}>{children}</body>
       </StoreProvider>
     </html>
   )
