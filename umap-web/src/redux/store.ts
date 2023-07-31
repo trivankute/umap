@@ -3,13 +3,15 @@ import routingReducer from "./slices/routingSlice";
 import searchReducer from "./slices/searchSlice";
 import popupReducer from "./slices/popupSlice"
 import loadingReducer from "./slices/loadingSlice"
+import specialReducer from "./slices/specialSlice"
 
 export const store = configureStore({
     reducer: {
         routing: routingReducer,
         loading: loadingReducer,
         search: searchReducer,
-        popup: popupReducer
+        popup: popupReducer,
+        special: specialReducer
     }
 })
 
