@@ -7,6 +7,10 @@ Dịch vụ bản đồ dựa trên nguồn dữ liệu mở OpenStreetMap
 
 [Demo test api vui vẻ](https://drive.google.com/file/d/1uFWvB8lY5P_8K86eaEQhOpTBB7cuZLp-/view?usp=drive_link)
 
+[Báo cáo tổng kết của Khoa](https://www.canva.com/design/DAFqGSPnvAI/EuJUWwCTDJtdxGot2VZMvA/edit)
+
+[Báo cáo tổng kết của Văn](https://www.canva.com/design/DAFqIfAZCns/uwaBYcpLMZy7plmlI8DS0g/edit)
+
 ## TechStack
 - NodeJs 
 - NextJs 
